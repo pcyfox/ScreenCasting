@@ -1,0 +1,2 @@
+include ':app',":lib_rtsp_player"
+rootProject.name = "UDP_Player"

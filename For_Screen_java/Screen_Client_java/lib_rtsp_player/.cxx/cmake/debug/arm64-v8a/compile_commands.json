@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/debug/arm64-v8a",
+  "command": "/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Drtp_player_EXPORTS -I/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/include -I/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/jni/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -frtti -fexceptions -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/rtp_player.dir/jni/PlayerBridge.cpp.o -c /Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/jni/PlayerBridge.cpp",
+  "file": "/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/jni/PlayerBridge.cpp"
+},
+
+{
+  "directory": "/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/debug/arm64-v8a",
+  "command": "/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=aarch64-none-linux-android21 --gcc-toolchain=/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Drtp_player_EXPORTS -I/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/include -I/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/jni/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/rtp_player.dir/RTPUnpac.c.o   -c /Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/RTPUnpac.c",
+  "file": "/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/RTPUnpac.c"
+}
+]

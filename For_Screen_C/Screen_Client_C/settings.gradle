@@ -1,0 +1,2 @@
+include ':app', ':lib_player'
+rootProject.name = "UDP_Player_C"

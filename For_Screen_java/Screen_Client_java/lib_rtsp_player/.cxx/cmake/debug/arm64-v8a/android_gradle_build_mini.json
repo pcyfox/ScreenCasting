@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/src/main/cpp/CMakeLists.txt",
+    "/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/build/cmake/android.toolchain.cmake",
+    "/Users/pcyfox/Library/Android/sdk/ndk/22.0.6917172/build/cmake/platforms.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/debug/arm64-v8a\" clean"
+  ],
+  "buildTargetsCommand": "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/debug/arm64-v8a\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "rtp_player-Debug-arm64-v8a": {
+      "artifactName": "rtp_player",
+      "buildCommand": "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/debug/arm64-v8a\" rtp_player",
+      "abi": "arm64-v8a",
+      "output": "/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/build/intermediates/cmake/debug/obj/arm64-v8a/librtp_player.so",
+      "runtimeFiles": []
+    }
+  }
+}

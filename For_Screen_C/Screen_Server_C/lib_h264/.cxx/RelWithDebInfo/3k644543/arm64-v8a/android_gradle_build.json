@@ -1,0 +1,42 @@
+{
+  "stringTable": {},
+  "buildFiles": [
+    "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+      "-C",
+      "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+    "-C",
+    "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "rtp_lib-RelWithDebInfo-arm64-v8a": {
+      "buildCommandComponents": [
+        "/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja",
+        "-C",
+        "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a",
+        "rtp_lib"
+      ],
+      "buildType": "release",
+      "abi": "arm64-v8a",
+      "artifactName": "rtp_lib",
+      "output": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cxx/RelWithDebInfo/3k644543/obj/arm64-v8a/librtp_lib.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {},
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

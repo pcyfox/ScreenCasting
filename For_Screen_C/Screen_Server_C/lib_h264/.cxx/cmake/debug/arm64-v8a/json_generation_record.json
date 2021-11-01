@@ -1,0 +1,182 @@
+[
+  {
+    "level": "INFO",
+    "message": "Start JSON generation. Platform version: 23 min SDK version: arm64-v8a",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Trying to locate CMake in local SDK repository.",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- CMake found in SDK at \u0027/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404\u0027 had version \u00273.10.2\u0027",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "CMake \u00273.18.1\u0027 found in SDK did not match requested version \u00273.10.2\u0027.",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "rebuilding JSON /Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a/android_gradle_build.json due to:",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- expected json /Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a/android_gradle_build.json file is not present, will remove stale json folder",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- missing previous command file /Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a/build_command.txt, will remove stale json folder",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "- command changed from previous, will remove stale json folder",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "removing stale contents from \u0027/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a\u0027",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "created folder \u0027/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a\u0027",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "executing cmake Executable : /Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/cmake\narguments : \n-H/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp\n-DCMAKE_CXX_FLAGS\u003d-frtti -fexceptions\n-DCMAKE_FIND_ROOT_PATH\u003d/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/prefab/arm64-v8a/prefab\n-DCMAKE_BUILD_TYPE\u003dDebug\n-DCMAKE_TOOLCHAIN_FILE\u003d/Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake\n-DANDROID_ABI\u003darm64-v8a\n-DANDROID_NDK\u003d/Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462\n-DCMAKE_ANDROID_ARCH_ABI\u003darm64-v8a\n-DCMAKE_ANDROID_NDK\u003d/Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cmake/debug/obj/arm64-v8a\n-DCMAKE_MAKE_PROGRAM\u003d/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_SYSTEM_VERSION\u003d23\n-DANDROID_PLATFORM\u003dandroid-21\n-B/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a\n-GNinja\njvmArgs : \n\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "[\u003d\u003d \"CMake Server\" \u003d\u003d[\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"supportedProtocolVersions\":[{\"isExperimental\":true,\"major\":1,\"minor\":1}],\"type\":\"hello\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "]\u003d\u003d \"CMake Server\" \u003d\u003d]\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\n  \"type\": \"handshake\",\n  \"cookie\": \"gradle-cmake-cookie\",\n  \"protocolVersion\": {\n    \"isExperimental\": true,\n    \"major\": 1,\n    \"minor\": 1\n  },\n  \"sourceDirectory\": \"/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp\",\n  \"buildDirectory\": \"/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/arm64-v8a\",\n  \"generator\": \"Ninja\"\n}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"gradle-cmake-cookie\",\"inReplyTo\":\"handshake\",\"type\":\"reply\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\n  \"type\": \"configure\",\n  \"cacheArguments\": [\n    \"\",\n    \"-DCMAKE_CXX_FLAGS\\u003d-frtti -fexceptions\",\n    \"-DCMAKE_FIND_ROOT_PATH\\u003d/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/cmake/debug/prefab/arm64-v8a/prefab\",\n    \"-DCMAKE_BUILD_TYPE\\u003dDebug\",\n    \"-DCMAKE_TOOLCHAIN_FILE\\u003d/Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake\",\n    \"-DANDROID_ABI\\u003darm64-v8a\",\n    \"-DANDROID_NDK\\u003d/Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462\",\n    \"-DCMAKE_ANDROID_ARCH_ABI\\u003darm64-v8a\",\n    \"-DCMAKE_ANDROID_NDK\\u003d/Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462\",\n    \"-DCMAKE_EXPORT_COMPILE_COMMANDS\\u003dON\",\n    \"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\\u003d/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cmake/debug/obj/arm64-v8a\",\n    \"-DCMAKE_MAKE_PROGRAM\\u003d/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja\",\n    \"-DCMAKE_SYSTEM_NAME\\u003dAndroid\",\n    \"-DCMAKE_SYSTEM_VERSION\\u003d23\",\n    \"-DANDROID_PLATFORM\\u003dandroid-21\"\n  ]\n}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"CMake Error at /Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake:100 (message):\\n  Could not find toolchain file:\\n  /Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake\\nCall Stack (most recent call first):\\n  CMakeLists.txt:6 (project)\\n\\n\",\"title\":\"Error\",\"type\":\"message\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "ERROR",
+    "message": "CMake Error at /Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake:100 (message):\n  Could not find toolchain file:\n  /Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake\nCall Stack (most recent call first):\n  CMakeLists.txt:6 (project)\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage\",\"title\":\"Error\",\"type\":\"message\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "ERROR",
+    "message": "CMake Error: CMAKE_C_COMPILER not set, after EnableLanguage",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage\",\"title\":\"Error\",\"type\":\"message\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "ERROR",
+    "message": "CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"progressCurrent\":1000,\"progressMaximum\":1000,\"progressMessage\":\"Configuring\",\"progressMinimum\":0,\"type\":\"progress\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"inReplyTo\":\"configure\",\"message\":\"Configuring incomplete, errors occurred!\",\"type\":\"message\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "Configuring incomplete, errors occurred!",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "{\"cookie\":\"\",\"errorMessage\":\"Configuration failed.\",\"inReplyTo\":\"configure\",\"type\":\"error\"}\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "ERROR",
+    "message": "Configuration failed.",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  },
+  {
+    "level": "INFO",
+    "message": "JSON generation completed with problem. Exception: com.android.ide.common.process.ProcessException: Error configuring CMake server (/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin).\r\nCMake Error at /Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake:100 (message):\n  Could not find toolchain file:\n  /Users/panchengyao/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake\nCall Stack (most recent call first):\n  CMakeLists.txt:6 (project)\n\n\nCMake Error: CMAKE_C_COMPILER not set, after EnableLanguage\nCMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage\nConfiguring incomplete, errors occurred!\n",
+    "file": "/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp/CMakeLists.txt",
+    "tag": "debug|arm64-v8a"
+  }
+]

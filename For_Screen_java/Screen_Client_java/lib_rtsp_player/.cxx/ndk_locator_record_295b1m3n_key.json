@@ -1,0 +1,12 @@
+{
+  "ndkDirProperty": "/Users/pcyfox/Library/Android/sdk/ndk/21.3.6528147",
+  "sdkFolder": "/Users/pcyfox/Library/Android/sdk",
+  "sideBySideNdkFolderNames": [
+    "22.0.6917172",
+    "21.3.6528147",
+    "android-ndk-r16b",
+    "android-ndk-r14b",
+    "21.1.6352462",
+    "android-ndk-r10e"
+  ]
+}

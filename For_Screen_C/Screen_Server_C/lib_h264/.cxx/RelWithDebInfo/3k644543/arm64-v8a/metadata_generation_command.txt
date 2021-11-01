@@ -1,0 +1,24 @@
+                    Executable : /Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/cmake
+arguments : 
+-H/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/src/main/cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=21
+-DANDROID_ABI=arm64-v8a
+-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a
+-DANDROID_NDK=/Users/panchengyao/Library/Android/sdk/ndk/21.4.7075529
+-DCMAKE_ANDROID_NDK=/Users/panchengyao/Library/Android/sdk/ndk/21.4.7075529
+-DCMAKE_TOOLCHAIN_FILE=/Users/panchengyao/Library/Android/sdk/ndk/21.4.7075529/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja
+-DCMAKE_CXX_FLAGS=-frtti -fexceptions
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cxx/RelWithDebInfo/3k644543/obj/arm64-v8a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cxx/RelWithDebInfo/3k644543/obj/arm64-v8a
+-DCMAKE_BUILD_TYPE=RelWithDebInfo
+-B/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a
+-GNinja
+-DANDROID_PLATFORM=android-21
+jvmArgs : 
+
+
+                    Build command args: []
+                    Version: 2

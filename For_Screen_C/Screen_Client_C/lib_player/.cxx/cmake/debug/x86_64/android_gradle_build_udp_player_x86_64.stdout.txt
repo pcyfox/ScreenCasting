@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64'
+ninja: no work to do.

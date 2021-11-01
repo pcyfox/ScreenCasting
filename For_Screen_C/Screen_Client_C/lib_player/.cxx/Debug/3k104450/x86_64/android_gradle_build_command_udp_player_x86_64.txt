@@ -1,0 +1,7 @@
+Executable : /Users/panchengyao/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja
+arguments : 
+-C
+/Volumes/文件/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/Debug/3k104450/x86_64
+udp_player
+jvmArgs : 
+

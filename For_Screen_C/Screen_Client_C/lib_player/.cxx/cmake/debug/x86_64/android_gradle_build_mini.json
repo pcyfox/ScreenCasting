@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/CMakeLists.txt",
+    "/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake",
+    "/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/build/cmake/platforms.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64\" clean"
+  ],
+  "buildTargetsCommand": "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "udp_player-Debug-x86_64": {
+      "artifactName": "udp_player",
+      "buildCommand": "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64\" udp_player",
+      "abi": "x86_64",
+      "output": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/build/intermediates/cmake/debug/obj/x86_64/libudp_player.so",
+      "runtimeFiles": []
+    }
+  }
+}

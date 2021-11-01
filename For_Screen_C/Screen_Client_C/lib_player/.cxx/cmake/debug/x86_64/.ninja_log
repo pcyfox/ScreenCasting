@@ -1,0 +1,22 @@
+# ninja log v5
+1	61	1616990047	CMakeFiles/udp_player.dir/player/StateListener.cpp.o	6f088543bf7ba5fb
+1	83	1616990047	CMakeFiles/udp_player.dir/player/AVPacket.cpp.o	623517573df00922
+1	135	1616990047	CMakeFiles/udp_player.dir/player/RTPUnpack.c.o	cde914a10c111768
+0	548	1616990048	CMakeFiles/udp_player.dir/jni/PlayerBridge.cpp.o	2b383a9bb07b7056
+1	587	1616990048	CMakeFiles/udp_player.dir/player/PlayerInfo.cpp.o	6218b4c8af841790
+0	654	1616990048	CMakeFiles/udp_player.dir/player/Player.cpp.o	ff31cbb42aa78b3d
+654	734	1616990048	/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/build/intermediates/cmake/debug/obj/x86_64/libudp_player.so	7451073adb6cb266
+0	8	0	clean	4b09511e43c6816c
+0	5	0	clean	4b09511e43c6816c
+5	96	1617085915	CMakeFiles/udp_player.dir/player/StateListener.cpp.o	b143f10a75fa4c9b
+4	112	1617085915	CMakeFiles/udp_player.dir/player/AVPacket.cpp.o	1627f6bca0b8c879
+3	118	1617085915	CMakeFiles/udp_player.dir/jni/PlayerBridgeEnv.cpp.o	b727b17589c50c49
+6	189	1617085915	CMakeFiles/udp_player.dir/player/RTPUnpack.c.o	5f8d87729cf5f245
+2	744	1617085916	CMakeFiles/udp_player.dir/jni/PlayerBridge.cpp.o	5745f5bfc05aa58b
+5	811	1617085916	CMakeFiles/udp_player.dir/player/PlayerInfo.cpp.o	8357a97f55284393
+4	883	1617085916	CMakeFiles/udp_player.dir/player/Player.cpp.o	1d6810c60912749b
+883	988	1617085916	/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/build/intermediates/cmake/debug/obj/x86_64/libudp_player.so	baa6d2ff6333c499
+2	502	1626062965	CMakeFiles/udp_player.dir/jni/PlayerBridge.cpp.o	5745f5bfc05aa58b
+3	534	1626062965	CMakeFiles/udp_player.dir/player/PlayerInfo.cpp.o	8357a97f55284393
+2	602	1626062965	CMakeFiles/udp_player.dir/player/Player.cpp.o	1d6810c60912749b
+602	688	1626062965	/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/build/intermediates/cmake/debug/obj/x86_64/libudp_player.so	baa6d2ff6333c499

@@ -1,0 +1,77 @@
+{
+  "stringTable": {
+    "0": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64",
+    "1": "--target=x86_64-none-linux-android21 --gcc-toolchain=/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dudp_player_EXPORTS -I/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/include -I/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/include -I/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/jni/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -frtti -fexceptions -O0 -fno-limit-debug-info -fPIC",
+    "2": "--target=x86_64-none-linux-android21 --gcc-toolchain=/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dudp_player_EXPORTS -I/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/include -I/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/include -I/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/jni/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -O0 -fno-limit-debug-info -fPIC"
+  },
+  "buildFiles": [
+    "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/CMakeLists.txt",
+    "/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/build/cmake/android.toolchain.cmake",
+    "/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/build/cmake/platforms.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64\" clean"
+  ],
+  "buildTargetsCommand": "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja  -C \"/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "udp_player-Debug-x86_64": {
+      "buildCommand": "/Users/pcyfox/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/debug/x86_64\" udp_player",
+      "buildType": "debug",
+      "toolchain": "3819740912",
+      "abi": "x86_64",
+      "artifactName": "udp_player",
+      "files": [
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/RTPUnpack.c",
+          "flagsOrdinal": 2,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/jni/PlayerBridge.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/jni/PlayerBridgeEnv.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/Player.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/AVPacket.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/StateListener.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        },
+        {
+          "src": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/src/main/cpp/player/PlayerInfo.cpp",
+          "flagsOrdinal": 1,
+          "workingDirectoryOrdinal": 0
+        }
+      ],
+      "headers": [],
+      "output": "/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/build/intermediates/cmake/debug/obj/x86_64/libudp_player.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "3819740912": {
+      "cCompilerExecutable": "/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang",
+      "cppCompilerExecutable": "/Users/pcyfox/Library/Android/sdk/ndk/21.1.6352462/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
