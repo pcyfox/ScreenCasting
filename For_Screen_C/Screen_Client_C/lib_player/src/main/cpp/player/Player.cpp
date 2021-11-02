@@ -112,8 +112,9 @@ void *Player::Decode(void *info) {
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
             if (inputBuf != NULL && length <= out_size) {
                 //clear buf
-                memset(inputBuf, 0, out_size);
-                // 将待解码的数据copy到硬件中
+                //memset(inputBuf, 0, out_size);
+
+                // 将待解码的数据copy到解码缓冲区中
                 memcpy(inputBuf, packet->data, length);
 
                 int64_t pts = packet->pts;
@@ -279,16 +280,14 @@ int Player::Pause(int delay) {
 
 int Player::Stop() {
     LOGI("--------Stop()  called-------");
-    if (playerInfo->GetPlayState() != STARTED) {
+    if (!playerInfo||playerInfo->GetPlayState() != STARTED) {
         LOGE("playerInfo is not started");
         return PLAYER_RESULT_ERROR;
     }
     playerInfo->SetPlayState(STOPPED);
     AMediaCodec_stop(playerInfo->AMediaCodec);
-    if (playerInfo != NULL) {
-        delete playerInfo;
-        playerInfo = NULL;
-    }
+    delete playerInfo;
+    playerInfo = NULL;
     LOGD("--------Stop Over------");
     return PLAYER_RESULT_OK;
 }

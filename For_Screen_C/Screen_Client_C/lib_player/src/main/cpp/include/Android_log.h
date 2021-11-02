@@ -1,4 +1,4 @@
-#define TAG "udp-player"
+#define TAG "screen-client"
 
 #include <android/log.h>
 

@@ -29,7 +29,6 @@ void *ChangeState(void *s) {
         if (ret == 0 && env) {
             int iState = *(int *) s;
             env->CallVoidMethod(playerEnv.object, playerEnv.jMid_onStateChangeId, iState);
-
         } else {
             LOGE("onStateChange() get jEnv error");
         }
@@ -54,7 +53,6 @@ extern "C"
 JNIEXPORT jint JNICALL
 Java_com_taike_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
                                                   jboolean is_debug) {
-
     player = new Player();
     player->SetDebug(is_debug);
     playerEnv.object = env->NewGlobalRef(thiz);
@@ -93,11 +91,11 @@ JNIEXPORT jint JNICALL
 Java_com_taike_lib_1udp_1player_NativePlayer_changeSurface(JNIEnv *env, jobject thiz,
                                                            jobject surface, jint w,
                                                            jint h) {
-
     if (player == NULL) {
         LOGE("player not init,it is null");
         return PLAYER_RESULT_ERROR;
     }
+
     ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
     if (!window) {
         PLAYER_RESULT_ERROR;
@@ -109,7 +107,6 @@ Java_com_taike_lib_1udp_1player_NativePlayer_changeSurface(JNIEnv *env, jobject 
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_taike_lib_1udp_1player_NativePlayer_play(JNIEnv *env, jobject thiz) {
-
     if (player == NULL) {
         LOGE("player not init,it is null");
         return PLAYER_RESULT_ERROR;
@@ -124,7 +121,7 @@ int stop() {
     }
     int ret = player->Stop();
     if (ret == PLAYER_RESULT_OK) {
-        delete &player;
+        delete player;
         player = NULL;
     }
     return ret;
@@ -170,7 +167,6 @@ Java_com_taike_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thiz
 
 JNIEXPORT void JNICALL
 Java_com_taike_lib_1udp_1player_NativePlayer_release(JNIEnv *env, jobject thiz) {
-
     stop();
     delete &playerEnv;
 }

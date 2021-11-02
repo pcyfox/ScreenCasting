@@ -15,8 +15,6 @@ class Player {
 private:
     bool isDebug = false;
 
-
-
 public:
     Player();
 
@@ -38,6 +36,7 @@ public:
     int Stop();
 
     void SetStateChangeListener(void (*listener)(PlayState));
+
 
 
 private:
