@@ -10,7 +10,9 @@ import java.nio.ByteBuffer
 class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) :
     DisplayBase(context, false) {
     var isStop = false
-    private val sender = Sender(ip, port, SocketType.UDP, maxPacketLength = maxPacketLen)
+
+    private val sender = Sender(ip, port, SocketType.UDP,isLiteMod = true, maxPacketLength = maxPacketLen)
+
     override fun prepareAudioRtp(isStereo: Boolean, sampleRate: Int) {
     }
 
@@ -24,6 +26,7 @@ class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) 
     }
 
     override fun stopStreamRtp() {
+        sender.stop()
         isStop = true
     }
 

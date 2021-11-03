@@ -1,5 +1,4 @@
 package com.pcyfox.h264;
-
 public class H264HandlerNative {
     static {
         System.loadLibrary("rtp_lib");

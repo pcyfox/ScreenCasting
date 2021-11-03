@@ -92,7 +92,7 @@ Java_com_pcyfox_h264_H264HandlerNative_packH264ToRTP(JNIEnv *env, jobject thiz,
                                                      jint max_pkt_len, jlong
                                                      ts,
                                                      jlong clock,
-                                                     jboolean isAutoPackSPS_PPS,
+                                                     jboolean isLiteMod,
                                                      jobject callback) {
 
     if (jOnCallbackMid == NULL && callback != NULL) {
@@ -103,7 +103,7 @@ Java_com_pcyfox_h264_H264HandlerNative_packH264ToRTP(JNIEnv *env, jobject thiz,
     }
 
     return PackRTP(ByteArrayToChars(env, h264_pkt, length), length, max_pkt_len, ts, clock,
-                   isAutoPackSPS_PPS,
+                   isLiteMod,
                    RTPCallback);
 
 }

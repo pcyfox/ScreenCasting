@@ -283,7 +283,10 @@ int PackRTP(unsigned char *h264Pkt,
             int isLiteMod,
             Callback callback) {
     int8_t type = h264Pkt[4] & 0x1F;
+
+    LOGD("isLiteMod=%d",isLiteMod);
     headerLen = isLiteMod == 1 ? RTP_LITE_HEADER_LEN : RTP_HEADER_LEN;
+
     //如果遇到关键帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包
     if (type == 5) {
         callback(GetSPS_PPS_RTP_STAP_Pkt(ts, clock));

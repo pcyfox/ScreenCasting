@@ -158,7 +158,9 @@ int UnPacket(unsigned char *rtpPacket, const unsigned int length, const unsigned
         receiveDataInfo->startTime = getCurrentTime();
         receiveDataInfo->receiveCount = 0;
     }
+
     unsigned int headerLen = isLiteMod == 1 ? RTP_LITE_HEADER_LEN : RTP_HEAD_LEN;
+    LOGD("isLiteMod=%d",isLiteMod);
     int offHeadSize = length - headerLen;
     if (offHeadSize < 2) {
         LOGE("illegal data,packet is too small");

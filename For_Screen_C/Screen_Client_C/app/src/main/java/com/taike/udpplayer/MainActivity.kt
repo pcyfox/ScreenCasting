@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         playerView?.run {
             if (isPlaying) {
                 Log.e(TAG, "configAndStart() called player is playing")
-                return;
+                return
             }
             config(multiCastHost, videoPort, maxFrameLen)
             postDelayed({

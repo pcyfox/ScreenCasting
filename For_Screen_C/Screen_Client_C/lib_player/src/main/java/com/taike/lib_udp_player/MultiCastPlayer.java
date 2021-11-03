@@ -96,7 +96,7 @@ public class MultiCastPlayer {
         while (isPlaying) {
             try {
                 multicastSocket.receive(dataPacket);
-                nativeUDPPlayer.handlePkt(receiveByte, dataPacket.getLength(), maxFrameLen, true);
+                nativeUDPPlayer.handlePkt(receiveByte, dataPacket.getLength(), maxFrameLen, false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
