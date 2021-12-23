@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <com.taike.lib_udp_player.MultiCastPlayerView
+        <com.pcyfox.lib_udp_player.MultiCastPlayerView
             android:id="@+id/view_mcpv"
             android:layout_width="0dp"
             android:layout_height="0dp"

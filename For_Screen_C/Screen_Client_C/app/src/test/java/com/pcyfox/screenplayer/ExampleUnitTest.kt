@@ -1,4 +1,4 @@
-package com.taike.udpplayer
+package com.pcyfox.screenplayer
 
 import org.junit.Test
 

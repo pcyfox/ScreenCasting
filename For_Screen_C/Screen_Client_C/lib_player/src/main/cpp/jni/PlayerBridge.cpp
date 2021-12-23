@@ -51,7 +51,7 @@ const void *onStateChange(PlayState state) {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
                                                   jboolean is_debug) {
     player = new Player();
     player->SetDebug(is_debug);
@@ -67,7 +67,7 @@ Java_com_taike_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject thiz,
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject thiz,
                                                           jobject surface,
                                                           jint w, jint h) {
 
@@ -88,7 +88,7 @@ Java_com_taike_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject t
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_changeSurface(JNIEnv *env, jobject thiz,
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_changeSurface(JNIEnv *env, jobject thiz,
                                                            jobject surface, jint w,
                                                            jint h) {
     if (player == NULL) {
@@ -106,7 +106,7 @@ Java_com_taike_lib_1udp_1player_NativePlayer_changeSurface(JNIEnv *env, jobject 
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_play(JNIEnv *env, jobject thiz) {
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_play(JNIEnv *env, jobject thiz) {
     if (player == NULL) {
         LOGE("player not init,it is null");
         return PLAYER_RESULT_ERROR;
@@ -130,7 +130,7 @@ int stop() {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_stop(JNIEnv *env, jobject thiz) {
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_stop(JNIEnv *env, jobject thiz) {
     return stop();
 }
 
@@ -138,7 +138,7 @@ Java_com_taike_lib_1udp_1player_NativePlayer_stop(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_pause(JNIEnv *env, jobject thiz) {
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_pause(JNIEnv *env, jobject thiz) {
 
     if (player == NULL) {
         LOGE("player not init,it is null");
@@ -149,7 +149,7 @@ Java_com_taike_lib_1udp_1player_NativePlayer_pause(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thiz,
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thiz,
                                                        jbyteArray pkt, int len,
                                                        int maxFrameLen,
                                                        jboolean isLiteMode) {
@@ -166,7 +166,7 @@ Java_com_taike_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thiz
 }extern "C"
 
 JNIEXPORT void JNICALL
-Java_com_taike_lib_1udp_1player_NativePlayer_release(JNIEnv *env, jobject thiz) {
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_release(JNIEnv *env, jobject thiz) {
     stop();
     delete &playerEnv;
 }

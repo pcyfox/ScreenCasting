@@ -1,15 +1,13 @@
-package com.taike.udpplayer
+package com.pcyfox.screenplayer
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
-import android.view.SurfaceView
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.taike.lib_udp_player.MultiCastPlayer
-import com.taike.lib_udp_player.MultiCastPlayerView
+import com.pcyfox.lib_udp_player.MultiCastPlayerView
 
 class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"

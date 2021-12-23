@@ -140,8 +140,8 @@ class ScreenRecorderService : Service() {
         private var requestDisplayIntent: Intent? = null
         private var w = 1920
         private var h = 1080
-        private var fps =25
-        private var bitRate: Int = (w * h ).toInt()
+        private var fps =20
+        private var bitRate: Int = (w * h *0.3f).toInt()
         private var ip: String = Sender.MULTI_CAST_IP
         private var port: Int = Sender.TARGET_PORT
         private const val KEY_STATE = "KEY_STATE"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.taike.udpplayer">
+    package="com.pcyfox.screenplayer">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -14,7 +14,7 @@
         android:theme="@style/Theme.UDP_Player">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.pcyfox.screenplayer.MainActivity"
             android:screenOrientation="landscape"
             android:turnScreenOn="true">
 

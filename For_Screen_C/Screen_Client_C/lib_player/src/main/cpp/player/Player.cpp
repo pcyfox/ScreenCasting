@@ -293,13 +293,10 @@ int Player::Stop() {
 }
 
 
-void unpackCallback(UnpackResult result) {
+void unpackCallback(H264Pkt result) {
     auto *avPacket = new AVPacket();
     avPacket->data = result->data;
     avPacket->size = result->length;
-    avPacket->nalu_type = result->packet_NAL_unit_type;
-    avPacket->cq = result->curr_Sq;
-    avPacket->pkt_interval = result->pkt_interval;
     playerInfo->packetQueue.put(avPacket);
     free(result);
     result = NULL;

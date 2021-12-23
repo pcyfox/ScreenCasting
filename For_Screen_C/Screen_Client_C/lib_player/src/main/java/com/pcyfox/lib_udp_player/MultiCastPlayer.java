@@ -1,4 +1,4 @@
-package com.taike.lib_udp_player;
+package com.pcyfox.lib_udp_player;
 
 import android.os.Handler;
 import android.os.HandlerThread;

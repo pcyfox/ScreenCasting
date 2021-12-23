@@ -31,6 +31,7 @@ class Sender(
         h264HandlerNative.init(true, ip, port, type.ordinal)
         h264HandlerNative.startSend()
         val handlerThread = HandlerThread("SenderHandler")
+        handlerThread.start();
         handler = Handler(handlerThread.looper)
 
         if (h264File == null) {

@@ -9,7 +9,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.taike.udpplayer"
+        applicationId "com.pcyfox.screenplayer"
         minSdkVersion 21
         targetSdkVersion  30
         versionCode 1
@@ -48,9 +48,9 @@ dependencies {
     //https://github.com/Blankj/AndroidUtilCode
     implementation 'com.blankj:utilcode:1.30.0'
 
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation project(path: ':lib_player')
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

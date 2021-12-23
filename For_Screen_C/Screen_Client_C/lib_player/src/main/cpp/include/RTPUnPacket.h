@@ -6,17 +6,23 @@
 #define UDP_PLAYER_RTPUNPACKET_H
 
 
-struct RtpUnpackResult {
+struct RtpPacketInfo {
     unsigned int length;
     unsigned int pkt_interval;
     unsigned long long curr_Sq;
-    unsigned char packet_NAL_unit_type;
+    unsigned char type;
+} typedef *RTPPkt;
+
+
+
+struct H264Packet {
+    unsigned int length;
+    unsigned char type;
     unsigned char *data;
-} typedef *UnpackResult;
+} typedef *H264Pkt;
 
 
-typedef void (*Callback)(UnpackResult
-result);
+typedef void (*Callback)(H264Pkt  pkt);
 
 int UnPacket(unsigned char *rtpPacket, const unsigned int length, const unsigned int maxFrameLen,
              unsigned int isLiteMod,
