@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 public abstract class BaseEncoder implements EncoderCallback {
 
     private static final String TAG = "BaseEncoder";
-    private MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
+    private final MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
     protected MediaCodec codec;
     protected long presentTimeUs;
     protected volatile boolean running = false;
@@ -35,12 +35,14 @@ public abstract class BaseEncoder implements EncoderCallback {
     public void stop() {
         running = false;
         stopImp();
-        try {
-            codec.stop();
-            codec.release();
-            codec = null;
-        } catch (IllegalStateException | NullPointerException e) {
-            codec = null;
+        if (codec != null) {
+            try {
+                codec.stop();
+                codec.release();
+                codec = null;
+            } catch (IllegalStateException | NullPointerException e) {
+                codec = null;
+            }
         }
     }
 
@@ -48,6 +50,7 @@ public abstract class BaseEncoder implements EncoderCallback {
 
     /**
      * 获取编码后数据
+     *
      * @param frame
      * @throws IllegalStateException
      */
@@ -121,11 +124,7 @@ public abstract class BaseEncoder implements EncoderCallback {
     public void inputAvailable(@NonNull MediaCodec mediaCodec, int inBufferIndex, Frame frame)
             throws IllegalStateException {
         ByteBuffer byteBuffer;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            byteBuffer = mediaCodec.getInputBuffer(inBufferIndex);
-        } else {
-            byteBuffer = mediaCodec.getInputBuffers()[inBufferIndex];
-        }
+        byteBuffer = mediaCodec.getInputBuffer(inBufferIndex);
         processInput(byteBuffer, mediaCodec, inBufferIndex, frame);
     }
 
@@ -133,12 +132,7 @@ public abstract class BaseEncoder implements EncoderCallback {
     public void outputAvailable(@NonNull MediaCodec mediaCodec, int outBufferIndex,
                                 @NonNull MediaCodec.BufferInfo bufferInfo) throws IllegalStateException {
         ByteBuffer byteBuffer;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            byteBuffer = mediaCodec.getOutputBuffer(outBufferIndex);
-        } else {
-            byteBuffer = mediaCodec.getOutputBuffers()[outBufferIndex];
-        }
-
+        byteBuffer = mediaCodec.getOutputBuffer(outBufferIndex);
 //        Log.d(TAG, "outputAvailable() byteBuffer size="+bufferInfo.size);
         processOutput(byteBuffer, mediaCodec, outBufferIndex, bufferInfo);
     }

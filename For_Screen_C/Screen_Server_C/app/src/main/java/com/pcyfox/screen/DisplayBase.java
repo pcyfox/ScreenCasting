@@ -16,6 +16,7 @@ import android.view.SurfaceView;
 
 import androidx.annotation.RequiresApi;
 
+import com.blankj.utilcode.util.ConvertUtils;
 import com.pcyfox.encoder.Frame;
 import com.pcyfox.encoder.audio.AudioEncoder;
 import com.pcyfox.encoder.audio.GetAacData;
@@ -98,8 +99,9 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     }
 
     public boolean prepareVideo(int width, int height, int fps, int bitrate, int rotation, int dpi) {
-        Log.d(TAG, "prepareVideo() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], bitrate = [" + bitrate + "], rotation = [" + rotation + "], dpi = [" + dpi + "]");
-        return prepareVideo(width, height, fps, bitrate, rotation, dpi, -1, -1, 2);
+        String br = ConvertUtils.byte2FitMemorySize(bitrate);
+        Log.d(TAG, "prepareVideo() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], bitrate = [" + br + "], rotation = [" + rotation + "], dpi = [" + dpi + "]");
+        return prepareVideo(width, height, fps, bitrate, rotation, dpi, -1, -1, 1);
     }
 
     protected abstract void prepareAudioRtp(boolean isStereo, int sampleRate);
@@ -231,7 +233,7 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     }
 
     private void startEncoders(int resultCode, Intent data) {
-        Log.d(TAG, "startEncoders() called with: resultCode = [" + resultCode + "], data = [" + data + "],dpi="+dpi);
+        Log.d(TAG, "startEncoders() called with: resultCode = [" + resultCode + "], data = [" + data + "],dpi=" + dpi);
         if (data == null) {
             throw new RuntimeException("You need send intent data before startRecord or startStream");
         }

@@ -50,7 +50,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     private int bitRate = 1200 * 1024; //in kbps
     private int rotation = 90;
 
-    private final int iFrameInterval = 2;
+    private final int iFrameInterval = 1;
     //for disable video
     private final FpsLimiter fpsLimiter = new FpsLimiter();
     private String type = CodecUtil.H264_MIME;
@@ -76,6 +76,8 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     public boolean prepareVideoEncoder(int width, int height, int fps, int bitRate, int rotation,
                                        boolean hardwareRotation, int iFrameInterval, FormatVideoEncoder formatVideoEncoder,
                                        int avcProfile, int avcProfileLevel) {
+
+        Log.d(TAG, "prepareVideoEncoder() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], bitRate = [" + bitRate + "], rotation = [" + rotation + "], hardwareRotation = [" + hardwareRotation + "], iFrameInterval = [" + iFrameInterval + "], formatVideoEncoder = [" + formatVideoEncoder + "], avcProfile = [" + avcProfile + "], avcProfileLevel = [" + avcProfileLevel + "]");
         this.width = width;
         this.height = height;
         this.fps = fps;
@@ -116,8 +118,9 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             Log.i(TAG, "Prepare video info: " + this.formatVideoEncoder.name() + ", " + resolution);
             videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     this.formatVideoEncoder.getFormatCodec());
-            videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
+          //  videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
             videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+            videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE,MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
             videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
             videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
             if (hardwareRotation) {
@@ -333,6 +336,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
      */
     @Override
     protected MediaCodecInfo chooseEncoder(String mime) {
+        Log.d(TAG, "chooseEncoder() called with: mime = [" + mime + "]");
         List<MediaCodecInfo> mediaCodecInfoList;
         if (force == CodecUtil.Force.HARDWARE) {
             mediaCodecInfoList = CodecUtil.getAllHardwareEncoders(mime);

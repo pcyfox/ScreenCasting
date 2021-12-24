@@ -13,8 +13,10 @@
 
 #define  TIME_BASE 1000000000L
 #define  RTP_HEADER_LEN  12
-//RTP 青春版
-#define  RTP_LITE_HEADER_LEN  2
+
+
+
+
 
 /**
 ******************************************************************
@@ -133,7 +135,7 @@ unsigned int min(unsigned int a, unsigned int b) {
     return a < b ? a : b;
 }
 
-void SetLong(unsigned char *buffer, unsigned long n, int begin, int end) {
+void setLong(unsigned char *buffer, unsigned long n, int begin, int end) {
     for (end--; end >= begin; end--) {
         buffer[end] = n % 256;
         n >>= 8;
@@ -163,11 +165,7 @@ int GetStartCodeLen(const unsigned char *pkt) {
 
 void PrintCurrentSq(Result result) {
     unsigned long currSq;
-    if (headerLen == RTP_LITE_HEADER_LEN) {
-        currSq = ((result->data[0] & 0xFF) << 8) + (result->data[1] & 0xFF);
-    } else {
-        currSq = ((result->data[2] & 0xFF) << 8) + (result->data[3] & 0xFF);
-    }
+    currSq = ((result->data[2] & 0xFF) << 8) + (result->data[3] & 0xFF);
     LOGD("----------currentSq------------%ld", currSq);
 }
 
@@ -193,7 +191,7 @@ AddRTPLiteHeader(const unsigned char *data, unsigned int len) {
      */
     unsigned char *RTPData = result->data;
     //sequence number
-    SetLong(RTPData, ++cq, 0, 2);
+    setLong(RTPData, ++cq, 0, 2);
     result->h264StartCodeLen = GetStartCodeLen(data);
     memcpy(RTPData + headerLen, data + result->h264StartCodeLen, len);
     return result;
@@ -246,15 +244,15 @@ AddRTPHeader(const unsigned long ts, unsigned long clock, const unsigned char *d
     RTPData[0] = 0x80;//V P X CC->10 0 0 0000=0x80\十进制的28
     RTPData[1] = 96;
     //sequence number
-    SetLong(RTPData, ++cq, 2, 4);
+    setLong(RTPData, ++cq, 2, 4);
     //添加4bit的的时间错
     unsigned long timestamp = ts * clock / TIME_BASE;
-    SetLong(RTPData, timestamp, 4, 8);
+    setLong(RTPData, timestamp, 4, 8);
     if (ssrc == 0) {
         ssrc = rand();
     }
     //同步信源(SSRC)标识符：占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC
-    SetLong(RTPData, ssrc, 8, 12);
+    setLong(RTPData, ssrc, 8, 12);
     int startCodeLen = GetStartCodeLen(data);
     result->h264StartCodeLen = startCodeLen;
     memcpy(RTPData + headerLen, data + startCodeLen, len);
@@ -264,8 +262,7 @@ AddRTPHeader(const unsigned long ts, unsigned long clock, const unsigned char *d
 
 Result GetSPS_PPS_RTP_STAP_Pkt(const unsigned long ts, unsigned long clock) {
     if (stapA != NULL) {
-        return headerLen == RTP_LITE_HEADER_LEN ? AddRTPLiteHeader(stapA->pkt, stapA->len)
-                                                : AddRTPHeader(ts, clock, stapA->pkt, stapA->len);
+        return AddRTPHeader(ts, clock, stapA->pkt, stapA->len);
     }
     return NULL;
 }
@@ -280,28 +277,26 @@ int PackRTP(unsigned char *h264Pkt,
             const unsigned int maxPktLen,
             const unsigned long ts,
             unsigned int clock,
-            int isLiteMod,
+            int tag,
             Callback callback) {
+
     int8_t type = h264Pkt[4] & 0x1F;
+    headerLen = RTP_HEADER_LEN;
 
-    LOGD("isLiteMod=%d",isLiteMod);
-    headerLen = isLiteMod == 1 ? RTP_LITE_HEADER_LEN : RTP_HEADER_LEN;
-
-    //如果遇到关键帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包
+    //如果遇到I帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包发送出去
     if (type == 5) {
         callback(GetSPS_PPS_RTP_STAP_Pkt(ts, clock));
     }
+
     if (cq >= ULONG_MAX) {
         cq = 0;
     }
-    // 小于规定的最大值，直接打包成RTP包，不管是什么类型的帧
+    // 小于规定的最，直接打包成RTP包，不管是什么类型的帧,即单NALU模式
     if (length <= maxPktLen - headerLen) {
         //  printCharsHex(h264Pkt, length, 20, "FU-A Raw Small");
-
-        Result result = isLiteMod ? AddRTPLiteHeader(h264Pkt, length) : AddRTPHeader(ts, clock,
-                                                                                     h264Pkt,
-                                                                                     length);
-
+        Result result = AddRTPHeader(ts, clock,
+                                     h264Pkt,
+                                     length);
         LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
         callback(result);
     } else {
@@ -321,9 +316,9 @@ int PackRTP(unsigned char *h264Pkt,
             unsigned int bufSize = maxPktLen - headerLen;
             unsigned char *buf = calloc(bufSize, sizeof(char));
             //1、add RTP header
-            Result result = isLiteMod ? AddRTPLiteHeader(buf, bufSize) : AddRTPHeader(ts, clock,
-                                                                                      buf,
-                                                                                      bufSize);
+            Result result = AddRTPHeader(ts, clock,
+                                         buf,
+                                         bufSize);
             free(buf);
             buf = NULL;
 

@@ -21,7 +21,6 @@
 
 #define START_CODE_LEN 4
 #define RTP_HEAD_LEN  12
-#define RTP_LITE_HEADER_LEN  2
 
 /**
   *
@@ -241,9 +240,8 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
              unsigned int isLiteMod,/*是否为RTP青春版*/
              Callback callback) {
 
-    unsigned int headerLen = isLiteMod == 1 ? RTP_LITE_HEADER_LEN : RTP_HEAD_LEN;
-    //LOGD("isLiteMod=%d",isLiteMod);
-    int offHeadSize = length - headerLen;
+    int offHeadSize = length - RTP_HEAD_LEN;
+
     if (offHeadSize < 2) {
         LOGE("illegal data,packet is too small");
         return -1;
@@ -257,7 +255,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
 
     rtpPkt->curr_Sq = currSq;
     //第13个字节
-    rtpPkt->type = (rtpData[headerLen] & 0x1F);
+    rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
 
     if (rtpPkt->type != 28) {
         frameLen = 0;
@@ -273,10 +271,10 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         case 24: {
             //--------------SPS------------------------------
             H264Pkt spsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
-            unsigned int spsSize = (rtpData[headerLen + 1] << 8) + rtpData[headerLen + 2];
+            unsigned int spsSize = (rtpData[RTP_HEAD_LEN+ 1] << 8) + rtpData[RTP_HEAD_LEN+ 2];
             unsigned char *sps = (unsigned char *) calloc(spsSize + START_CODE_LEN, sizeof(char));
             sps[3] = HEAD_4;
-            memcpy(sps + START_CODE_LEN, rtpData + headerLen + 3, spsSize);
+            memcpy(sps + START_CODE_LEN, rtpData + RTP_HEAD_LEN+ 3, spsSize);
             spsPkt->length = spsSize + START_CODE_LEN;
             spsPkt->data = sps;
             spsPkt->type = TYPE_SPS;
@@ -284,7 +282,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
 
             //--------------PPS------------------------------
             H264Pkt ppsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
-            unsigned int ppsSizeStart = headerLen + 3 + spsSize;
+            unsigned int ppsSizeStart =RTP_HEAD_LEN+ 3 + spsSize;
             unsigned int ppsSizeEnd = ppsSizeStart + 1;
             int ppsSize = ((rtpData[ppsSizeStart] & 0xff) << 8) + rtpData[ppsSizeEnd] & 0xff;
             unsigned len = ppsSize + START_CODE_LEN;
@@ -328,7 +326,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             H264Pkt pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             // For these NALUs, the first two bytes are the FU indicator （at 13） and the FU header (14).
             // If the start bit is set, we reconstruct the original NAL header into byte 1:
-            int naluType = rtpData[headerLen + 1] & 0x1F;
+            int naluType = rtpData[RTP_HEAD_LEN+ 1] & 0x1F;
 
             if (naluType == 5 || naluType == 1) {
                 frame[3] = HEAD_4;
@@ -344,12 +342,12 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
                 frameLen = 0;
                 //  printCharsHex(rtpPacket, length, headerLen + 5, "PKT-raw");
                 //14=RTP Header len +FU-Indicator+FU-Header
-                memcpy(frame + frameLen + 5, rtpData + headerLen + 2, offHeadSize - 2);
+                memcpy(frame + frameLen + 5, rtpData + RTP_HEAD_LEN+ 2, offHeadSize - 2);
                 frameLen += offHeadSize + 3;
                 //  printCharsHex(frame, length, headerLen + 5, "PKT-copy");
             } else {
                 //14=RTP Header len +FU-Indicator+FU-Header
-                memcpy(frame + frameLen, rtpData + headerLen + 2, offHeadSize - 2);
+                memcpy(frame + frameLen, rtpData + RTP_HEAD_LEN+ 2, offHeadSize - 2);
                 frameLen += offHeadSize - 2;
             }
 
@@ -379,7 +377,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             //I
             unsigned char *i_data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
             i_data[3] = HEAD_4;
-            memcpy(i_data + 4, rtpData + headerLen, offHeadSize);
+            memcpy(i_data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);
             H264Pkt pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             pkt->length = 4 + offHeadSize;
             pkt->data = i_data;

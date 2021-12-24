@@ -11,6 +11,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.pcyfox.screen.ScreenDisplay
 import com.pcyfox.screen.Sender
@@ -141,7 +142,7 @@ class ScreenRecorderService : Service() {
         private var w = 1920
         private var h = 1080
         private var fps =20
-        private var bitRate: Int = (w * h *0.3f).toInt()
+        private var bitRate: Int = (w * h *0.1f).toInt()
         private var ip: String = Sender.MULTI_CAST_IP
         private var port: Int = Sender.TARGET_PORT
         private const val KEY_STATE = "KEY_STATE"

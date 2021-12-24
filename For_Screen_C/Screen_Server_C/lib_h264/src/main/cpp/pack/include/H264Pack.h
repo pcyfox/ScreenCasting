@@ -24,7 +24,7 @@ typedef void (*Callback)(Result
 static unsigned long cq = 0;
 
 int PackRTP(unsigned char *h264Pkt, const unsigned int length, const unsigned int maxPktLen,
-            const unsigned long ts, unsigned int clock, int isLiteMod,
+            const unsigned long ts, unsigned int clock, int tag,
             Callback callback);
 
 
