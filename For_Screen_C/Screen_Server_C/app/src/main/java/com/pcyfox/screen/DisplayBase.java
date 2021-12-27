@@ -391,11 +391,11 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
      */
 
 
-    protected abstract void getAacDataRtp(ByteBuffer aacBuffer, MediaCodec.BufferInfo info);
+    protected abstract void aacDataToRtp(ByteBuffer aacBuffer, MediaCodec.BufferInfo info);
 
     @Override
-    public void getAacData(ByteBuffer aacBuffer, MediaCodec.BufferInfo info) {
-        if (streaming) getAacDataRtp(aacBuffer, info);
+    public void onAacData(ByteBuffer aacBuffer, MediaCodec.BufferInfo info) {
+        if (streaming) aacDataToRtp(aacBuffer, info);
     }
 
     protected abstract void onSpsPpsVpsRtp(ByteBuffer sps, ByteBuffer pps, ByteBuffer vps);
@@ -410,11 +410,11 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         if (streaming) onSpsPpsVpsRtp(sps, pps, vps);
     }
 
-    protected abstract void getH264DataRtp(ByteBuffer h264Buffer, MediaCodec.BufferInfo info);
+    protected abstract void h264DataToRtp(ByteBuffer h264Buffer, MediaCodec.BufferInfo info);
 
     @Override
-    public void getVideoData(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
-        if (streaming) getH264DataRtp(h264Buffer, info);
+    public void onVideoData(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
+        if (streaming) h264DataToRtp(h264Buffer, info);
     }
 
     @Override

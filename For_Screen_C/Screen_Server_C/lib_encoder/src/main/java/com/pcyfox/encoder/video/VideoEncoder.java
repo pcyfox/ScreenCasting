@@ -490,7 +490,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     protected void sendBuffer(@NonNull ByteBuffer byteBuffer,
                               @NonNull MediaCodec.BufferInfo bufferInfo) {
         bufferInfo.presentationTimeUs = System.nanoTime() / 1000 - presentTimeUs;
-        getVideoData.getVideoData(byteBuffer, bufferInfo);
+        getVideoData.onVideoData(byteBuffer, bufferInfo);
     }
 
     private MediaCodec.Callback callback;

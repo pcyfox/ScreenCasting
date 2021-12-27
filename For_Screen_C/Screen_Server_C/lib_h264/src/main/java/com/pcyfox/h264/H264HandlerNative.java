@@ -11,7 +11,7 @@ public class H264HandlerNative {
 
 
     public native int packH264ToRTP(byte[] h264Pkt, int length, int maxPktLen,
-                                    long ts, long clock, boolean isLiteMod, ResultCallback callback);
+                                    long pts, long clock, int tag, ResultCallback callback);
 
     public native int startSend();
 

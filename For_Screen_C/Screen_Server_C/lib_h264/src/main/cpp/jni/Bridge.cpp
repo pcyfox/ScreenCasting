@@ -22,7 +22,7 @@ extern "C" {
 static jmethodID jOnCallbackMid = NULL;
 static jobject jCaller = NULL;
 static JNIEnv *jCallerCurrentEnv = NULL;
-static int startToSendData = 0;
+static int isStartToSendData = 0;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -55,7 +55,7 @@ void RTPCallback(Result result) {
     if (result == NULL) {
         return;
     }
-    if (startToSendData) {
+    if (isStartToSendData) {
         sendData(result->data, result->length);
     }
     if (jOnCallbackMid != NULL) {
@@ -72,10 +72,10 @@ JNIEXPORT void JNICALL
 
 Java_com_pcyfox_h264_H264HandlerNative_updateSPS_1PPS(JNIEnv
                                                       *env,
-                                                      jobject thiz, jbyteArray
-                                                      sps,
-                                                      jint sps_len, jbyteArray
-                                                      pps,
+                                                      jobject thiz,
+                                                      jbyteArray sps,
+                                                      jint sps_len,
+                                                      jbyteArray pps,
                                                       jint pps_len
 ) {
     unsigned char *spsChars = ByteArrayToChars(env, sps, sps_len);
@@ -87,12 +87,10 @@ extern "C"
 JNIEXPORT jint JNICALL
 Java_com_pcyfox_h264_H264HandlerNative_packH264ToRTP(JNIEnv *env, jobject thiz,
                                                      jbyteArray h264_pkt,
-                                                     jint
-                                                     length,
-                                                     jint max_pkt_len, jlong
-                                                     ts,
+                                                     jint length,
+                                                     jint max_pkt_len, jlong ts,
                                                      jlong clock,
-                                                     jboolean isLiteMod,
+                                                     int tag,
                                                      jobject callback) {
 
     if (jOnCallbackMid == NULL && callback != NULL) {
@@ -103,7 +101,7 @@ Java_com_pcyfox_h264_H264HandlerNative_packH264ToRTP(JNIEnv *env, jobject thiz,
     }
 
     return PackRTP(ByteArrayToChars(env, h264_pkt, length), length, max_pkt_len, ts, clock,
-                   isLiteMod,
+                   tag,
                    RTPCallback);
 
 }
@@ -124,6 +122,6 @@ Java_com_pcyfox_h264_H264HandlerNative_getSPS_1PPS_1RTP_1Pkt(JNIEnv *env, jobjec
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_pcyfox_h264_H264HandlerNative_startSend(JNIEnv *env, jobject thiz) {
-    startToSendData = 1;
+    isStartToSendData = 1;
     return 1;
 }

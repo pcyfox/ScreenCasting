@@ -90,7 +90,7 @@
    * TYPE=24:STAP-A
    * TYPE=25:STAP-B
    * 如：STAP-A类型组合封包：
-   * RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+.....
+   * RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+ NALU2 Size（2 bit） +NALU2....
    *
    * STAP Header 格式与 NALU Header 格式相同,后五位为TYPE
    *
@@ -385,9 +385,9 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             callback(pkt);
             break;
         }
-
         default: {
-            LOGW("not support NAL ,type=%d", rtpPkt->type);
+            printCharsHex(rtpPkt,length,18,"RTP---");
+            LOGW("not support NALU type=%d", rtpPkt->type);
         }
     }
     free(rtpData);

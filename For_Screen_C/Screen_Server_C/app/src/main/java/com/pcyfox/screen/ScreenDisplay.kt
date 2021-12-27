@@ -11,7 +11,7 @@ class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) 
     DisplayBase(context, false) {
     var isStop = false
 
-    private val sender = Sender(ip, port, SocketType.UDP,isLiteMod = true, maxPacketLength = maxPacketLen)
+    private val publisher = Publisher(ip, port, SocketType.UDP, false, maxPacketLength = maxPacketLen)
 
     override fun prepareAudioRtp(isStereo: Boolean, sampleRate: Int) {
     }
@@ -26,11 +26,11 @@ class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) 
     }
 
     override fun stopStreamRtp() {
-        sender.stop()
+        publisher.stop()
         isStop = true
     }
 
-    override fun getAacDataRtp(aacBuffer: ByteBuffer, info: MediaCodec.BufferInfo) {
+    override fun aacDataToRtp(aacBuffer: ByteBuffer, info: MediaCodec.BufferInfo) {
     }
 
     override fun onSpsPpsVpsRtp(sps: ByteBuffer, pps: ByteBuffer, vps: ByteBuffer?) {
@@ -38,11 +38,11 @@ class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) 
         sps.get(spsBuf)
         val ppsBuf = ByteArray(pps.capacity())
         pps.get(ppsBuf)
-        sender.updateSPS_PPS(spsBuf, ppsBuf)
+        publisher.updateSPS_PPS(spsBuf, ppsBuf)
     }
 
-    override fun getH264DataRtp(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
-        sender.send(h264Buffer, info)
+    override fun h264DataToRtp(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
+        publisher.send(h264Buffer, info)
     }
 
 

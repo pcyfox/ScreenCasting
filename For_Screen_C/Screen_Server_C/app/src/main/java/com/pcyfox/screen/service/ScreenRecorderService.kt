@@ -11,10 +11,9 @@ import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.pcyfox.screen.ScreenDisplay
-import com.pcyfox.screen.Sender
+import com.pcyfox.screen.Publisher
 import kotlin.math.min
 
 
@@ -82,7 +81,7 @@ class ScreenRecorderService : Service() {
         }
 
         requestDisplayIntent?.run {
-            val maxPacketLen = min(w * h, (Sender.MAX_PKT_LEN))
+            val maxPacketLen = min(w * h, (Publisher.MAX_PKT_LEN))
             serverDisplay = ScreenDisplay(applicationContext, ip, port, maxPacketLen)
             serverDisplay?.setIntentResult(resultCode, this)
             startStreamRtp(w, h, bitRate, fps)
@@ -143,8 +142,8 @@ class ScreenRecorderService : Service() {
         private var h = 1080
         private var fps =20
         private var bitRate: Int = (w * h *0.1f).toInt()
-        private var ip: String = Sender.MULTI_CAST_IP
-        private var port: Int = Sender.TARGET_PORT
+        private var ip: String = Publisher.MULTI_CAST_IP
+        private var port: Int = Publisher.TARGET_PORT
         private const val KEY_STATE = "KEY_STATE"
 
         private fun changeState(context: Context, state: Int) {

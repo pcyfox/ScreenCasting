@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 public interface GetAacData {
 
-  void getAacData(ByteBuffer aacBuffer, MediaCodec.BufferInfo info);
+  void onAacData(ByteBuffer aacBuffer, MediaCodec.BufferInfo info);
 
   void onAudioFormat(MediaFormat mediaFormat);
 }

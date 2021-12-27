@@ -13,7 +13,7 @@ import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.pcyfox.screen.R
-import com.pcyfox.screen.Sender
+import com.pcyfox.screen.Publisher
 import com.pcyfox.screen.service.ScreenRecorderService
 import kotlinx.android.synthetic.main.activity_screen_record.*
 
@@ -87,8 +87,8 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
                 h,
                 fps,
                 r,
-                Sender.MULTI_CAST_IP,
-                Sender.TARGET_PORT,
+                Publisher.MULTI_CAST_IP,
+                Publisher.TARGET_PORT,
             )
         }
 

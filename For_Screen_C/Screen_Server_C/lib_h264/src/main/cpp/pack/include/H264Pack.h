@@ -10,9 +10,6 @@
 struct PackResult {
     unsigned int h264StartCodeLen;
     unsigned int length;
-    unsigned int pkt_interval;
-    unsigned int curr_Sq;
-    unsigned char packet_NAL_unit_type;
     unsigned char *data;
 } typedef *Result;
 

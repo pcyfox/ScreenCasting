@@ -11,11 +11,12 @@
 #include <Android_log.h>
 #include <limits.h>
 
+//#define  TIME_BASE 1000000L
 #define  TIME_BASE 1000000000L
 #define  RTP_HEADER_LEN  12
 
 
-
+static int startCodeLen = 0;
 
 
 /**
@@ -154,9 +155,9 @@ void freeSTAP() {
 
 
 int GetStartCodeLen(const unsigned char *pkt) {
-    if (pkt[0] == 0 && pkt[1] == 0 && pkt[2] == 0 && pkt[3] == 1) {
+    if (pkt[3] == 1 && pkt[0] == 0 && pkt[1] == 0 && pkt[2] == 0) {
         return 4;
-    } else if (pkt[0] == 0 && pkt[1] == 0 && pkt[2] == 1) {
+    } else if (pkt[2] == 1 && pkt[0] == 0 && pkt[1] == 0) {
         return 3;
     } else {
         return 0;
@@ -169,44 +170,17 @@ void PrintCurrentSq(Result result) {
     LOGD("----------currentSq------------%ld", currSq);
 }
 
-Result
-AddRTPLiteHeader(const unsigned char *data, unsigned int len) {
-    Result result = malloc(sizeof(struct PackResult));
-    if (result == NULL) {
-        LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult fail");
-        return NULL;
-    }
-    result->data = NULL;
-    result->length = len + headerLen;
-    result->data = (unsigned char *) calloc(result->length, sizeof(char));
-    if (result->data == NULL) {
-        LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult data fail");
-        return NULL;
-    }
-    /**
-     * -------------------RTP Lite (RTP 青春版)------------------------------
-     * -------------------第1、2字节---------------------------------
-     *sequence number(16 bit) 序列号，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。
-     *同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的
-     */
-    unsigned char *RTPData = result->data;
-    //sequence number
-    setLong(RTPData, ++cq, 0, 2);
-    result->h264StartCodeLen = GetStartCodeLen(data);
-    memcpy(RTPData + headerLen, data + result->h264StartCodeLen, len);
-    return result;
-}
-
 
 Result
-AddRTPHeader(const unsigned long ts, unsigned long clock, const unsigned char *data,
+AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned long clock,
+             const unsigned char *data,
              unsigned int len) {
+
     Result result = malloc(sizeof(struct PackResult));
     if (result == NULL) {
         LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult fail");
         return NULL;
     }
-    result->data = NULL;
     result->length = len + headerLen;
     result->data = (unsigned char *) calloc(result->length, sizeof(char));
     if (result->data == NULL) {
@@ -242,27 +216,32 @@ AddRTPHeader(const unsigned long ts, unsigned long clock, const unsigned char *d
 
     unsigned char *RTPData = result->data;
     RTPData[0] = 0x80;//V P X CC->10 0 0 0000=0x80\十进制的28
-    RTPData[1] = 96;
-    //sequence number
+    RTPData[1] = 0x60;
+    //RTPData[1] = 0x60+(marker_bit << 7);           // H264 payload  is dynamic  payload(96-127) and marker bit
+    //add sequence number
     setLong(RTPData, ++cq, 2, 4);
-    //添加4bit的的时间错
+    //添加4bit的的时间戳
     unsigned long timestamp = ts * clock / TIME_BASE;
     setLong(RTPData, timestamp, 4, 8);
+
     if (ssrc == 0) {
         ssrc = rand();
     }
     //同步信源(SSRC)标识符：占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC
     setLong(RTPData, ssrc, 8, 12);
-    int startCodeLen = GetStartCodeLen(data);
+    LOGD("addHeader startCodeLen=%d", startCodeLen);
+    if (startCodeLen == 0) {
+        printCharsHex(data, len, len / 2, "NotStartCode");
+    }
     result->h264StartCodeLen = startCodeLen;
-    memcpy(RTPData + headerLen, data + startCodeLen, len);
+    memcpy(RTPData + headerLen, data + startCodeLen, len - startCodeLen);
     return result;
 }
 
 
 Result GetSPS_PPS_RTP_STAP_Pkt(const unsigned long ts, unsigned long clock) {
     if (stapA != NULL) {
-        return AddRTPHeader(ts, clock, stapA->pkt, stapA->len);
+        return AddRTPHeader(ts, 1, clock, stapA->pkt, stapA->len);
     }
     return NULL;
 }
@@ -285,43 +264,39 @@ int PackRTP(unsigned char *h264Pkt,
 
     //如果遇到I帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包发送出去
     if (type == 5) {
-        callback(GetSPS_PPS_RTP_STAP_Pkt(ts, clock));
+        Result result = GetSPS_PPS_RTP_STAP_Pkt(ts, clock);
+        callback(result);
+        //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
+        //  printCharsHex(result->data, length, 20, "Single Raw Small");
     }
 
     if (cq >= ULONG_MAX) {
         cq = 0;
     }
+
     // 小于规定的最，直接打包成RTP包，不管是什么类型的帧,即单NALU模式
     if (length <= maxPktLen - headerLen) {
-        //  printCharsHex(h264Pkt, length, 20, "FU-A Raw Small");
-        Result result = AddRTPHeader(ts, clock,
-                                     h264Pkt,
-                                     length);
-        LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
+        Result result = AddRTPHeader(ts, 1, clock, h264Pkt, length);
+        //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
         callback(result);
+        //printCharsHex(result->data, length, 20, "Single Raw Small");
     } else {
         //   printCharsHex(h264Pkt, length, 20, "FU-A Raw Large");
         //create FU-A pkt
         unsigned int currentIndex = 0;
         unsigned int remainLen;
 
-        int startCodeLen = GetStartCodeLen(h264Pkt);
         while (currentIndex < length) {
             remainLen = length - currentIndex;
             if (remainLen <= 0) {
                 break;
             }
-            //RTP Header len=12 FU-Indicator len=1, FU-Header len=1
-            unsigned int copyLen = min(remainLen, maxPktLen - headerLen - 2);
             unsigned int bufSize = maxPktLen - headerLen;
             unsigned char *buf = calloc(bufSize, sizeof(char));
             //1、add RTP header
-            Result result = AddRTPHeader(ts, clock,
-                                         buf,
-                                         bufSize);
+            Result result = AddRTPHeader(ts, currentIndex == 0 ? 0 : 1, clock, buf, bufSize);
             free(buf);
             buf = NULL;
-
             unsigned char NALU_header = h264Pkt[4];
             //2、set FU-Indicator at  NALU-Header position
             //FU-Indicator的F、 NRI 来自 NAL Header 中的 F、 NRI
@@ -329,6 +304,9 @@ int PackRTP(unsigned char *h264Pkt,
             //取NALU Header中的前三位（11100000=0ce0）加上type=28=0x1c;
             result->data[headerLen] = (NALU_header & 0xe0) | 0x1c;
             //3、add FU-Header
+
+            //RTP Header len=12, FU-Indicator len=1, FU-Header len=1
+            unsigned int copyLen = min(remainLen, maxPktLen - headerLen - 2);
             if (currentIndex + copyLen == length) {
                 result->data[headerLen + 1] = 0x40 | type;//mark end
             } else {
@@ -341,25 +319,37 @@ int PackRTP(unsigned char *h264Pkt,
             }
             //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
             memcpy(result->data + headerLen + 2, h264Pkt + currentIndex, copyLen);
-            //    printCharsHex(result->data, result->length, result->length, "FU-A After Packed");
+            // printCharsHex(result->data, result->length, result->length, "FU-A After Packed");
             LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
             callback(result);
             currentIndex += copyLen;
         }
     }
+
     free(h264Pkt);
     return RESULT_OK;
 }
 
-
+/**
+ * 将SPS及PPS存储到一个全局变量中(以RTP STAP-A 的方式打包在一起)
+ *
+ * STAP-A类型组合封包：
+ * RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+ NALU2 Size（2 bit） +NALU2....
+*/
 void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, int ppsLen) {
     if (stapA == NULL) {
         stapA = (STAP_A) malloc(sizeof(struct STAP_A_SPS_PPS_Pkt));
     } else {
         free(stapA->pkt);
     }
-    __uint16_t spsSize = (__uint16_t) spsLen;
-    __uint16_t ppsSize = (__uint16_t) ppsLen;
+
+    if (startCodeLen == 0) {
+       startCodeLen = GetStartCodeLen(spsData);
+    }
+
+    __uint16_t spsSize = (__uint16_t) spsLen - startCodeLen;
+    __uint16_t ppsSize = (__uint16_t) ppsLen - startCodeLen;
+    //5= STAP Header Len(1bit)+SPS Size Len(2bit)+PPS Size Len(3bit)
     stapA->len = spsSize + ppsSize + 5;
     stapA->pkt = (unsigned char *) calloc(stapA->len, sizeof(char));
     //STAP-A unit  Type=24
@@ -367,11 +357,11 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
     //SPS size used 2 bit
     stapA->pkt[1] = spsSize >> 8;//前8位
     stapA->pkt[2] = spsSize & 0xFF;//后8位
-    memcpy(stapA->pkt + 3, spsData, spsSize);
+    memcpy(stapA->pkt + 3, spsData + startCodeLen, spsSize);
     //PPS size used 2 bit
     stapA->pkt[spsSize + 3] = ppsSize >> 8;//前8位
     stapA->pkt[spsSize + 4] = ppsSize & 0xFF;//后8位
-    memcpy(stapA->pkt + 5 + spsSize, ppsData, ppsSize);
+    memcpy(stapA->pkt + 5 + spsSize, ppsData + startCodeLen, ppsSize);
 }
 
 
