@@ -176,13 +176,19 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
              const unsigned char *data,
              unsigned int len) {
 
+
+    if (startCodeLen == 0) {
+        printCharsHex(data, len, len / 2, "NotStartCode");
+    }
     Result result = malloc(sizeof(struct PackResult));
+    result->h264StartCodeLen = startCodeLen;
     if (result == NULL) {
         LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult fail");
         return NULL;
     }
     result->length = len + headerLen;
     result->data = (unsigned char *) calloc(result->length, sizeof(char));
+
     if (result->data == NULL) {
         LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult data fail");
         return NULL;
@@ -229,10 +235,6 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
     }
     //同步信源(SSRC)标识符：占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC
     setLong(RTPData, ssrc, 8, 12);
-    LOGD("addHeader startCodeLen=%d", startCodeLen);
-    if (startCodeLen == 0) {
-        printCharsHex(data, len, len / 2, "NotStartCode");
-    }
     result->h264StartCodeLen = startCodeLen;
     memcpy(RTPData + headerLen, data + startCodeLen, len - startCodeLen);
     return result;
@@ -259,6 +261,10 @@ int PackRTP(unsigned char *h264Pkt,
             int tag,
             Callback callback) {
 
+    if (startCodeLen == 0) {
+        startCodeLen = GetStartCodeLen(h264Pkt);
+    }
+
     int8_t type = h264Pkt[4] & 0x1F;
     headerLen = RTP_HEADER_LEN;
 
@@ -267,7 +273,7 @@ int PackRTP(unsigned char *h264Pkt,
         Result result = GetSPS_PPS_RTP_STAP_Pkt(ts, clock);
         callback(result);
         //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
-        //  printCharsHex(result->data, length, 20, "Single Raw Small");
+        printCharsHex(result->data, length, 20, "Single Raw Small");
     }
 
     if (cq >= ULONG_MAX) {
@@ -344,7 +350,7 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
     }
 
     if (startCodeLen == 0) {
-       startCodeLen = GetStartCodeLen(spsData);
+        startCodeLen = GetStartCodeLen(spsData);
     }
 
     __uint16_t spsSize = (__uint16_t) spsLen - startCodeLen;

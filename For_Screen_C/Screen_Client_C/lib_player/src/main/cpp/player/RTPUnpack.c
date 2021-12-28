@@ -237,11 +237,9 @@ void analysePkt(unsigned char *rtpPacket) {
 
 
 int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned int maxFrameLen,
-             unsigned int isLiteMod,/*是否为RTP青春版*/
-             Callback callback) {
+             unsigned int tag, Callback callback) {
 
     int offHeadSize = length - RTP_HEAD_LEN;
-
     if (offHeadSize < 2) {
         LOGE("illegal data,packet is too small");
         return -1;
@@ -249,10 +247,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
 
     RTPPkt rtpPkt = (RTPPkt) malloc(sizeof(struct RtpPacketInfo));
     rtpPkt->length = 0;
-
-    unsigned long long currSq = isLiteMod ? ((rtpData[0] & 0xFF) << 8) + (rtpData[1] & 0xFF)
-                                          : ((rtpData[2] & 0xFF) << 8) + (rtpData[3] & 0xFF);
-
+    unsigned long long currSq = ((rtpData[2] & 0xFF) << 8) + (rtpData[3] & 0xFF);
     rtpPkt->curr_Sq = currSq;
     //第13个字节
     rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
@@ -265,16 +260,18 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         }
     }
 
-    LOGD("------------------ RTP TYPE %d--------------",rtpPkt->type);
+    printCharsHex(rtpPkt, length, 20, "RTP---");
+
+    //LOGD("------------------ RTP TYPE=%d,sq=%lld--------------", rtpPkt->type, currSq);
     switch (rtpPkt->type) {
         // STAP-A:RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+.....
         case 24: {
             //--------------SPS------------------------------
             H264Pkt spsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
-            unsigned int spsSize = (rtpData[RTP_HEAD_LEN+ 1] << 8) + rtpData[RTP_HEAD_LEN+ 2];
+            unsigned int spsSize = (rtpData[RTP_HEAD_LEN + 1] << 8) + rtpData[RTP_HEAD_LEN + 2];
             unsigned char *sps = (unsigned char *) calloc(spsSize + START_CODE_LEN, sizeof(char));
             sps[3] = HEAD_4;
-            memcpy(sps + START_CODE_LEN, rtpData + RTP_HEAD_LEN+ 3, spsSize);
+            memcpy(sps + START_CODE_LEN, rtpData + RTP_HEAD_LEN + 3, spsSize);
             spsPkt->length = spsSize + START_CODE_LEN;
             spsPkt->data = sps;
             spsPkt->type = TYPE_SPS;
@@ -282,7 +279,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
 
             //--------------PPS------------------------------
             H264Pkt ppsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
-            unsigned int ppsSizeStart =RTP_HEAD_LEN+ 3 + spsSize;
+            unsigned int ppsSizeStart = RTP_HEAD_LEN + 3 + spsSize;
             unsigned int ppsSizeEnd = ppsSizeStart + 1;
             int ppsSize = ((rtpData[ppsSizeStart] & 0xff) << 8) + rtpData[ppsSizeEnd] & 0xff;
             unsigned len = ppsSize + START_CODE_LEN;
@@ -303,7 +300,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
                 idr[3] = HEAD_4;
                 idr[4] = TYPE_I;
                 memcpy(idr + 5, rtpData + ppsSizeEnd + ppsSize + 1, retain);
-            //    printCharsHex(idr,length+5,length,"idr");
+                //    printCharsHex(idr,length+5,length,"idr");
                 H264Pkt idrPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
                 idrPkt->length = retain + 5;
                 idrPkt->data = idr;
@@ -326,7 +323,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             H264Pkt pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             // For these NALUs, the first two bytes are the FU indicator （at 13） and the FU header (14).
             // If the start bit is set, we reconstruct the original NAL header into byte 1:
-            int naluType = rtpData[RTP_HEAD_LEN+ 1] & 0x1F;
+            int naluType = rtpData[RTP_HEAD_LEN + 1] & 0x1F;
 
             if (naluType == 5 || naluType == 1) {
                 frame[3] = HEAD_4;
@@ -342,12 +339,12 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
                 frameLen = 0;
                 //  printCharsHex(rtpPacket, length, headerLen + 5, "PKT-raw");
                 //14=RTP Header len +FU-Indicator+FU-Header
-                memcpy(frame + frameLen + 5, rtpData + RTP_HEAD_LEN+ 2, offHeadSize - 2);
+                memcpy(frame + frameLen + 5, rtpData + RTP_HEAD_LEN + 2, offHeadSize - 2);
                 frameLen += offHeadSize + 3;
                 //  printCharsHex(frame, length, headerLen + 5, "PKT-copy");
             } else {
                 //14=RTP Header len +FU-Indicator+FU-Header
-                memcpy(frame + frameLen, rtpData + RTP_HEAD_LEN+ 2, offHeadSize - 2);
+                memcpy(frame + frameLen, rtpData + RTP_HEAD_LEN + 2, offHeadSize - 2);
                 frameLen += offHeadSize - 2;
             }
 
@@ -386,9 +383,9 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             break;
         }
         default: {
-            printCharsHex(rtpPkt,length,18,"RTP---");
             LOGW("not support NALU type=%d", rtpPkt->type);
         }
+
     }
     free(rtpData);
     rtpData = NULL;
