@@ -260,7 +260,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         }
     }
 
-    printCharsHex(rtpPkt, length, 20, "RTP---");
+    printCharsHex(rtpData, length, 20, "RTP---");
 
     //LOGD("------------------ RTP TYPE=%d,sq=%lld--------------", rtpPkt->type, currSq);
     switch (rtpPkt->type) {

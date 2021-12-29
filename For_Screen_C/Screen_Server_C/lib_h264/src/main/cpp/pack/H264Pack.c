@@ -16,9 +16,6 @@
 #define  RTP_HEADER_LEN  12
 
 
-static int startCodeLen = 0;
-
-
 /**
 ******************************************************************
 *
@@ -177,11 +174,8 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
              unsigned int len) {
 
 
-    if (startCodeLen == 0) {
-        printCharsHex(data, len, len / 2, "NotStartCode");
-    }
+
     Result result = malloc(sizeof(struct PackResult));
-    result->h264StartCodeLen = startCodeLen;
     if (result == NULL) {
         LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult fail");
         return NULL;
@@ -193,6 +187,8 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
         LOGE("GetSPS_PPS_RTP_STAP_Pkt(),malloc UnpackResult data fail");
         return NULL;
     }
+
+    result->h264StartCodeLen = GetStartCodeLen(data);
     /**
      * -------------------第1个字节---------------------------------
      * V(2 bit) 版本号通常为2，即：10
@@ -235,8 +231,7 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
     }
     //同步信源(SSRC)标识符：占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC
     setLong(RTPData, ssrc, 8, 12);
-    result->h264StartCodeLen = startCodeLen;
-    memcpy(RTPData + headerLen, data + startCodeLen, len - startCodeLen);
+    memcpy(RTPData + headerLen, data + result->h264StartCodeLen, len - result->h264StartCodeLen);
     return result;
 }
 
@@ -261,10 +256,6 @@ int PackRTP(unsigned char *h264Pkt,
             int tag,
             Callback callback) {
 
-    if (startCodeLen == 0) {
-        startCodeLen = GetStartCodeLen(h264Pkt);
-    }
-
     int8_t type = h264Pkt[4] & 0x1F;
     headerLen = RTP_HEADER_LEN;
 
@@ -273,9 +264,10 @@ int PackRTP(unsigned char *h264Pkt,
         Result result = GetSPS_PPS_RTP_STAP_Pkt(ts, clock);
         callback(result);
         //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
-        printCharsHex(result->data, length, 20, "Single Raw Small");
+        printCharsHex(result->data, length, 20, "SPS_PPS");
     }
 
+    int startCodeLen = GetStartCodeLen(h264Pkt);
     if (cq >= ULONG_MAX) {
         cq = 0;
     }
@@ -285,7 +277,7 @@ int PackRTP(unsigned char *h264Pkt,
         Result result = AddRTPHeader(ts, 1, clock, h264Pkt, length);
         //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
         callback(result);
-        //printCharsHex(result->data, length, 20, "Single Raw Small");
+        printCharsHex(result->data, length, 20, "Single Raw Small");
     } else {
         //   printCharsHex(h264Pkt, length, 20, "FU-A Raw Large");
         //create FU-A pkt
@@ -325,7 +317,7 @@ int PackRTP(unsigned char *h264Pkt,
             }
             //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
             memcpy(result->data + headerLen + 2, h264Pkt + currentIndex, copyLen);
-            // printCharsHex(result->data, result->length, result->length, "FU-A After Packed");
+            printCharsHex(result->data, result->length, result->length, "FU-A After Packed");
             LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
             callback(result);
             currentIndex += copyLen;
@@ -349,9 +341,7 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
         free(stapA->pkt);
     }
 
-    if (startCodeLen == 0) {
-        startCodeLen = GetStartCodeLen(spsData);
-    }
+    int startCodeLen = GetStartCodeLen(spsData);
 
     __uint16_t spsSize = (__uint16_t) spsLen - startCodeLen;
     __uint16_t ppsSize = (__uint16_t) ppsLen - startCodeLen;
