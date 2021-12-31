@@ -190,7 +190,7 @@ ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
 //         receiveDataInfo->receive_count, currSq, receiveDataInfo->last_Sq);
 
     receiveDataInfo->receive_count++;
-    if (currSq - receiveDataInfo->last_Sq - 1 != 0) {
+    if (currSq != 1 && currSq - receiveDataInfo->last_Sq - 1 != 0) {
         receiveDataInfo->lost_count += abs(receiveDataInfo->curr_Sq - receiveDataInfo->last_Sq);
         LOGW("analysePkt() maybe lost %d frame lastSq=%ld,currSq=%ld", receiveDataInfo->lost_count,
              receiveDataInfo->last_Sq, receiveDataInfo->curr_Sq);
