@@ -1,3 +1,0 @@
-/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a/CMakeFiles/rebuild_cache.dir
-/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a/CMakeFiles/edit_cache.dir
-/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/.cxx/RelWithDebInfo/3k644543/arm64-v8a/CMakeFiles/rtp_lib.dir
