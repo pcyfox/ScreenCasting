@@ -154,11 +154,6 @@
 
 
 
-struct TempPacket {
-    unsigned char *data;
-    unsigned int index;
-    unsigned int len;
-} typedef *TempPkt;
 
 static TempPkt tempPkt = NULL;
 static ReceiveDataInfo receiveDataInfo = NULL;
@@ -171,7 +166,7 @@ void printCharsHex(char *data, int length, int printLen, char *tag) {
         return;
     }
     for (int i = 0; i < printLen; ++i) {
-        LOGD("----------printChars() TAG=%s:i=%d,char=%02x", tag, i, *(data + i));
+        LOGD("----------printChars() %s:i=%d,char=%02x", tag, i, *(data + i));
     }
 }
 
@@ -182,7 +177,7 @@ void ClearReceiveDataInfo() {
     receiveDataInfo->lost_rate = 0;
 }
 
-ReceiveDataInfo analysePkt(unsigned char *rtpPacket) {
+ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
     if (receiveDataInfo == NULL) {
         receiveDataInfo = malloc(sizeof(struct RTPDataInfo));
         receiveDataInfo->start_time = getCurrentTime();
@@ -211,10 +206,11 @@ ReceiveDataInfo analysePkt(unsigned char *rtpPacket) {
         // LOGD("startTime=%ld,lastTime=%ld", receiveDataInfo->start_time, currentTime);
         if (receiveDataInfo->lost_count > 0) {
             receiveDataInfo->lost_rate =
-                    (double) receiveDataInfo->lost_count /
-                    (double) receiveDataInfo->receive_count;
+                    (float) receiveDataInfo->lost_count /
+                    (float) receiveDataInfo->receive_count;
+
             if (receiveDataInfo->lost_rate > 0.) {
-                LOGD("analysePkt() pkt lost rate=%.2lf", receiveDataInfo->lost_rate);
+                LOGD("analysePkt() pkt lost rate=%.2f", receiveDataInfo->lost_rate);
             }
         }
         ClearReceiveDataInfo();
@@ -250,9 +246,10 @@ void freeTempPkt() {
 }
 
 void clearTempPkt() {
-    if (tempPkt == NULL) {
+    if (tempPkt == NULL || tempPkt->data == NULL) {
         return;
     }
+
     memset(tempPkt->data, 0, tempPkt->len);
     tempPkt->index = 0;
 }

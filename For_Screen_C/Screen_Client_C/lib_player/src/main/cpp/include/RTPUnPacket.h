@@ -25,7 +25,7 @@ struct RTPDataInfo {
     unsigned long start_time;
     unsigned long receive_count;
     unsigned int lost_count;
-    double lost_rate;
+    float lost_rate;
 
 } typedef *ReceiveDataInfo;
 
@@ -37,6 +37,11 @@ struct RtpPacketInfo {
 } typedef *RTPPkt;
 
 
+struct TempPacket {
+    unsigned char *data;
+    unsigned int index;
+    unsigned int len;
+} typedef *TempPkt;
 
 struct H264Packet {
     unsigned int length;
