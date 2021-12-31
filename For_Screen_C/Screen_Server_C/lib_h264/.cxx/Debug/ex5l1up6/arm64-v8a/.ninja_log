@@ -1,7 +1,0 @@
-# ninja log v5
-1	158	1632385051	CMakeFiles/rtp_lib.dir/pack/H264Pack.c.o	b10b7c6b9f9ce4e3
-3	159	1632385051	CMakeFiles/rtp_lib.dir/socket/Sender.c.o	5a03c0bce6c6e07b
-0	210	1632385051	CMakeFiles/rtp_lib.dir/jni/Bridge.cpp.o	cbea0c8436540994
-210	239	1632385051	/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cxx/Debug/ex5l1up6/obj/arm64-v8a/librtp_lib.so	2794338e5ac119fa
-18	474	1635757297	CMakeFiles/rtp_lib.dir/pack/H264Pack.c.o	b10b7c6b9f9ce4e3
-474	718	1635757297	/Volumes/文件/AndroidProjects/UDP_Player/UDP_Screen_Server_C/lib_h264/build/intermediates/cxx/Debug/ex5l1up6/obj/arm64-v8a/librtp_lib.so	2794338e5ac119fa

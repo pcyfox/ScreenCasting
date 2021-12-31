@@ -1,3 +1,0 @@
-/Volumes/文件/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/Debug/3k104450/armeabi-v7a/CMakeFiles/rebuild_cache.dir
-/Volumes/文件/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/Debug/3k104450/armeabi-v7a/CMakeFiles/edit_cache.dir
-/Volumes/文件/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/Debug/3k104450/armeabi-v7a/CMakeFiles/udp_player.dir

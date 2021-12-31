@@ -1,2 +1,0 @@
-ninja: Entering directory `/Volumes/文件/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/Debug/3k104450/arm64-v8a'
-ninja: no work to do.
