@@ -3,5 +3,7 @@
 /local.properties
 /.idea
 /build
+/.cxx
 .DS_Store
 /build/
+/.DS_Store
