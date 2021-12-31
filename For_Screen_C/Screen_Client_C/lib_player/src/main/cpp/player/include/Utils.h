@@ -28,6 +28,4 @@ static int64_t getCurrentTime()
       ((const uint8_t*)(x))[1])
 
 
-
-
 #endif //TCTS_EDU_APP_RECODER_UTILS_H

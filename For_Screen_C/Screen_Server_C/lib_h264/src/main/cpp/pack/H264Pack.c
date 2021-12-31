@@ -11,8 +11,8 @@
 #include <Android_log.h>
 #include <limits.h>
 
-//#define  TIME_BASE 1000000L
-#define  TIME_BASE 1000000000L
+#define  TIME_BASE 1000000L
+//#define  TIME_BASE 1000000000L
 #define  RTP_HEADER_LEN  12
 
 
@@ -143,8 +143,6 @@ void setLong(unsigned char *buffer, unsigned long n, int begin, int end) {
 
 void freeSTAP() {
     if (stapA != NULL) {
-        //free(stapA->sps);
-        //free(stapA->pps);
         free(stapA->pkt);
         stapA = NULL;
     }
@@ -172,7 +170,6 @@ Result
 AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned long clock,
              const unsigned char *data,
              unsigned int len) {
-
 
 
     Result result = malloc(sizeof(struct PackResult));
@@ -218,8 +215,8 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
 
     unsigned char *RTPData = result->data;
     RTPData[0] = 0x80;//V P X CC->10 0 0 0000=0x80\十进制的28
-    RTPData[1] = 0x60;
-    //RTPData[1] = 0x60+(marker_bit << 7);           // H264 payload  is dynamic  payload(96-127) and marker bit
+    // H264 payload  is dynamic  payload(96-127) and marker bit
+    RTPData[1] = 0x60 + (marker_bit << 7);
     //add sequence number
     setLong(RTPData, ++cq, 2, 4);
     //添加4bit的的时间戳
@@ -256,15 +253,14 @@ int PackRTP(unsigned char *h264Pkt,
             int tag,
             Callback callback) {
 
-    int8_t type = h264Pkt[4] & 0x1F;
+    int8_t naluType = h264Pkt[4] & 0x1F;
     headerLen = RTP_HEADER_LEN;
 
     //如果遇到I帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包发送出去
-    if (type == 5) {
+    if (naluType == 5) {
         Result result = GetSPS_PPS_RTP_STAP_Pkt(ts, clock);
         callback(result);
-        //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
-        printCharsHex(result->data, length, 20, "SPS_PPS");
+        //printCharsHex(result->data, length, 20, "SPS_PPS");
     }
 
     int startCodeLen = GetStartCodeLen(h264Pkt);
@@ -275,11 +271,9 @@ int PackRTP(unsigned char *h264Pkt,
     // 小于规定的最，直接打包成RTP包，不管是什么类型的帧,即单NALU模式
     if (length <= maxPktLen - headerLen) {
         Result result = AddRTPHeader(ts, 1, clock, h264Pkt, length);
-        //LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
         callback(result);
-        printCharsHex(result->data, length, 20, "Single Raw Small");
+        //printCharsHex(result->data, length, 20, "Single Raw Small");
     } else {
-        //   printCharsHex(h264Pkt, length, 20, "FU-A Raw Large");
         //create FU-A pkt
         unsigned int currentIndex = 0;
         unsigned int remainLen;
@@ -296,29 +290,29 @@ int PackRTP(unsigned char *h264Pkt,
             free(buf);
             buf = NULL;
             unsigned char NALU_header = h264Pkt[4];
+
             //2、set FU-Indicator at  NALU-Header position
             //FU-Indicator的F、 NRI 来自 NAL Header 中的 F、 NRI
             //FU-A类型分片的Type是固定的28
             //取NALU Header中的前三位（11100000=0ce0）加上type=28=0x1c;
             result->data[headerLen] = (NALU_header & 0xe0) | 0x1c;
-            //3、add FU-Header
 
-            //RTP Header len=12, FU-Indicator len=1, FU-Header len=1
+            //3、set FU-Header
+            //RTP Header(12 bit) +FU indicator(1 bit) +FU header(1 bit)
             unsigned int copyLen = min(remainLen, maxPktLen - headerLen - 2);
             if (currentIndex + copyLen == length) {
-                result->data[headerLen + 1] = 0x40 | type;//mark end
+                result->data[headerLen + 1] = 0x40 | naluType;//mark end
             } else {
                 if (currentIndex == 0) {
                     currentIndex = startCodeLen + 1;
-                    result->data[headerLen + 1] = 0x80 | type;//mark start
+                    result->data[headerLen + 1] = 0x80 | naluType;//mark start
                 } else {
-                    result->data[headerLen + 1] = 0x00 | type;//mark mid
+                    result->data[headerLen + 1] = 0x00 | naluType;//mark mid
                 }
             }
             //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
             memcpy(result->data + headerLen + 2, h264Pkt + currentIndex, copyLen);
-            printCharsHex(result->data, result->length, result->length, "FU-A After Packed");
-            LOGD("-----------NAL TYPE:%d", result->data[headerLen] & 0x1f);
+            printCharsHex(result->data, result->length, 16, "FU-A After Packed");
             callback(result);
             currentIndex += copyLen;
         }

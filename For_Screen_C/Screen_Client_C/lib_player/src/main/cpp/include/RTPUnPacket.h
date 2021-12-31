@@ -5,6 +5,29 @@
 #ifndef UDP_PLAYER_RTPUNPACKET_H
 #define UDP_PLAYER_RTPUNPACKET_H
 
+#define HEAD_1  0x00
+#define HEAD_2  0x00
+#define HEAD_3  0x00
+#define HEAD_4  0x01
+
+#define TYPE_IDR  0x65
+#define TYPE_P  0x61
+#define TYPE_SPS  0x67
+#define TYPE_PPS  0x68
+
+#define START_CODE_LEN 4
+#define RTP_HEAD_LEN  12
+
+
+struct RTPDataInfo {
+    unsigned long last_Sq;
+    unsigned long curr_Sq;
+    unsigned long start_time;
+    unsigned long receive_count;
+    unsigned int lost_count;
+    double lost_rate;
+
+} typedef *ReceiveDataInfo;
 
 struct RtpPacketInfo {
     unsigned int length;
