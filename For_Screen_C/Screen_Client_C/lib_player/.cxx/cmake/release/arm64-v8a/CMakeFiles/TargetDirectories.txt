@@ -1,3 +1,0 @@
-/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/release/arm64-v8a/CMakeFiles/rebuild_cache.dir
-/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/release/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/pcyfox/AndroidProjects/UDP_Player/UDP_Player_C/lib_player/.cxx/cmake/release/arm64-v8a/CMakeFiles/udp_player.dir
