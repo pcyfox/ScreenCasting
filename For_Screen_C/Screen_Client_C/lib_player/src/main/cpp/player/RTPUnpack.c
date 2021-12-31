@@ -157,6 +157,7 @@
 struct TempPacket {
     unsigned char *data;
     unsigned int index;
+    unsigned int len;
 } typedef *TempPkt;
 
 static TempPkt tempPkt = NULL;
@@ -185,47 +186,53 @@ ReceiveDataInfo analysePkt(unsigned char *rtpPacket) {
     if (receiveDataInfo == NULL) {
         receiveDataInfo = malloc(sizeof(struct RTPDataInfo));
         receiveDataInfo->start_time = getCurrentTime();
+        receiveDataInfo->last_Sq = 0;
         receiveDataInfo->receive_count = 0;
     }
-
     unsigned long currSq = ((rtpPacket[2] & 0xFF) << 8) + (rtpPacket[3] & 0xFF);
-    receiveDataInfo->curr_Sq = currSq;
-
-    LOGD("--------->curr_Sq =%ld,lsat_Sq=%ld", currSq, receiveDataInfo->last_Sq);
-    if (receiveDataInfo->receive_count > 0 && currSq - receiveDataInfo->last_Sq - 1 != 0) {
-        receiveDataInfo->lost_count++;
-        LOGW("maybe lost %d frame lastSq=%ld,currSq=%ld", receiveDataInfo->lost_count,
-             receiveDataInfo->last_Sq, receiveDataInfo->curr_Sq);
-    }
-
-    receiveDataInfo->receive_count++;
-
     if (currSq <= 1) {
         ClearReceiveDataInfo();
     }
+    receiveDataInfo->curr_Sq = currSq;
+
+//    LOGD("analysePkt()--------->receive_count=%ld,curr_Sq %ld,lsat_Sq=%ld",
+//         receiveDataInfo->receive_count, currSq, receiveDataInfo->last_Sq);
+
+    receiveDataInfo->receive_count++;
+    if (currSq - receiveDataInfo->last_Sq - 1 != 0) {
+        receiveDataInfo->lost_count += abs(receiveDataInfo->curr_Sq - receiveDataInfo->last_Sq);
+        LOGW("analysePkt() maybe lost %d frame lastSq=%ld,currSq=%ld", receiveDataInfo->lost_count,
+             receiveDataInfo->last_Sq, receiveDataInfo->curr_Sq);
+    }
 
     int64_t currentTime = getCurrentTime();
+
     if (currentTime - receiveDataInfo->start_time >= 5 * 1000) {
+        // LOGD("startTime=%ld,lastTime=%ld", receiveDataInfo->start_time, currentTime);
         if (receiveDataInfo->lost_count > 0) {
             receiveDataInfo->lost_rate =
                     (double) receiveDataInfo->lost_count /
                     (double) receiveDataInfo->receive_count;
-            if (receiveDataInfo->lost_rate > 0) {
-                LOGD("pkt lost rate=%.2lf", receiveDataInfo->lost_rate);
+            if (receiveDataInfo->lost_rate > 0.) {
+                LOGD("analysePkt() pkt lost rate=%.2lf", receiveDataInfo->lost_rate);
             }
         }
-        receiveDataInfo->start_time = currentTime;
         ClearReceiveDataInfo();
+        receiveDataInfo->start_time = currentTime;
     }
-
     receiveDataInfo->last_Sq = currSq;
     return receiveDataInfo;
 }
 
 
 int initTempPkt(unsigned int maxFrameLen) {
+    if (tempPkt) {
+        return 1;
+    }
+
     tempPkt = (TempPkt) malloc(sizeof(struct TempPacket));
     tempPkt->data = (unsigned char *) calloc(maxFrameLen, sizeof(char));
+    tempPkt->len = maxFrameLen;
     if (tempPkt->data == NULL) {
         LOGE("FU-A frame calloc fail!,size=%d", maxFrameLen);
         return -1;
@@ -242,6 +249,14 @@ void freeTempPkt() {
     tempPkt = NULL;
 }
 
+void clearTempPkt() {
+    if (tempPkt == NULL) {
+        return;
+    }
+    memset(tempPkt->data, 0, tempPkt->len);
+    tempPkt->index = 0;
+}
+
 
 int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned int maxFrameLen,
              unsigned int tag, Callback callback) {
@@ -252,7 +267,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         return -1;
     }
 
-    //analysePkt(rtpData);
+    analysePkt(rtpData);
 
     RTPPkt rtpPkt = (RTPPkt) malloc(sizeof(struct RtpPacketInfo));
     rtpPkt->length = 0;
@@ -270,7 +285,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
     switch (rtpPkt->type) {
         // STAP-A:RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+.....
         case 24: {
-            printCharsHex(rtpData, length, 20, "---STAP-RTP---");
+            //   printCharsHex(rtpData, length, 20, "---STAP-RTP---");
             //--------------SPS------------------------------
             H264Pkt spsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             unsigned int spsSize = (rtpData[RTP_HEAD_LEN + 1] << 8) + rtpData[RTP_HEAD_LEN + 2];
@@ -323,22 +338,17 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             int startCode = FUHeader >> 7;
             int endCode = (FUHeader & 0x40) >> 6;
 
-            LOGD("---FU-A Header=%02x,startCode=%d,endCode=%d", FUHeader, startCode, endCode);
+            //  LOGD("---FU-A Header=%02x,startCode=%d,endCode=%d", FUHeader, startCode, endCode);
             if (tempPkt != NULL && tempPkt->index >= maxFrameLen) {
                 break;
                 LOGE("---FU-A pack data error,frameLen>=maxFrameLen!");
             }
             //start
             if (startCode == 1) {
-                if (tempPkt != NULL) {
-                    freeTempPkt();
-                }
                 if (!initTempPkt(maxFrameLen)) {
                     return -1;
                 }
-
                 tempPkt->data[3] = HEAD_4;
-
                 int naluType = FUHeader & 0x1F;
                 if (naluType == 5) {
                     //I Frame start
@@ -379,7 +389,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
                 h264_pkt->length = tempPkt->index;
                 //    printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A After PackedRTP---");
                 callback(h264_pkt);
-                freeTempPkt();
+                clearTempPkt();
                 break;
             }
             break;
@@ -391,12 +401,12 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         case 5: {
             //I\P
             // printCharsHex(rtpData, length, 20, "---Single RTP---");
-            unsigned char *i_data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
-            i_data[3] = HEAD_4;
-            memcpy(i_data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);
+            unsigned char *data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
+            data[3] = HEAD_4;
+            memcpy(data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);
             H264Pkt pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             pkt->length = 4 + offHeadSize;
-            pkt->data = i_data;
+            pkt->data = data;
             pkt->type = rtpPkt->type;
             callback(pkt);
             break;

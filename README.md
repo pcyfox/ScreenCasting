@@ -1,9 +1,5 @@
-# ScreenCasting
-One-to-many screen casting
 
-Android 一对多投屏（设备有限，目前能测试的极限是1对24投屏
-主要维护的C语言版本工程
-
+//java 版不再维护
 
 /**
   *
@@ -35,11 +31,9 @@ Android 一对多投屏（设备有限，目前能测试的极限是1对24投屏
    * <p>
    * 补码=反码+1
    *
-   * <p>
    * java数字的二进制;
    * 正数是用原码来表示的
    * 负数是用补码来表示的
-   * <p>
    *
    * H.2364编码知识：
    * [1]DR帧一定是I帧，但I帧不一定是IDR帧；IDR帧的作用是立刻刷新,使错误不致传播,从IDR帧开始算新的序列开始编码。I帧有被跨帧参考的可能,IDR不会。
@@ -47,8 +41,6 @@ Android 一对多投屏（设备有限，目前能测试的极限是1对24投屏
    * GOP:从一个IDR帧到下一个IDR帧之间的帧序列叫做。
    * <p>
    * RTP打包h.264:@see https://blog.csdn.net/shixin_0125/article/details/78798238
-
-
 
 
    * ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -74,18 +66,21 @@ Android 一对多投屏（设备有限，目前能测试的极限是1对24投屏
    * 打包H264码流时，只需在帧前面加上12字节的RTP头
    *
    * 2. 组合封包模式:多NALU RTP包, 特别小的包几个NALU放在一个RTP包中,如PPS、SPS
-   * 如：STAP-A类型组合封包：
-   * RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+.....
-   *
-   * STAP Header 格式与 NALU Header 格式相同,后五位为TYPE
    * TYPE=24:STAP-A
    * TYPE=25:STAP-B
+   * 如：STAP-A类型组合封包：
+   * RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+ NALU2 Size（2 bit） +NALU2....
    *
+   * STAP Header 格式与 NALU Header 格式相同,后五位为TYPE
    *
+
    *
-   * 3.FragmentationUnits (FUs):   I帧长度超过一定的阀值，就必须要拆包组成RTP包了,有FU-A，FU-B
+   * 3.FragmentationUnits (FUs):帧长度超过一定的阀值，就必须要拆包组成RTP包了,有FU-A，FU-B
+   * TYPE=28:FU-A
+   * TYPE=29:FU-B
    *
-   * RTP Header(12 bit) +FU indicator(1 bit) +FU header
+   * RTP Header(12 bit) +FU indicator(1 bit) +FU header(1 bit)
+   *
    * (NALU中的Header会被剔除，并且NALU Header的信息被拆分到这两个字节中，其中
    * NALU-Header的前三位放在FU-Indicator的前三位
    * 最重要NALU-Header的TYPE放在 FU-Header的type中)
@@ -128,7 +123,7 @@ Android 一对多投屏（设备有限，目前能测试的极限是1对24投屏
    * R: 1 bit
    * 保留位必须设置为0，接收者必须忽略该位。
    * Type: 5 bits ，就是NALU Type： 5:IDR,1:P...
-   *
+   1
    *
    * 拆包和解包
    * 拆包：当编码器在编码时需要将原有一个NAL按照FU-A进行分片，原有的NAL的单元头与分片后的FU-A的单元头有如下关系：
@@ -146,4 +141,7 @@ Android 一对多投屏（设备有限，目前能测试的极限是1对24投屏
    * 荷载结构
    *
    */
+
+
+
 

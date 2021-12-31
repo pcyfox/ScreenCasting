@@ -312,7 +312,7 @@ int PackRTP(unsigned char *h264Pkt,
             }
             //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
             memcpy(result->data + headerLen + 2, h264Pkt + currentIndex, copyLen);
-            printCharsHex(result->data, result->length, 16, "FU-A After Packed");
+        //    printCharsHex(result->data, result->length, 16, "FU-A After Packed");
             callback(result);
             currentIndex += copyLen;
         }
