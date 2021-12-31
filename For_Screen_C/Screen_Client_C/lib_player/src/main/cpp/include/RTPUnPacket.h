@@ -50,10 +50,14 @@ struct H264Packet {
 } typedef *H264Pkt;
 
 
-typedef void (*Callback)(H264Pkt  pkt);
+typedef void (*Callback)(H264Pkt
+pkt);
 
 int UnPacket(unsigned char *rtpPacket, const unsigned int length, const unsigned int maxFrameLen,
              unsigned int isLiteMod,
              const Callback callback);
+
+void Clear(void);
+
 
 #endif //UDP_PLAYER_RTPUNPACKET_H

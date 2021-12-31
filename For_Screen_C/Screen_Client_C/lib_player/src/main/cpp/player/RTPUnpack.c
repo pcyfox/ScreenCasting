@@ -151,10 +151,6 @@
    *
    */
 
-
-
-
-
 static TempPkt tempPkt = NULL;
 static ReceiveDataInfo receiveDataInfo = NULL;
 
@@ -170,7 +166,7 @@ void printCharsHex(char *data, int length, int printLen, char *tag) {
     }
 }
 
-void ClearReceiveDataInfo() {
+void ResetReceiveDataInfo() {
     receiveDataInfo->start_time = 0;
     receiveDataInfo->receive_count = 0;
     receiveDataInfo->lost_count = 0;
@@ -186,7 +182,7 @@ ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
     }
     unsigned long currSq = ((rtpPacket[2] & 0xFF) << 8) + (rtpPacket[3] & 0xFF);
     if (currSq <= 1) {
-        ClearReceiveDataInfo();
+        ResetReceiveDataInfo();
     }
     receiveDataInfo->curr_Sq = currSq;
 
@@ -213,7 +209,7 @@ ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
                 LOGD("analysePkt() pkt lost rate=%.2f", receiveDataInfo->lost_rate);
             }
         }
-        ClearReceiveDataInfo();
+        ResetReceiveDataInfo();
         receiveDataInfo->start_time = currentTime;
     }
     receiveDataInfo->last_Sq = currSq;
@@ -245,7 +241,7 @@ void freeTempPkt() {
     tempPkt = NULL;
 }
 
-void clearTempPkt() {
+void resetTempPkt() {
     if (tempPkt == NULL || tempPkt->data == NULL) {
         return;
     }
@@ -272,11 +268,6 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
     rtpPkt->curr_Sq = currSq;
     //第13个字节
     rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
-
-    if (rtpPkt->type != 28) {
-        freeTempPkt();
-    }
-
 
     //printCharsHex(rtpData, length, 20, "---RTP---");
     switch (rtpPkt->type) {
@@ -367,26 +358,29 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             }
 
             //mid
-            if (startCode == 0 && endCode == 0) {
+            if (endCode == 1 || startCode == 0 && endCode == 0) {
+                if (tempPkt == NULL) {
+                    LOGW("temPkt been freed!");
+                    return -1;
+                }
                 //14=RTP Header len +FU-Indicator+FU-Header
                 int copyLen = offHeadSize - 2;
                 memcpy(tempPkt->data + tempPkt->index + 1, rtpData + RTP_HEAD_LEN + 2, copyLen);
                 tempPkt->index += copyLen;
-                break;
+                if (endCode != 1) {
+                    break;
+                }
             }
 
             //end
             if (endCode == 1) {
-                int copyLen = offHeadSize - 2;
-                memcpy(tempPkt->data + tempPkt->index + 1, rtpData + RTP_HEAD_LEN + 2, copyLen);
-                tempPkt->index += copyLen;
                 H264Pkt h264_pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
                 h264_pkt->data = (unsigned char *) calloc(tempPkt->index, sizeof(char));
                 memcpy(h264_pkt->data, tempPkt->data, tempPkt->index);
                 h264_pkt->length = tempPkt->index;
                 //    printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A After PackedRTP---");
                 callback(h264_pkt);
-                clearTempPkt();
+                resetTempPkt();
                 break;
             }
             break;
@@ -416,4 +410,10 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
     free(rtpData);
     rtpData = NULL;
     return 1;
+}
+
+
+void clear() {
+    freeTempPkt();
+    free(receiveDataInfo);
 }
