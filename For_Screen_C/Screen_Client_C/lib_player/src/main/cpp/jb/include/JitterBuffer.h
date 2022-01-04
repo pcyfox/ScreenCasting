@@ -6,9 +6,6 @@
 #define SCREEN_CLIENT_C_JITTERBUFFER_H
 
 
-class JitterBuffer {
-
-};
 
 
 #endif //SCREEN_CLIENT_C_JITTERBUFFER_H

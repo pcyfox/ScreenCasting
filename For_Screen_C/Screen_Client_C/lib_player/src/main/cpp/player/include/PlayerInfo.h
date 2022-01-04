@@ -9,7 +9,7 @@
 #include <media/NdkMediaCodec.h>
 #include "pthread.h"
 #include "Player.h"
-#include "Android_log.h"
+#include "AndroidLog.hpp"
 #include "StateListener.h"
 #include "AsyncQueue.hpp"
 #include "AVPacket.h"

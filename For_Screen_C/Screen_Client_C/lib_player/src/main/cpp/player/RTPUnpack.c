@@ -3,7 +3,7 @@
 //
 #include <stdlib.h>
 #include <string.h>
-#include <Android_log.h>
+#include <AndroidLog.hpp>
 #include <unistd.h>
 #include <Utils.h>
 #include <RTPUnPacket.h>
@@ -154,17 +154,6 @@
 static TempPkt tempPkt = NULL;
 static ReceiveDataInfo receiveDataInfo = NULL;
 
-void printCharsHex(char *data, int length, int printLen, char *tag) {
-    LOGD("-------------%s-length=%d,printLen=%d------------->",
-         tag,
-         length, printLen);
-    if (printLen > length) {
-        return;
-    }
-    for (int i = 0; i < printLen; ++i) {
-        LOGD("----------printChars() %s:i=%d,char=%02x", tag, i, *(data + i));
-    }
-}
 
 void ResetReceiveDataInfo() {
     receiveDataInfo->start_time = 0;
@@ -391,7 +380,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         case 1:
         case 5: {
             //I\P
-            // printCharsHex(rtpData, length, 20, "---Single RTP---");
+            printCharsHex(rtpData, length, 20, "---Single RTP---");
             unsigned char *data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
             data[3] = HEAD_4;
             memcpy(data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);

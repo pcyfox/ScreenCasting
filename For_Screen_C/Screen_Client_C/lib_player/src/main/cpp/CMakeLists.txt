@@ -16,7 +16,7 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         jni/PlayerBridge.cpp
         jni/PlayerBridgeEnv.cpp
-        jb/JitterBuffer.cpp
+        jb/JitterBuffer.c
         player/Player.cpp
         player/AVPacket.cpp
         player/StateListener.cpp

@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "Android_log.h"
+#include "AndroidLog.hpp"
 #include "include/Utils.h"
 #include <android/native_window_jni.h>
 #include <android/native_window.h>

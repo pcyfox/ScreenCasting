@@ -3,7 +3,7 @@
 //
 
 #include "include/StateListener.h"
-#include "Android_log.h"
+#include "AndroidLog.hpp"
 
 
 void StateListener::onStateChange(PlayState state) {
