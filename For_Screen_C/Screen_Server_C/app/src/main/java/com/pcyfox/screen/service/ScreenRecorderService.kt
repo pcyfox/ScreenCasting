@@ -81,7 +81,7 @@ class ScreenRecorderService : Service() {
         }
 
         requestDisplayIntent?.run {
-            val maxPacketLen = min(w * h, (Publisher.MAX_PKT_LEN))
+            val maxPacketLen = maxUdpPktLen
             serverDisplay = ScreenDisplay(applicationContext, ip, port, maxPacketLen)
             serverDisplay?.setIntentResult(resultCode, this)
             startStreamRtp(w, h, bitRate, fps)
@@ -140,10 +140,11 @@ class ScreenRecorderService : Service() {
         private var requestDisplayIntent: Intent? = null
         private var w = 1920
         private var h = 1080
-        private var fps =20
-        private var bitRate: Int = (w * h *0.1f).toInt()
+        private var fps = 20
+        private var bitRate: Int = (w * h * 0.1f).toInt()
         private var ip: String = Publisher.MULTI_CAST_IP
         private var port: Int = Publisher.TARGET_PORT
+        private var maxUdpPktLen = Publisher.MAX_PKT_LEN;
         private const val KEY_STATE = "KEY_STATE"
 
         private fun changeState(context: Context, state: Int) {
@@ -174,6 +175,7 @@ class ScreenRecorderService : Service() {
             h: Int,
             fps: Int,
             bitRate: Int,
+            maxUdpPktLen: Int,
             ip: String,
             port: Int
         ) {
@@ -185,6 +187,11 @@ class ScreenRecorderService : Service() {
             Companion.port = port
             Companion.resultCode = resultCode
             Companion.requestDisplayIntent = requestDisplayIntent
+            Companion.maxUdpPktLen = maxUdpPktLen;
+            Log.d(
+                TAG,
+                "start() called with: context = $context, resultCode = $resultCode, requestDisplayIntent = $requestDisplayIntent, w = $w, h = $h, fps = $fps, bitRate = $bitRate, maxUdpPktLen = $maxUdpPktLen, ip = $ip, port = $port"
+            )
 
             val startIntent = Intent()
             startIntent.setClass(context, ScreenRecorderService::class.java)

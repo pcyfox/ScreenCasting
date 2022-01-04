@@ -22,7 +22,7 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.UDP_Player">
-        <activity android:name=".activity.StartActivity"></activity>
+        <activity android:name=".activity.StartActivity" />
         <activity
             android:name=".activity.ScreenRecordDemoActivity"
             android:screenOrientation="landscape"

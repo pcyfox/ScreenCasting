@@ -43,10 +43,11 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
 
         val w = 1920
         val h = 1080
-         et_w.setText(w.toString())
+        et_w.setText(w.toString())
         et_h.setText(h.toString())
         val r = (w * h * 0.8).toInt()
         et_bitrate.setText(r.toString())
+        et_udp_max_len.setText(Publisher.MAX_PKT_LEN.toString())
     }
 
 
@@ -75,6 +76,8 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
         val h = Integer.parseInt(et_h.text.toString())
         val r = Integer.parseInt(et_bitrate.text.toString())
         val fps = Integer.parseInt(et_fps.text.toString())
+        val maxUdpPktLen = Integer.parseInt(et_udp_max_len.text.toString())
+
 
         if (data == null) {
             ToastUtils.showShort("intent data=null!")
@@ -87,6 +90,7 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
                 h,
                 fps,
                 r,
+                maxUdpPktLen,
                 Publisher.MULTI_CAST_IP,
                 Publisher.TARGET_PORT,
             )

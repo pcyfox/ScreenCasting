@@ -49,12 +49,22 @@
                 android:textColor="@android:color/white" />
 
             <EditText
-
                 android:id="@+id/et_bitrate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="bitRate"
+                android:inputType="number"
+                android:textColor="@android:color/white" />
+
+
+
+            <EditText
+                android:id="@+id/et_udp_max_len"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="udp_max_len"
                 android:inputType="number"
                 android:textColor="@android:color/white" />
 
