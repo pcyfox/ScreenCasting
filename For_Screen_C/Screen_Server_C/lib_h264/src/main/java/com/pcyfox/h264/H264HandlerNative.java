@@ -9,9 +9,12 @@ public class H264HandlerNative {
 
     public native void updateSPS_PPS(byte[] sps, int spsLen, byte[] pps, int ppsLen);
 
+    public native void updateScreen(int w,int h);
 
-    public native int packH264ToRTP(byte[] h264Pkt, int length, int maxPktLen,
-                                    long pts, long clock, int tag, ResultCallback callback);
+
+    public native int packAndSedH264ToRTP(byte[] h264Pkt, int length, int maxPktLen,
+                                          long pts, long clock, int tag,
+                                          ResultCallback callback);
 
     public native int startSend();
 

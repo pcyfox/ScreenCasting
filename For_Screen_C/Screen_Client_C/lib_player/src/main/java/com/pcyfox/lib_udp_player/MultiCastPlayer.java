@@ -25,7 +25,7 @@ public class MultiCastPlayer {
     private final Handler handler;
     private final static int MAX_UDP_PACKET_LEN = 65507;//UDP包大小限制
     private NativePlayer nativeUDPPlayer;
-    private int maxFrameLen;
+    private final int maxFrameLen;
 
     public MultiCastPlayer(String host, int port, int maxFrameLen, SurfaceView surfaceView) {
         multiCastHost = host;

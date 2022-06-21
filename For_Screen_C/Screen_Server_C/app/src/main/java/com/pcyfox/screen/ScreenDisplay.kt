@@ -6,12 +6,10 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import java.nio.ByteBuffer
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) :
-    DisplayBase(context, false) {
+class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) : DisplayBase(context, false) {
     var isStop = false
 
-    private val publisher = Publisher(ip, port, SocketType.UDP, false, maxPacketLength = maxPacketLen)
+    private val publisher = Publisher(ip, port, SocketType.UDP,  maxPacketLength = maxPacketLen)
 
     override fun prepareAudioRtp(isStereo: Boolean, sampleRate: Int) {
     }
@@ -19,6 +17,7 @@ class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) 
     fun startStream() {
         super.startStream("")
         isStop = false
+
     }
 
     override fun startStreamRtp(url: String) { //unused
@@ -34,6 +33,7 @@ class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) 
     }
 
     override fun onSpsPpsVpsRtp(sps: ByteBuffer, pps: ByteBuffer, vps: ByteBuffer?) {
+        publisher.updateScreen(width,height)
         val spsBuf = ByteArray(sps.capacity())
         sps.get(spsBuf)
         val ppsBuf = ByteArray(pps.capacity())

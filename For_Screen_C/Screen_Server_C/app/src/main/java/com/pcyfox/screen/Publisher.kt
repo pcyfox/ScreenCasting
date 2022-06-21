@@ -52,20 +52,22 @@ class Publisher(
     fun send(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
         val buf = ByteArray(info.size)
         h264Buffer.get(buf, info.offset, info.size)
-        h264HandlerNative.packH264ToRTP(
+
+
+        if (isNeedSaveRTPPkt) {
+            handler?.post {
+                bufOS?.write(buf)
+            }
+        }
+
+        h264HandlerNative.packAndSedH264ToRTP(
             buf,
             buf.size,
             maxPacketLength,
             info.presentationTimeUs * 1000,
             clock,
-            0
-        ) {
-            if (isNeedSaveRTPPkt) {
-                handler?.post {
-                    bufOS?.write(it)
-                }
-            }
-        }
+            0, null
+        )
         h264Buffer.clear()
     }
 
@@ -81,9 +83,16 @@ class Publisher(
         h264HandlerNative.updateSPS_PPS(sps, sps.size, pps, pps.size)
     }
 
+    fun updateScreen(w: Int, h: Int) {
+        if(w*h>0){
+            h264HandlerNative.updateScreen(w, h)
+        }
+    }
+
     companion object {
         const val MULTI_CAST_IP = "239.0.0.200"
         const val TARGET_PORT = 2021
+
         //const val MAX_PKT_LEN = 10000
         const val MAX_PKT_LEN = 65000
     }

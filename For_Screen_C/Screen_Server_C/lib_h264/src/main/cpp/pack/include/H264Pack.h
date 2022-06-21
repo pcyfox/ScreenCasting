@@ -21,11 +21,14 @@ typedef void (*Callback)(Result
 static unsigned long cq = 0;
 
 int PackRTP(unsigned char *h264Pkt, const unsigned int length, const unsigned int maxPktLen,
-            const unsigned long ts, unsigned int clock, int tag,
+            const unsigned long ts, unsigned int clock,
+            int tag,
             Callback callback);
 
 
 void UpdateSPS_PPS(unsigned char *sps, int spsLen, unsigned char *pps, int ppsLen);
+
+void UpdateScreen(int w,int h);
 
 Result GetSPS_PPS_RTP_STAP_Pkt(const unsigned long ts, unsigned long clock);
 

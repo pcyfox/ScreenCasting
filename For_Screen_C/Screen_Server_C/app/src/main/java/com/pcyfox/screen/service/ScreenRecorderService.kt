@@ -14,13 +14,11 @@ import androidx.core.app.NotificationCompat
 import com.blankj.utilcode.util.ScreenUtils
 import com.pcyfox.screen.ScreenDisplay
 import com.pcyfox.screen.Publisher
-import kotlin.math.min
 
 
 /**
  * Basic RTMP/RTSP service streaming implementation with camera2
  */
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class ScreenRecorderService : Service() {
     private var serverDisplay: ScreenDisplay? = null
     override fun onCreate() {
@@ -114,20 +112,20 @@ class ScreenRecorderService : Service() {
 
     private fun startStreamRtp(w: Int, h: Int, bitRate: Int, fps: Int) {
         serverDisplay?.run {
-            if (!serverDisplay!!.isStreaming) {
-                val prepareVideo = serverDisplay!!.prepareVideo(
-                    w,
-                    h,
-                    fps,
-                    bitRate,
-                    0,
-                    ScreenUtils.getScreenDensityDpi()
-                )
-                if (prepareVideo) {
-                    serverDisplay!!.startStream()
+            if (!isStreaming) {
+                if (prepareVideo(
+                        w,
+                        h,
+                        fps,
+                        bitRate,
+                        0,
+                        ScreenUtils.getScreenDensityDpi()
+                    )
+                ) {
+                    startStream()
                 }
             } else {
-                serverDisplay!!.stopStream()
+                stopStream()
             }
         }
     }
@@ -140,8 +138,8 @@ class ScreenRecorderService : Service() {
         private var requestDisplayIntent: Intent? = null
         private var w = 1920
         private var h = 1080
-        private var fps = 20
-        private var bitRate: Int = (w * h * 0.1f).toInt()
+        private var fps = 25
+        private var bitRate: Int = (w * h * 0.5f).toInt()
         private var ip: String = Publisher.MULTI_CAST_IP
         private var port: Int = Publisher.TARGET_PORT
         private var maxUdpPktLen = Publisher.MAX_PKT_LEN;

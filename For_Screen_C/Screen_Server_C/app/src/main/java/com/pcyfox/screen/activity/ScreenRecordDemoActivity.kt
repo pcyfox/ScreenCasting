@@ -3,14 +3,13 @@ package com.pcyfox.screen.activity
 import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.PermissionUtils
+import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.pcyfox.screen.R
 import com.pcyfox.screen.Publisher
@@ -41,12 +40,12 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
 //        val w = ScreenUtils.getAppScreenWidth()
 //        val h = ScreenUtils.getAppScreenHeight()
 
-        val w = 1920
-        val h = 1080
+        val w =ScreenUtils.getScreenWidth()
+        val h =ScreenUtils.getScreenHeight()
         et_w.setText(w.toString())
         et_h.setText(h.toString())
-        val r = (w * h * 0.8).toInt()
-        et_bitrate.setText(r.toString())
+        val bitrate =1.6*1024*1024
+        et_bitrate.setText(bitrate.toString())
         et_udp_max_len.setText(Publisher.MAX_PKT_LEN.toString())
     }
 
@@ -69,12 +68,11 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val w = Integer.parseInt(et_w.text.toString())
         val h = Integer.parseInt(et_h.text.toString())
-        val r = Integer.parseInt(et_bitrate.text.toString())
+        val r = et_bitrate.text.toString().toFloat()
         val fps = Integer.parseInt(et_fps.text.toString())
         val maxUdpPktLen = Integer.parseInt(et_udp_max_len.text.toString())
 
@@ -89,7 +87,7 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
                 w,
                 h,
                 fps,
-                r,
+                r.toInt(),
                 maxUdpPktLen,
                 Publisher.MULTI_CAST_IP,
                 Publisher.TARGET_PORT,

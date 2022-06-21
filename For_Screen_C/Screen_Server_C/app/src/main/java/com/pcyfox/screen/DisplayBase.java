@@ -41,7 +41,6 @@ import static android.content.Context.MEDIA_PROJECTION_SERVICE;
  * <p>
  * Created by pedro on 9/08/17.
  */
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrophoneData {
     private static final String TAG = "DisplayBase";
     private boolean disableAudio = true;
@@ -54,7 +53,9 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     private boolean streaming = false;
     private boolean isRunning = false;
     protected SurfaceView surfaceView;
-    private int dpi = 320;
+    private int dpi = 480;
+    int width;
+    int height;
     private VirtualDisplay virtualDisplay;
     private int resultCode = -1;
     private Intent data;
@@ -94,6 +95,8 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     public boolean prepareVideo(int width, int height, int fps, int bitrate, int rotation, int dpi,
                                 int avcProfile, int avcProfileLevel, int iFrameInterval) {
         this.dpi = dpi;
+        this.width=width;
+        this.height=height;
         return videoEncoder.prepareVideoEncoder(width, height, fps, bitrate, rotation, true, iFrameInterval,
                 FormatVideoEncoder.SURFACE, avcProfile, avcProfileLevel);
     }

@@ -85,13 +85,13 @@ Java_com_pcyfox_h264_H264HandlerNative_updateSPS_1PPS(JNIEnv
 
 extern "C"
 JNIEXPORT jint JNICALL
-Java_com_pcyfox_h264_H264HandlerNative_packH264ToRTP(JNIEnv *env, jobject thiz,
-                                                     jbyteArray h264_pkt,
-                                                     jint length,
-                                                     jint max_pkt_len, jlong ts,
-                                                     jlong clock,
-                                                     int tag,
-                                                     jobject callback) {
+Java_com_pcyfox_h264_H264HandlerNative_packAndSedH264ToRTP(JNIEnv *env, jobject thiz,
+                                                           jbyteArray h264_pkt,
+                                                           jint length,
+                                                           jint max_pkt_len, jlong ts,
+                                                           jlong clock,
+                                                           int tag,
+                                                           jobject callback) {
 
     if (jOnCallbackMid == NULL && callback != NULL) {
         jCallerCurrentEnv = env;
@@ -100,9 +100,7 @@ Java_com_pcyfox_h264_H264HandlerNative_packH264ToRTP(JNIEnv *env, jobject thiz,
         jOnCallbackMid = env->GetMethodID(jCallback, "onCallback", "([B)V");
     }
 
-    return PackRTP(ByteArrayToChars(env, h264_pkt, length), length, max_pkt_len, ts, clock,
-                   tag,
-                   RTPCallback);
+    return PackRTP(ByteArrayToChars(env, h264_pkt, length), length, max_pkt_len, ts, clock,tag,RTPCallback);
 
 }
 
@@ -124,4 +122,10 @@ JNIEXPORT jint JNICALL
 Java_com_pcyfox_h264_H264HandlerNative_startSend(JNIEnv *env, jobject thiz) {
     isStartToSendData = 1;
     return 1;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_pcyfox_h264_H264HandlerNative_updateScreen(JNIEnv *env, jobject thiz, jint w, jint h) {
+    UpdateScreen(w,h);
 }

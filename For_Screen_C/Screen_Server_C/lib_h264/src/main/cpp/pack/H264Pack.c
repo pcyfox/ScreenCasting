@@ -115,13 +115,14 @@ FU-A:
  *
  ******************************************************************
 */
-struct STAP_A_SPS_PPS_Pkt {
+struct Packet {
     unsigned char *pkt;
     unsigned int len;
-} typedef *STAP_A;
+} typedef *STAP_A, *Pkt;
 
 
 static STAP_A stapA = NULL;
+static Pkt screenInfo = NULL;
 static int ssrc = 0;
 static unsigned int headerLen = RTP_HEADER_LEN;
 
@@ -157,12 +158,6 @@ int GetStartCodeLen(const unsigned char *pkt) {
     } else {
         return 0;
     }
-}
-
-void PrintCurrentSq(Result result) {
-    unsigned long currSq;
-    currSq = ((result->data[2] & 0xFF) << 8) + (result->data[3] & 0xFF);
-    LOGD("----------currentSq------------%ld", currSq);
 }
 
 
@@ -240,6 +235,16 @@ Result GetSPS_PPS_RTP_STAP_Pkt(const unsigned long ts, unsigned long clock) {
     return NULL;
 }
 
+
+Result GetScreenInfo(const unsigned long ts, unsigned long clock) {
+    if(screenInfo){
+        return AddRTPHeader(ts, 1, clock, screenInfo->pkt, screenInfo->len);
+    }
+
+    return NULL;
+}
+
+
 void GetFU_A_Pkt(const unsigned long ts, unsigned long clock, unsigned char *h264Pkt,
                  unsigned int length, unsigned int maxPktLen, Callback callback) {
 
@@ -258,9 +263,8 @@ int PackRTP(unsigned char *h264Pkt,
 
     //如果遇到I帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包发送出去
     if (naluType == 5) {
-        Result result = GetSPS_PPS_RTP_STAP_Pkt(ts, clock);
-        callback(result);
-        //printCharsHex(result->data, length, 20, "SPS_PPS");
+        callback(GetScreenInfo(ts, clock));
+        callback(GetSPS_PPS_RTP_STAP_Pkt(ts, clock));
     }
 
     int startCodeLen = GetStartCodeLen(h264Pkt);
@@ -312,7 +316,7 @@ int PackRTP(unsigned char *h264Pkt,
             }
             //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
             memcpy(result->data + headerLen + 2, h264Pkt + currentIndex, copyLen);
-        //    printCharsHex(result->data, result->length, 16, "FU-A After Packed");
+            //    printCharsHex(result->data, result->length, 16, "FU-A After Packed");
             callback(result);
             currentIndex += copyLen;
         }
@@ -339,19 +343,26 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
 
     __uint16_t spsSize = (__uint16_t) spsLen - startCodeLen;
     __uint16_t ppsSize = (__uint16_t) ppsLen - startCodeLen;
-    //5= STAP Header Len(1bit)+SPS Size Len(2bit)+PPS Size Len(3bit)
+
+    //5= STAP Header Len(1bit)+SPS Size Len(2bit)+PPS Size Len(2bit)
     stapA->len = spsSize + ppsSize + 5;
     stapA->pkt = (unsigned char *) calloc(stapA->len, sizeof(char));
-    //STAP-A unit  Type=24
-    stapA->pkt[0] = 24;//0x18
+    //STAP-A unit  Type=24:0x18
+    stapA->pkt[0] = 24;
     //SPS size used 2 bit
     stapA->pkt[1] = spsSize >> 8;//前8位
     stapA->pkt[2] = spsSize & 0xFF;//后8位
+    //printCharsHex(spsData,spsSize+startCodeLen,spsSize+startCodeLen,"sps");
+    //copy sps
     memcpy(stapA->pkt + 3, spsData + startCodeLen, spsSize);
+    //printCharsHex(stapA->pkt,stapA->len,spsSize+3,"stapA1");
     //PPS size used 2 bit
     stapA->pkt[spsSize + 3] = ppsSize >> 8;//前8位
     stapA->pkt[spsSize + 4] = ppsSize & 0xFF;//后8位
+    //copy  pps
     memcpy(stapA->pkt + 5 + spsSize, ppsData + startCodeLen, ppsSize);
+    // printCharsHex(stapA->pkt,stapA->len,stapA->len,"stapA");
+    int i = 0;
 }
 
 
@@ -367,4 +378,19 @@ void FreeResult(Result result) {
 void clear() {
     cq = 0;
     freeSTAP();
+}
+
+void UpdateScreen(int w, int h) {
+    if (!screenInfo) {
+        screenInfo = malloc(sizeof(Pkt));
+        screenInfo->pkt = calloc(5, sizeof(char));
+        screenInfo->pkt[0]=0x24;
+    }
+
+    screenInfo->pkt[1] = w>> 8;//前8位
+    screenInfo->pkt[2] = w& 0xFF;//后8位
+
+    screenInfo->pkt[3] = h>> 8;//前8位
+    screenInfo->pkt[4] = h& 0xFF;//后8位
+
 }
