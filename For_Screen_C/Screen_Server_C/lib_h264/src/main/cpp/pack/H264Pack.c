@@ -263,7 +263,8 @@ int PackRTP(unsigned char *h264Pkt,
 
     //如果遇到I帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包发送出去
     if (naluType == 5) {
-        callback(GetScreenInfo(ts, clock));
+        //callback(GetScreenInfo(ts, clock));
+
         callback(GetSPS_PPS_RTP_STAP_Pkt(ts, clock));
     }
 
@@ -334,7 +335,7 @@ int PackRTP(unsigned char *h264Pkt,
 */
 void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, int ppsLen) {
     if (stapA == NULL) {
-        stapA = (STAP_A) malloc(sizeof(struct STAP_A_SPS_PPS_Pkt));
+        stapA = (STAP_A) malloc(sizeof(struct Packet));
     } else {
         free(stapA->pkt);
     }

@@ -64,6 +64,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         this.getVideoData = getVideoData;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideoEncoder(int width, int height, int fps, int bitRate, int rotation,
                                        boolean hardwareRotation, int iFrameInterval, FormatVideoEncoder formatVideoEncoder) {
         return prepareVideoEncoder(width, height, fps, bitRate, rotation, hardwareRotation,
@@ -73,6 +74,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     /**
      * Prepare encoder with custom parameters
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideoEncoder(int width, int height, int fps, int bitRate, int rotation,
                                        boolean hardwareRotation, int iFrameInterval, FormatVideoEncoder formatVideoEncoder,
                                        int avcProfile, int avcProfileLevel) {
@@ -118,9 +120,9 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             Log.i(TAG, "Prepare video info: " + this.formatVideoEncoder.name() + ", " + resolution);
             videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                     this.formatVideoEncoder.getFormatCodec());
-          //  videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
+            //  videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
             videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
-            videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE,MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
             videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
             videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
             if (hardwareRotation) {
@@ -142,8 +144,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             }
             codec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             running = false;
-            if (formatVideoEncoder == FormatVideoEncoder.SURFACE
-                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            if (formatVideoEncoder == FormatVideoEncoder.SURFACE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 isBufferMode = false;
                 inputSurface = codec.createInputSurface();
             }
@@ -177,15 +178,12 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             codec.start();
         } else {
             codec.start();
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    while (running) {
-                        try {
-                            getDataFromEncoder(null);
-                        } catch (IllegalStateException e) {
-                            Log.i(TAG, "Encoding error", e);
-                        }
+            handler.post(() -> {
+                while (running) {
+                    try {
+                        getDataFromEncoder(null);
+                    } catch (IllegalStateException e) {
+                        Log.i(TAG, "Encoding error", e);
                     }
                 }
             });
@@ -209,6 +207,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         Log.i(TAG, "stopped");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void reset() {
         stop();
         prepareVideoEncoder(width, height, fps, bitRate, rotation, hardwareRotation, iFrameInterval,
@@ -222,6 +221,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
      * @param mediaCodecInfo
      * @return
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private FormatVideoEncoder chooseColorDynamically(MediaCodecInfo mediaCodecInfo) {
         for (int color : mediaCodecInfo.getCapabilitiesForType(type).colorFormats) {
             if (color == FormatVideoEncoder.YUV420PLANAR.getFormatCodec()) {
@@ -236,6 +236,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     /**
      * Prepare encoder with default parameters
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideoEncoder() {
         return prepareVideoEncoder(width, height, fps, bitRate, rotation, false, iFrameInterval,
                 formatVideoEncoder, avcProfile, avcProfileLevel);
@@ -334,6 +335,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     /**
      * choose the video encoder by mime.
      */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected MediaCodecInfo chooseEncoder(String mime) {
         Log.d(TAG, "chooseEncoder() called with: mime = [" + mime + "]");
@@ -475,13 +477,11 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     @Override
     protected void checkBuffer(@NonNull ByteBuffer byteBuffer,
                                @NonNull MediaCodec.BufferInfo bufferInfo) {
-        if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-            if (!spsPpsSetted) {
-                Pair<ByteBuffer, ByteBuffer> buffers = decodeSpsPpsFromBuffer(byteBuffer.duplicate(), bufferInfo.size);
-                if (buffers != null) {
-                    getVideoData.onSpsPps(buffers.first, buffers.second);
-                    spsPpsSetted = true;
-                }
+        if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0 && !spsPpsSetted) {
+            Pair<ByteBuffer, ByteBuffer> buffers = decodeSpsPpsFromBuffer(byteBuffer.duplicate(), bufferInfo.size);
+            if (buffers != null) {
+                getVideoData.onSpsPps(buffers.first, buffers.second);
+                spsPpsSetted = true;
             }
         }
     }
@@ -497,6 +497,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void createAsyncCallback() {
+        Log.d(TAG, "createAsyncCallback() called");
         callback = new MediaCodec.Callback() {
             @Override
             public void onInputBufferAvailable(@NonNull MediaCodec mediaCodec, int inBufferIndex) {

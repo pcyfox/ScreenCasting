@@ -4,14 +4,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 22
+        targetSdkVersion 30
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
 
@@ -30,7 +28,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version '3.10.2'
+            version '3.18.1'
         }
     }
 
@@ -47,6 +45,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    ndkVersion '21.4.7075529'
 }
 
 

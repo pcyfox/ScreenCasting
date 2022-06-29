@@ -37,14 +37,14 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
             it.isLooping = true
 
         }
-//        val w = ScreenUtils.getAppScreenWidth()
-//        val h = ScreenUtils.getAppScreenHeight()
 
         val w =ScreenUtils.getScreenWidth()
         val h =ScreenUtils.getScreenHeight()
         et_w.setText(w.toString())
         et_h.setText(h.toString())
-        val bitrate =1.6*1024*1024
+        //val bitrate =1.2*1024*1024
+        val bitrate =w*h
+        //val bitrate =w*h
         et_bitrate.setText(bitrate.toString())
         et_udp_max_len.setText(Publisher.MAX_PKT_LEN.toString())
     }

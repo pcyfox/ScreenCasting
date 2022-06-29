@@ -49,6 +49,7 @@ class ScreenRecorderService : Service() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "RTP Display service started")
         intent?.run {
@@ -110,6 +111,7 @@ class ScreenRecorderService : Service() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun startStreamRtp(w: Int, h: Int, bitRate: Int, fps: Int) {
         serverDisplay?.run {
             if (!isStreaming) {
@@ -119,7 +121,7 @@ class ScreenRecorderService : Service() {
                         fps,
                         bitRate,
                         0,
-                        ScreenUtils.getScreenDensityDpi()
+                        1
                     )
                 ) {
                     startStream()
@@ -139,7 +141,7 @@ class ScreenRecorderService : Service() {
         private var w = 1920
         private var h = 1080
         private var fps = 25
-        private var bitRate: Int = (w * h * 0.5f).toInt()
+        private var bitRate: Int = (w * h)
         private var ip: String = Publisher.MULTI_CAST_IP
         private var port: Int = Publisher.TARGET_PORT
         private var maxUdpPktLen = Publisher.MAX_PKT_LEN;

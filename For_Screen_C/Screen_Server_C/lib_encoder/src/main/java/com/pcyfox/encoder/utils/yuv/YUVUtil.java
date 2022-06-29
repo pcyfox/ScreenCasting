@@ -137,7 +137,7 @@ public class YUVUtil {
         a = (input[index] & 0xff000000) >> 24; // a is not used obviously
         R = (input[index] & 0xff0000) >> 16;
         G = (input[index] & 0xff00) >> 8;
-        B = (input[index] & 0xff) >> 0;
+        B = (input[index] & 0xff);
 
         // well known RGB to YUV algorithm
         Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
