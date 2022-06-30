@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.MediaCodecInfo
+import android.media.MediaFormat
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -114,20 +116,23 @@ class ScreenRecorderService : Service() {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun startStreamRtp(w: Int, h: Int, bitRate: Int, fps: Int) {
         serverDisplay?.run {
-            if (!isStreaming) {
-                if (prepareVideo(
-                        w,
-                        h,
-                        fps,
-                        bitRate,
-                        0,
-                        1
-                    )
-                ) {
-                    startStream()
-                }
-            } else {
+            if (isStreaming) {
                 stopStream()
+                return
+            }
+            if (prepareVideo(
+                    w,
+                    h,
+                    fps,
+                    bitRate,
+                    0,
+                    1,
+                    MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline,
+                    MediaCodecInfo.CodecProfileLevel.AVCLevel5,
+                    1
+                )
+            ) {
+                startStream()
             }
         }
     }

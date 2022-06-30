@@ -137,21 +137,21 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                 //2、主要档次（Main Profile）：支持隔行视频，采用B片的帧间编码和采用加权预测的帧间编码；支持利用基于上下文的自适应的算术编码（CABAC）。主要用于数字广播电视与数字视频存储。
                 //
                 //3、扩展档次（Extended Profile）：支持码流之间有效的切换（SP和SI片）、改进误码性能，但不支持隔行视频和CABAC。
-                videoFormat.setInteger("profile", avcProfile);
+                videoFormat.setInteger(MediaFormat.KEY_PROFILE, avcProfile);
                 // MediaFormat.KEY_LEVEL, API > 23
                 //level指示编码的分辨率、比特率、宏块数和帧率等
-                videoFormat.setInteger("level", avcProfileLevel);
+                videoFormat.setInteger(MediaFormat.KEY_LEVEL, avcProfileLevel);
             }
             codec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             running = false;
-            if (formatVideoEncoder == FormatVideoEncoder.SURFACE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            if (formatVideoEncoder == FormatVideoEncoder.SURFACE) {
                 isBufferMode = false;
                 inputSurface = codec.createInputSurface();
             }
             Log.i(TAG, "video prepared");
             return true;
         } catch (IOException | IllegalStateException e) {
-            Log.e(TAG, "Create VideoEncoder failed.", e);
+            Log.e(TAG, "Create VideoEncoder failed.e:", e);
             return false;
         }
     }

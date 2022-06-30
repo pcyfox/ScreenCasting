@@ -106,6 +106,7 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     public boolean prepareVideo(int width, int height, int fps, int bitrate, int rotation, int dpi) {
         String br = ConvertUtils.byte2FitMemorySize(bitrate);
         Log.d(TAG, "prepareVideo() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], bitrate = [" + br + "], rotation = [" + rotation + "], dpi = [" + dpi + "]");
+
         return prepareVideo(width, height, fps, bitrate, rotation, dpi, -1, -1, 1);
     }
 
