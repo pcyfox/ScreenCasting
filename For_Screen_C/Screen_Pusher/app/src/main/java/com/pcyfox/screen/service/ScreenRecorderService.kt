@@ -17,7 +17,7 @@ import com.pcyfox.screen.Publisher
 
 
 /**
- * Basic RTMP/RTSP service streaming implementation with camera2
+ *
  */
 class ScreenRecorderService : Service() {
     private var serverDisplay: ScreenDisplay? = null
