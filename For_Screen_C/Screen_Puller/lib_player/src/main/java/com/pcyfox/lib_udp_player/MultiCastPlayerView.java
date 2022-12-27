@@ -16,10 +16,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-/**
- * Created by Auser on 2018/5/28.
- */
-
 public class MultiCastPlayerView extends RelativeLayout {
     private static final String TAG = "MultiCastPlayer";
     //MediaCodec variable
@@ -141,9 +137,6 @@ public class MultiCastPlayerView extends RelativeLayout {
         Log.e(TAG, "startReceiveData:() over!");
     }
 
-    /*
-    开始播放
-     */
     public void startPlay() {
         if (isPlaying) {
             Log.e(TAG, "start play failed.  player is playing");
@@ -155,9 +148,6 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
 
-    /*
-     *停止播放
-     */
     public void stopPlay() {
         Log.d(TAG, "stopPlay() called");
         if (!isPlaying) {
