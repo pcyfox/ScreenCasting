@@ -35,10 +35,9 @@ import java.util.concurrent.BlockingQueue;
  */
 
 public class VideoEncoder extends BaseEncoder implements GetCameraData {
-
     private static final String TAG = "VideoEncoder";
     private final GetVideoData getVideoData;
-    private boolean spsPpsSetted = false;
+    private boolean hasSetUpSpsPps = false;
     private boolean hardwareRotation = false;
 
     //surface to buffer encoder
@@ -59,6 +58,11 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     private int avcProfileLevel = -1;
     private HandlerThread handlerThread;
     private final BlockingQueue<Frame> queue = new ArrayBlockingQueue<>(80);
+
+    {
+
+        force = CodecUtil.Force.FIRST_COMPATIBLE_FOUND;
+    }
 
     public VideoEncoder(GetVideoData getVideoData) {
         this.getVideoData = getVideoData;
@@ -91,19 +95,19 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         this.avcProfileLevel = avcProfileLevel;
         isBufferMode = true;
         MediaCodecInfo encoder = chooseEncoder(type);
+        if (encoder == null) {
+            Log.e(TAG, "Valid encoder not found");
+            return false;
+        }
+
         try {
-            if (encoder != null) {
-                codec = MediaCodec.createByCodecName(encoder.getName());
-                if (this.formatVideoEncoder == FormatVideoEncoder.YUV420Dynamical) {
-                    this.formatVideoEncoder = chooseColorDynamically(encoder);
-                    if (this.formatVideoEncoder == null) {
-                        Log.e(TAG, "YUV420 dynamical choose failed");
-                        return false;
-                    }
+            codec = MediaCodec.createByCodecName(encoder.getName());
+            if (this.formatVideoEncoder == FormatVideoEncoder.YUV420Dynamical) {
+                this.formatVideoEncoder = chooseColorDynamically(encoder);
+                if (this.formatVideoEncoder == null) {
+                    Log.e(TAG, "YUV420 dynamical choose failed");
+                    return false;
                 }
-            } else {
-                Log.e(TAG, "Valid encoder not found");
-                return false;
             }
             MediaFormat videoFormat;
             //if you dont use mediacodec rotation you need swap width and height in rotation 90 or 270
@@ -117,11 +121,15 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                 videoFormat = MediaFormat.createVideoFormat(type, width, height);
             }
 
-            Log.i(TAG, "Prepare video info: " + this.formatVideoEncoder.name() + ", " + resolution);
-            videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            Log.i(TAG, "Prepare video info: " + formatVideoEncoder.name() + ", " + resolution);
             videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, formatVideoEncoder.getFormatCodec());
-            videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
+
+            //  videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
             videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
+            //BITRATE_MODE_CQ: 表示完全不控制码率，尽最大可能保证图像质量
+            //BITRATE_MODE_CBR: 表示编码器会尽量把输出码率控制为设定值
+            //BITRATE_MODE_VBR: 表示编码器会根据图像内容的复杂度（实际上是帧间变化量的大小）来动态调整输出码率，图像复杂则码率高，图像简单则码率低；
+            videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR);
             videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
             videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
             if (hardwareRotation) {
@@ -136,22 +144,21 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                 //2、主要档次（Main Profile）：支持隔行视频，采用B片的帧间编码和采用加权预测的帧间编码；支持利用基于上下文的自适应的算术编码（CABAC）。主要用于数字广播电视与数字视频存储。
                 //
                 //3、扩展档次（Extended Profile）：支持码流之间有效的切换（SP和SI片）、改进误码性能，但不支持隔行视频和CABAC。
-                videoFormat.setInteger(MediaFormat.KEY_PROFILE, avcProfile);
+                videoFormat.setInteger("profile", avcProfile);
                 // MediaFormat.KEY_LEVEL, API > 23
                 //level指示编码的分辨率、比特率、宏块数和帧率等
-                videoFormat.setInteger(MediaFormat.KEY_LEVEL, avcProfileLevel);
+                videoFormat.setInteger("level", avcProfileLevel);
             }
-
             codec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             running = false;
-            if (formatVideoEncoder == FormatVideoEncoder.SURFACE) {
+            if (formatVideoEncoder == FormatVideoEncoder.SURFACE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 isBufferMode = false;
                 inputSurface = codec.createInputSurface();
             }
             Log.i(TAG, "video prepared");
             return true;
         } catch (IOException | IllegalStateException e) {
-            Log.e(TAG, "Create VideoEncoder failed.e:", e);
+            Log.e(TAG, "Create VideoEncoder failed.", e);
             return false;
         }
     }
@@ -159,7 +166,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void start(boolean resetTs) {
-        spsPpsSetted = false;
+        hasSetUpSpsPps = false;
         if (resetTs) {
             presentTimeUs = System.nanoTime() / 1000;//PTS
             fpsLimiter.setFPS(fps);
@@ -202,7 +209,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             }
         }
         queue.clear();
-        spsPpsSetted = false;
+        hasSetUpSpsPps = false;
         inputSurface = null;
         Log.i(TAG, "stopped");
     }
@@ -347,6 +354,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         } else {
             mediaCodecInfoList = CodecUtil.getAllEncoders(mime);
         }
+
         for (MediaCodecInfo mci : mediaCodecInfoList) {
             Log.i(TAG, String.format("VideoEncoder %s", mci.getName()));
             MediaCodecInfo.CodecCapabilities codecCapabilities = mci.getCapabilitiesForType(mime);
@@ -471,17 +479,17 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     public void formatChanged(@NonNull MediaCodec mediaCodec, @NonNull MediaFormat mediaFormat) {
         getVideoData.onVideoFormat(mediaFormat);
         sendSPSandPPS(mediaFormat);
-        spsPpsSetted = true;
+        hasSetUpSpsPps = true;
     }
 
     @Override
     protected void checkBuffer(@NonNull ByteBuffer byteBuffer,
                                @NonNull MediaCodec.BufferInfo bufferInfo) {
-        if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0 && !spsPpsSetted) {
+        if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0 && !hasSetUpSpsPps) {
             Pair<ByteBuffer, ByteBuffer> buffers = decodeSpsPpsFromBuffer(byteBuffer.duplicate(), bufferInfo.size);
             if (buffers != null) {
                 getVideoData.onSpsPps(buffers.first, buffers.second);
-                spsPpsSetted = true;
+                hasSetUpSpsPps = true;
             }
         }
     }

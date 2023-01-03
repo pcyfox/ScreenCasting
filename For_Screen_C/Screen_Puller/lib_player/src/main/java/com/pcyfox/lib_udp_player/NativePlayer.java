@@ -4,6 +4,8 @@ package com.pcyfox.lib_udp_player;
 import android.util.Log;
 import android.view.Surface;
 
+import java.lang.annotation.Native;
+
 public class NativePlayer {
     private static final String TAG = "NativePlayer";
     static {
@@ -20,21 +22,22 @@ public class NativePlayer {
     public PlayState getState() {
         return state;
     }
-    
-    
-    //for call in native
+
+
+    //call in native
     public void onPlayerStateChange(int state) {
         Log.d(TAG, "onPlayerStateChange() called with: state = [" + state + "]");
         for (PlayState s : PlayState.values()) {
             if (state == s.ordinal()) {
                 this.state = s;
+
                 if (onStateChangeListener != null) {
                     onStateChangeListener.onStateChange(s);
                 }
             }
         }
     }
-    
+
 
     //-------------for native-------------------------
     public native int init(boolean isDebug);

@@ -3,9 +3,10 @@ android {
   compileSdkVersion 30
 
   defaultConfig {
-    minSdkVersion 22
+    minSdkVersion 23
     targetSdkVersion  30
   }
+
   buildTypes {
     release {
       minifyEnabled false
@@ -15,5 +16,5 @@ android {
 }
 
 dependencies {
-  api 'androidx.annotation:annotation:1.1.0'
+  api 'androidx.annotation:annotation:1.2.0'
 }
