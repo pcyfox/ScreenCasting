@@ -118,11 +118,10 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             }
 
             Log.i(TAG, "Prepare video info: " + this.formatVideoEncoder.name() + ", " + resolution);
-            videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                    this.formatVideoEncoder.getFormatCodec());
-            //  videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
-            videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
             videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
+            videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, formatVideoEncoder.getFormatCodec());
+            videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
+            videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
             videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
             videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
             if (hardwareRotation) {
@@ -142,6 +141,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                 //level指示编码的分辨率、比特率、宏块数和帧率等
                 videoFormat.setInteger(MediaFormat.KEY_LEVEL, avcProfileLevel);
             }
+
             codec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             running = false;
             if (formatVideoEncoder == FormatVideoEncoder.SURFACE) {
