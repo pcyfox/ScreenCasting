@@ -8,12 +8,12 @@ import java.nio.ByteBuffer
 
 class ScreenDisplay(context: Context, ip: String, port: Int, maxPacketLen: Int) : DisplayBase(context, false) {
     var isStop = false
-
     private val publisher = Publisher(ip, port, SocketType.UDP,  maxPacketLength = maxPacketLen)
 
     override fun prepareAudioRtp(isStereo: Boolean, sampleRate: Int) {
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     fun startStream() {
         super.startStream("")
         isStop = false

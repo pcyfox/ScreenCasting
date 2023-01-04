@@ -32,15 +32,6 @@ import java.nio.ByteBuffer;
 
 import static android.content.Context.MEDIA_PROJECTION_SERVICE;
 
-/**
- * Wrapper to stream display screen of your device and microphone.
- * Can be executed in background.
- * <p>
- * API requirements:
- * API 21+.
- * <p>
- * Created by pedro on 9/08/17.
- */
 public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrophoneData {
     private static final String TAG = "DisplayBase";
     private boolean disableAudio = true;
@@ -54,8 +45,10 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     private boolean isRunning = false;
     protected SurfaceView surfaceView;
     private int dpi = 480;
-    int width;
-    int height;
+
+    protected int width;
+    protected int height;
+
     private VirtualDisplay virtualDisplay;
     private int resultCode = -1;
     private Intent data;
@@ -92,21 +85,19 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
      * @return true if success, false if you get a error (Normally because the encoder selected
      * doesn't support any configuration seated or your device hasn't a H264 encoder).
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public boolean prepareVideo(int width, int height, int fps, int bitrate, int rotation, int dpi,
-                                int avcProfile, int avcProfileLevel, int iFrameInterval) {
+    public boolean prepareVideo(int width, int height,
+                                int fps, int bitrate, int rotation, int dpi,
+                                int iFrameInterval,
+                                int avcProfile, int avcProfileLevel ) {
         this.dpi = dpi;
-        this.width=width;
-        this.height=height;
+        this.width = width;
+        this.height = height;
+
         return videoEncoder.prepareVideoEncoder(width, height, fps, bitrate, rotation, true, iFrameInterval,
                 FormatVideoEncoder.SURFACE, avcProfile, avcProfileLevel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideo(int width, int height, int fps, int bitrate, int rotation, int dpi) {
-        String br = ConvertUtils.byte2FitMemorySize(bitrate);
-        Log.d(TAG, "prepareVideo() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], bitrate = [" + br + "], rotation = [" + rotation + "], dpi = [" + dpi + "]");
-
         return prepareVideo(width, height, fps, bitrate, rotation, dpi, -1, -1, 1);
     }
 
@@ -218,17 +209,6 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         this.data = data;
     }
 
-    /**
-     * Need be called after @prepareVideo or/and @prepareAudio.
-     *
-     * @param url of the stream like:
-     *            protocol://ip:port/application/streamName
-     *            <p>
-     *            RTSP: rtsp://192.168.1.1:1935/live/pedroSG94
-     *            RTSPS: rtsps://192.168.1.1:1935/live/pedroSG94
-     *            RTMP: rtmp://192.168.1.1:1935/live/pedroSG94
-     *            RTMPS: rtmps://192.168.1.1:1935/live/pedroSG94
-     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void startStream(String url) {
         streaming = true;

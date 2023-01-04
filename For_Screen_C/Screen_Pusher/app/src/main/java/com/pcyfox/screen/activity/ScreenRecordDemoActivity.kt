@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -23,10 +24,12 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_screen_record)
+
         PermissionUtils.permission(
             PermissionConstants.STORAGE,
             PermissionConstants.ACTIVITY_RECOGNITION
         ).request()
+
         initTestVideo()
     }
 
@@ -38,14 +41,18 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
 
         }
 
-        val w =ScreenUtils.getScreenWidth()
-        val h =ScreenUtils.getScreenHeight()
+//        val w = ScreenUtils.getScreenWidth()
+//        val h = ScreenUtils.getScreenHeight()
+
+        val w = 1920
+        val h = 1080
+
         et_w.setText(w.toString())
         et_h.setText(h.toString())
         //val bitrate =1.2*1024*1024
-        val bitrate =w*h
-        //val bitrate =w*h
-        et_bitrate.setText(bitrate.toString())
+        val fps = et_fps.text.toString().toInt()
+        val bitRate: Int = (w * h * fps * 0.25).toInt()
+        et_bitrate.setText(bitRate.toString())
         et_udp_max_len.setText(Publisher.MAX_PKT_LEN.toString())
     }
 
@@ -70,11 +77,14 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
         val w = Integer.parseInt(et_w.text.toString())
         val h = Integer.parseInt(et_h.text.toString())
         val bitrate = et_bitrate.text.toString().toFloat()
+
         val fps = Integer.parseInt(et_fps.text.toString())
         val maxUdpPktLen = Integer.parseInt(et_udp_max_len.text.toString())
+
 
 
         if (data == null) {
@@ -88,6 +98,7 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
                 h,
                 fps,
                 bitrate.toInt(),
+                resources.displayMetrics.densityDpi,
                 maxUdpPktLen,
                 Publisher.MULTI_CAST_IP,
                 Publisher.TARGET_PORT,

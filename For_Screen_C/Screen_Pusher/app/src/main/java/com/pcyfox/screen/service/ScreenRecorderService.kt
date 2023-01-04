@@ -6,16 +6,12 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.media.MediaCodecInfo
-import android.media.MediaFormat
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.blankj.utilcode.util.ScreenUtils
-import com.pcyfox.screen.ScreenDisplay
 import com.pcyfox.screen.Publisher
+import com.pcyfox.screen.ScreenDisplay
 
 
 /**
@@ -51,7 +47,6 @@ class ScreenRecorderService : Service() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "RTP Display service started")
         intent?.run {
@@ -85,7 +80,7 @@ class ScreenRecorderService : Service() {
             val maxPacketLen = maxUdpPktLen
             serverDisplay = ScreenDisplay(applicationContext, ip, port, maxPacketLen)
             serverDisplay?.setIntentResult(resultCode, this)
-            startStreamRtp(w, h, bitRate, fps)
+            startStreamRtp(w, h, bitRate, fps, dpi)
         }
 
         return START_STICKY
@@ -113,23 +108,24 @@ class ScreenRecorderService : Service() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun startStreamRtp(w: Int, h: Int, bitRate: Int, fps: Int) {
+    private fun startStreamRtp(w: Int, h: Int, bitRate: Int, fps: Int, dpi: Int) {
         serverDisplay?.run {
             if (isStreaming) {
                 stopStream()
                 return
             }
+
+
             if (prepareVideo(
                     w,
                     h,
                     fps,
                     bitRate,
                     0,
+                    dpi,
                     1,
-                    MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline,
-                    MediaCodecInfo.CodecProfileLevel.AVCLevel5,
-                    1
+                    -1,
+                    -1
                 )
             ) {
                 startStream()
@@ -146,7 +142,9 @@ class ScreenRecorderService : Service() {
         private var w = 1920
         private var h = 1080
         private var fps = 25
-        private var bitRate: Int = (w * h)
+        private var dpi = 480
+        // Biterate = Width * Height * FrameRate * Factor
+        private var bitRate: Int = (w * h * fps * 0.25).toInt()
         private var ip: String = Publisher.MULTI_CAST_IP
         private var port: Int = Publisher.TARGET_PORT
         private var maxUdpPktLen = Publisher.MAX_PKT_LEN;
@@ -158,7 +156,6 @@ class ScreenRecorderService : Service() {
             intent.putExtra(KEY_STATE, state)
             context.startService(intent)
         }
-
 
         fun stop(context: Context) {
             changeState(context, 0)
@@ -180,6 +177,7 @@ class ScreenRecorderService : Service() {
             h: Int,
             fps: Int,
             bitRate: Int,
+            dpi: Int,
             maxUdpPktLen: Int,
             ip: String,
             port: Int
@@ -188,14 +186,16 @@ class ScreenRecorderService : Service() {
             Companion.w = w
             Companion.fps = fps
             Companion.bitRate = bitRate
+            Companion.dpi = dpi
             Companion.ip = ip
             Companion.port = port
             Companion.resultCode = resultCode
             Companion.requestDisplayIntent = requestDisplayIntent
-            Companion.maxUdpPktLen = maxUdpPktLen;
+            Companion.maxUdpPktLen = maxUdpPktLen
+
             Log.d(
                 TAG,
-                "start() called with: context = $context, resultCode = $resultCode, requestDisplayIntent = $requestDisplayIntent, w = $w, h = $h, fps = $fps, bitRate = $bitRate, maxUdpPktLen = $maxUdpPktLen, ip = $ip, port = $port"
+                "start() called with: context = $context, resultCode = $resultCode, requestDisplayIntent = $requestDisplayIntent, w = $w, h = $h, fps = $fps, bitRate = $bitRate, dpi = $dpi, maxUdpPktLen = $maxUdpPktLen, ip = $ip, port = $port"
             )
 
             val startIntent = Intent()
@@ -203,6 +203,7 @@ class ScreenRecorderService : Service() {
             startIntent.putExtra(KEY_STATE, 1)
             startIntent.putExtras(requestDisplayIntent)
             startIntent.putExtra("resultCode", resultCode)
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(startIntent)
             } else {

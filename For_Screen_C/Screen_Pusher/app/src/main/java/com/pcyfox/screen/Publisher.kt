@@ -11,6 +11,10 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 
 
+enum class SocketType {
+    TCP, UDP
+}
+
 class Publisher(
     ip: String,
     port: Int,
@@ -42,7 +46,7 @@ class Publisher(
                     it.delete()
                 }
             }
-            Log.d(TAG, "null() called: h264 file:${h264File?.absolutePath}")
+            Log.d(TAG, "init() called: save h264 file:${h264File?.absolutePath}")
             os = FileOutputStream(h264File)
             bufOS = BufferedOutputStream(os)
         }
@@ -52,7 +56,6 @@ class Publisher(
     fun send(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
         val buf = ByteArray(info.size)
         h264Buffer.get(buf, info.offset, info.size)
-
 
         if (isNeedSaveRTPPkt) {
             handler?.post {
@@ -73,9 +76,11 @@ class Publisher(
 
 
     fun stop() {
+        if (os == null) return
         bufOS?.flush()
         os?.close()
         bufOS?.close()
+        os = null
     }
 
 
@@ -84,7 +89,7 @@ class Publisher(
     }
 
     fun updateScreen(w: Int, h: Int) {
-        if(w*h>0){
+        if (w * h > 0) {
             h264HandlerNative.updateScreen(w, h)
         }
     }
@@ -93,12 +98,7 @@ class Publisher(
         const val MULTI_CAST_IP = "239.0.0.200"
         const val TARGET_PORT = 2021
 
-        //const val MAX_PKT_LEN = 10000
         const val MAX_PKT_LEN = 65000
     }
 }
 
-
-enum class SocketType {
-    TCP, UDP
-}

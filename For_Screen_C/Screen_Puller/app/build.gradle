@@ -40,6 +40,7 @@ android {
     buildFeatures {
         dataBinding = true
     }
+    namespace 'com.pcyfox.screenplayer'
 }
 
 dependencies {

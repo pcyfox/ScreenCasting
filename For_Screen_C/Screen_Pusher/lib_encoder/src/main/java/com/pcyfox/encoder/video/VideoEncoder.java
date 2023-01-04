@@ -60,15 +60,13 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     private final BlockingQueue<Frame> queue = new ArrayBlockingQueue<>(80);
 
     {
-
-        force = CodecUtil.Force.FIRST_COMPATIBLE_FOUND;
+        force = CodecUtil.Force.HARDWARE;
     }
 
     public VideoEncoder(GetVideoData getVideoData) {
         this.getVideoData = getVideoData;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideoEncoder(int width, int height, int fps, int bitRate, int rotation,
                                        boolean hardwareRotation, int iFrameInterval, FormatVideoEncoder formatVideoEncoder) {
         return prepareVideoEncoder(width, height, fps, bitRate, rotation, hardwareRotation,
@@ -78,12 +76,15 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     /**
      * Prepare encoder with custom parameters
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideoEncoder(int width, int height, int fps, int bitRate, int rotation,
                                        boolean hardwareRotation, int iFrameInterval, FormatVideoEncoder formatVideoEncoder,
                                        int avcProfile, int avcProfileLevel) {
 
-        Log.d(TAG, "prepareVideoEncoder() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], bitRate = [" + bitRate + "], rotation = [" + rotation + "], hardwareRotation = [" + hardwareRotation + "], iFrameInterval = [" + iFrameInterval + "], formatVideoEncoder = [" + formatVideoEncoder + "], avcProfile = [" + avcProfile + "], avcProfileLevel = [" + avcProfileLevel + "]");
+        Log.d(TAG, "prepareVideoEncoder() called with: width = [" + width + "], height = [" + height + "], fps = [" + fps + "], " +
+                "bitRate = [" + bitRate + "], rotation = [" + rotation + "], hardwareRotation = [" + hardwareRotation + "], " +
+                "iFrameInterval = [" + iFrameInterval + "], formatVideoEncoder = [" + formatVideoEncoder + "], avcProfile = [" + avcProfile + "], " +
+                "avcProfileLevel = [" + avcProfileLevel + "]");
+
         this.width = width;
         this.height = height;
         this.fps = fps;
@@ -100,6 +101,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             return false;
         }
 
+        Log.e(TAG, "encoder name:" + encoder.getName());
         try {
             codec = MediaCodec.createByCodecName(encoder.getName());
             if (this.formatVideoEncoder == FormatVideoEncoder.YUV420Dynamical) {
@@ -109,6 +111,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                     return false;
                 }
             }
+
             MediaFormat videoFormat;
             //if you dont use mediacodec rotation you need swap width and height in rotation 90 or 270
             // for correct encoding resolution
@@ -122,8 +125,8 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             }
 
             Log.i(TAG, "Prepare video info: " + formatVideoEncoder.name() + ", " + resolution);
-            videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, formatVideoEncoder.getFormatCodec());
 
+            videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, formatVideoEncoder.getFormatCodec());
             //  videoFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);
             videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate);
             //BITRATE_MODE_CQ: 表示完全不控制码率，尽最大可能保证图像质量
@@ -132,6 +135,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
             videoFormat.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR);
             videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, fps);
             videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameInterval);
+
             if (hardwareRotation) {
                 videoFormat.setInteger("rotation-degrees", rotation);
             }
@@ -149,7 +153,9 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                 //level指示编码的分辨率、比特率、宏块数和帧率等
                 videoFormat.setInteger("level", avcProfileLevel);
             }
+
             codec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+
             running = false;
             if (formatVideoEncoder == FormatVideoEncoder.SURFACE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 isBufferMode = false;
@@ -163,7 +169,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void start(boolean resetTs) {
         hasSetUpSpsPps = false;
@@ -214,7 +219,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         Log.i(TAG, "stopped");
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void reset() {
         stop();
         prepareVideoEncoder(width, height, fps, bitRate, rotation, hardwareRotation, iFrameInterval,
@@ -228,7 +232,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
      * @param mediaCodecInfo
      * @return
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private FormatVideoEncoder chooseColorDynamically(MediaCodecInfo mediaCodecInfo) {
         for (int color : mediaCodecInfo.getCapabilitiesForType(type).colorFormats) {
             if (color == FormatVideoEncoder.YUV420PLANAR.getFormatCodec()) {
@@ -243,13 +246,11 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     /**
      * Prepare encoder with default parameters
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideoEncoder() {
         return prepareVideoEncoder(width, height, fps, bitRate, rotation, false, iFrameInterval,
                 formatVideoEncoder, avcProfile, avcProfileLevel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void setVideoBitrateOnFly(int bitrate) {
         if (isRunning()) {
             this.bitRate = bitrate;
@@ -263,7 +264,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void forceSyncFrame() {
         if (isRunning()) {
             Bundle bundle = new Bundle();
@@ -342,7 +342,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     /**
      * choose the video encoder by mime.
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected MediaCodecInfo chooseEncoder(String mime) {
         Log.d(TAG, "chooseEncoder() called with: mime = [" + mime + "]");
@@ -364,8 +363,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
                     if (color == FormatVideoEncoder.SURFACE.getFormatCodec()) return mci;
                 } else {
                     //check if encoder support any yuv420 color
-                    if (color == FormatVideoEncoder.YUV420PLANAR.getFormatCodec()
-                            || color == FormatVideoEncoder.YUV420SEMIPLANAR.getFormatCodec()) {
+                    if (color == FormatVideoEncoder.YUV420PLANAR.getFormatCodec() || color == FormatVideoEncoder.YUV420SEMIPLANAR.getFormatCodec()) {
                         return mci;
                     }
                 }
@@ -503,7 +501,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
 
     private MediaCodec.Callback callback;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void createAsyncCallback() {
         Log.d(TAG, "createAsyncCallback() called");
         callback = new MediaCodec.Callback() {

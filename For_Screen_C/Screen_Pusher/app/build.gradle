@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId "com.pcyfox.screen"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
