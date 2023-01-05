@@ -1,0 +1,21 @@
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 32
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 32
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
+}
+
+
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.5.0'
+}
