@@ -11,6 +11,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ScreenClient" />
+            <option value="$PROJECT_DIR$/ScreenClient/lib_player" />
             <option value="$PROJECT_DIR$/ScreenServer" />
             <option value="$PROJECT_DIR$/ScreenServer/lib_encoder" />
             <option value="$PROJECT_DIR$/ScreenServer/lib_h264" />
