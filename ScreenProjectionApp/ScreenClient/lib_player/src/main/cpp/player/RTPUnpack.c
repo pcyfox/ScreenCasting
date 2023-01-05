@@ -380,7 +380,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         case 1:
         case 5: {
             //I\P
-           // printCharsHex(rtpData, length, 20, "---Single RTP---");
+            // printCharsHex(rtpData, length, 20, "---Single RTP---");
             unsigned char *data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
             data[3] = HEAD_4;
             memcpy(data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);
@@ -394,8 +394,8 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         default: {
             LOGE("not support NALU type=%d", rtpPkt->type);
         }
-
     }
+    free(rtpData);
     return 1;
 }
 

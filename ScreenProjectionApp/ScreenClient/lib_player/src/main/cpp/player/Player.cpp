@@ -75,10 +75,10 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
     AMediaFormat_setInt32(videoFormat, AMEDIAFORMAT_KEY_WIDTH, width); // 视频宽度
     AMediaFormat_setInt32(videoFormat, AMEDIAFORMAT_KEY_HEIGHT, height); // 视频高度
 
-    if (spsSize && sps) {
+    if (spsSize > 0 && sps) {
         AMediaFormat_setBuffer(videoFormat, "csd-0", sps, spsSize); // sps
     }
-    if (ppsSize && pps) {
+    if (ppsSize > 0 && pps) {
         AMediaFormat_setBuffer(videoFormat, "csd-1", pps, ppsSize); // pps
     }
     media_status_t status = AMediaCodec_configure(*mMediaCodec, videoFormat, window, NULL, 0);
@@ -101,6 +101,7 @@ void *Player::Decode(void *info) {
     while (pInfo->GetPlayState() == STARTED) {
         AVPacket *packet = NULL;
         pInfo->packetQueue.get(&packet);
+
         if (packet == NULL || packet->data == NULL) {
             continue;
         }
@@ -111,31 +112,25 @@ void *Player::Decode(void *info) {
             int length = packet->size;
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
             if (inputBuf != NULL && length <= out_size) {
-                //clear buf
-                //memset(inputBuf, 0, out_size);
-
-                // 将待解码的数据copy到解码缓冲区中
+                // 将待解码的数据copy到解码器（DSP）缓冲区中
                 memcpy(inputBuf, packet->data, length);
-
                 int64_t pts = packet->pts;
                 if (pts < 0 || !pts) {
                     pts = getCurrentTime();
                 }
-                delete packet;
-                packet = NULL;
-                media_status_t status = AMediaCodec_queueInputBuffer(codec, index, 0, length,
-                                                                     pts, 0);
-
+                delete packet, packet = nullptr;
+                media_status_t status = AMediaCodec_queueInputBuffer(codec, index, 0, length, pts,
+                                                                     0);
                 if (status != AMEDIA_OK) {
                     LOGE("Decode queue input buffer error status=%d", status);
                 }
             }
         }
 
-        auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(
-                sizeof(AMediaCodecBufferInfo));
+        auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
         ssize_t status = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 100);
-        if (status >= 0 && bufferInfo != NULL) {
+
+        if (status >= 0 && bufferInfo != nullptr) {
             AMediaFormat *format = playerInfo->videoFormat;
             int32_t width = -1;
             AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_MAX_HEIGHT, &width);
@@ -146,12 +141,10 @@ void *Player::Decode(void *info) {
                 if (playerInfo->height * playerInfo->width != width * height) {
                 }
             }
-
             AMediaCodec_releaseOutputBuffer(codec, status, bufferInfo->size != 0);
             if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
                 LOGE("Decode() video producer output EOS");
             }
-
         } else if (status == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
             LOGE("Decode() output buffers changed");
         } else if (status == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
@@ -160,8 +153,10 @@ void *Player::Decode(void *info) {
         } else {
             LOGE("Decode() unexpected info code: %zd", status);
         }
-        delete bufferInfo;
+
+        free(bufferInfo);
     }
+
     LOGD("-------Decode over!---------");
     return NULL;
 }
@@ -280,7 +275,7 @@ int Player::Pause(int delay) {
 
 int Player::Stop() {
     LOGI("--------Stop()  called-------");
-    if (!playerInfo||playerInfo->GetPlayState() != STARTED) {
+    if (!playerInfo || playerInfo->GetPlayState() != STARTED) {
         LOGE("playerInfo is not started");
         return PLAYER_RESULT_ERROR;
     }
@@ -298,8 +293,8 @@ void unpackCallback(H264Pkt result) {
     avPacket->data = result->data;
     avPacket->size = result->length;
     playerInfo->packetQueue.put(avPacket);
-    free(result);
-    result = NULL;
+
+    free(result), result = nullptr;
 }
 
 

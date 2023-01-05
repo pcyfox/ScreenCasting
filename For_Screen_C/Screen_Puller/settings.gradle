@@ -1,2 +1,0 @@
-include ':app', ':lib_player'
-rootProject.name = "Screen_Client_C"
