@@ -10,6 +10,7 @@ enum SocketType {
 
 
 void initSocket(char *ip, unsigned int port, int type);
+void closeSocket();
 
 int sendData(unsigned char *data, unsigned int len);
 

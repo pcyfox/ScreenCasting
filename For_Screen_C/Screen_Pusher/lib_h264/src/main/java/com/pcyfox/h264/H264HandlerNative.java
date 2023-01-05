@@ -18,6 +18,8 @@ public class H264HandlerNative {
 
     public native int startSend();
 
+    public native int stopSend();
+
     public native byte[] getSPS_PPS_RTP_Pkt(long ts, long clock);
 
 

@@ -58,6 +58,7 @@ void RTPCallback(Result result) {
     if (isStartToSendData) {
         sendData(result->data, result->length);
     }
+
     if (jOnCallbackMid != NULL) {
         jbyteArray byteArray = CharsToArray(jCallerCurrentEnv, result->data, result->length);
         jCallerCurrentEnv->CallVoidMethod(jCaller, jOnCallbackMid, byteArray);
@@ -100,7 +101,8 @@ Java_com_pcyfox_h264_H264HandlerNative_packAndSedH264ToRTP(JNIEnv *env, jobject 
         jOnCallbackMid = env->GetMethodID(jCallback, "onCallback", "([B)V");
     }
 
-    return PackRTP(ByteArrayToChars(env, h264_pkt, length), length, max_pkt_len, ts, clock,tag,RTPCallback);
+    return PackRTP(ByteArrayToChars(env, h264_pkt, length), length, max_pkt_len, ts, clock, tag,
+                   RTPCallback);
 
 }
 
@@ -125,7 +127,15 @@ Java_com_pcyfox_h264_H264HandlerNative_startSend(JNIEnv *env, jobject thiz) {
 }
 
 extern "C"
+JNIEXPORT jint JNICALL
+Java_com_pcyfox_h264_H264HandlerNative_stopSend(JNIEnv *env, jobject thiz) {
+    isStartToSendData = 0;
+    closeSocket();
+    return 1;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_pcyfox_h264_H264HandlerNative_updateScreen(JNIEnv *env, jobject thiz, jint w, jint h) {
-    UpdateScreen(w,h);
+    UpdateScreen(w, h);
 }

@@ -259,12 +259,12 @@ int PackRTP(unsigned char *h264Pkt,
             Callback callback) {
 
     int8_t naluType = h264Pkt[4] & 0x1F;
+
     headerLen = RTP_HEADER_LEN;
 
     //如果遇到I帧，则先通过STAP-A单聚合方式创建一个包含sps、pps的RTP包发送出去
     if (naluType == 5) {
         //callback(GetScreenInfo(ts, clock));
-
         callback(GetSPS_PPS_RTP_STAP_Pkt(ts, clock));
     }
 

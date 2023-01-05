@@ -19,7 +19,6 @@ class Publisher(
     ip: String,
     port: Int,
     type: SocketType,
-    val isNeedSaveRTPPkt: Boolean = BuildConfig.DEBUG,
     var maxPacketLength: Int = MAX_PKT_LEN
 ) {
     private val TAG = "Publisher"
@@ -28,6 +27,9 @@ class Publisher(
 
     private var h264File: File? = null
     private var handler: Handler? = null
+
+    @Volatile
+    private var isRecording: Boolean = false
 
     private var os: FileOutputStream? = null
     private var bufOS: BufferedOutputStream? = null
@@ -40,8 +42,11 @@ class Publisher(
         handlerThread.start();
         handler = Handler(handlerThread.looper)
 
-        if (isNeedSaveRTPPkt && h264File == null) {
-            h264File = File("sdcard/screen.h264").also {
+    }
+
+    fun startRecord(file: String = "sdcard/screen.h264") {
+        if (h264File == null || os == null) {
+            h264File = File(file).also {
                 if (it.exists()) {
                     it.delete()
                 }
@@ -50,19 +55,28 @@ class Publisher(
             os = FileOutputStream(h264File)
             bufOS = BufferedOutputStream(os)
         }
+        isRecording = true
+    }
 
+    fun stopRecord() {
+        isRecording = false
+        if (os == null) return
+        bufOS?.flush()
+        bufOS?.close()
+        os?.close()
+        os = null
+        bufOS = null
     }
 
     fun send(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
         val buf = ByteArray(info.size)
         h264Buffer.get(buf, info.offset, info.size)
 
-        if (isNeedSaveRTPPkt) {
+        if (isRecording) {
             handler?.post {
                 bufOS?.write(buf)
             }
         }
-
         h264HandlerNative.packAndSedH264ToRTP(
             buf,
             buf.size,
@@ -76,11 +90,8 @@ class Publisher(
 
 
     fun stop() {
-        if (os == null) return
-        bufOS?.flush()
-        os?.close()
-        bufOS?.close()
-        os = null
+        stopRecord()
+        h264HandlerNative.stopSend()
     }
 
 
@@ -98,7 +109,7 @@ class Publisher(
         const val MULTI_CAST_IP = "239.0.0.200"
         const val TARGET_PORT = 2021
 
-        const val MAX_PKT_LEN = 65000
+        const val MAX_PKT_LEN = 60000
     }
 }
 

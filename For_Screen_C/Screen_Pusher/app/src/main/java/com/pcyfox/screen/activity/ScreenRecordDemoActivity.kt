@@ -50,10 +50,13 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
         et_w.setText(w.toString())
         et_h.setText(h.toString())
         //val bitrate =1.2*1024*1024
+
         val fps = et_fps.text.toString().toInt()
-        val bitRate: Int = (w * h * fps * 0.25).toInt()
+        val bitRate: Int = (w * h * fps * 0.05).toInt()
+
+        et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
         et_bitrate.setText(bitRate.toString())
-        et_udp_max_len.setText(Publisher.MAX_PKT_LEN.toString())
+
     }
 
 
@@ -84,7 +87,6 @@ class ScreenRecordDemoActivity : AppCompatActivity(), View.OnClickListener {
 
         val fps = Integer.parseInt(et_fps.text.toString())
         val maxUdpPktLen = Integer.parseInt(et_udp_max_len.text.toString())
-
 
 
         if (data == null) {

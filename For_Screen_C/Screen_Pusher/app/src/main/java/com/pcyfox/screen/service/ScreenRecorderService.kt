@@ -77,8 +77,7 @@ class ScreenRecorderService : Service() {
         }
 
         requestDisplayIntent?.run {
-            val maxPacketLen = maxUdpPktLen
-            serverDisplay = ScreenDisplay(applicationContext, ip, port, maxPacketLen)
+            serverDisplay = ScreenDisplay(applicationContext, ip, port, maxUdpPktLen)
             serverDisplay?.setIntentResult(resultCode, this)
             startStreamRtp(w, h, bitRate, fps, dpi)
         }
@@ -143,8 +142,9 @@ class ScreenRecorderService : Service() {
         private var h = 1080
         private var fps = 25
         private var dpi = 480
+
         // Biterate = Width * Height * FrameRate * Factor
-        private var bitRate: Int = (w * h * fps * 0.25).toInt()
+        private var bitRate: Int = (w * h * fps * 0.12).toInt()
         private var ip: String = Publisher.MULTI_CAST_IP
         private var port: Int = Publisher.TARGET_PORT
         private var maxUdpPktLen = Publisher.MAX_PKT_LEN;
