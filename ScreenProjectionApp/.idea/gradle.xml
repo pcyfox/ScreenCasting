@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/ScreenServer" />
             <option value="$PROJECT_DIR$/ScreenServer/lib_encoder" />
             <option value="$PROJECT_DIR$/ScreenServer/lib_h264" />
+            <option value="$PROJECT_DIR$/ScreenServer/lib_push" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

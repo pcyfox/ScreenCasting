@@ -34,7 +34,7 @@
         </activity>
 
         <service
-            android:name=".service.ScreenRecorderService"
+            android:name="com.df.lib_push.service.ScreenRecorderService"
             android:enabled="true"
             android:foregroundServiceType="mediaProjection" />
     </application>

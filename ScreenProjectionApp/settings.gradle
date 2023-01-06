@@ -27,3 +27,4 @@ include ':ScreenServer:lib_encoder',':ScreenServer:lib_h264'
 include ':ScreenClient'
 include ':ScreenClient:lib_player'
 
+include ':ScreenServer:lib_push'
