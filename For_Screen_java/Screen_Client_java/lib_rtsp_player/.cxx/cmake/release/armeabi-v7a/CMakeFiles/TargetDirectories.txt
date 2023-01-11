@@ -1,3 +1,0 @@
-/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/release/armeabi-v7a/CMakeFiles/rebuild_cache.dir
-/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/release/armeabi-v7a/CMakeFiles/edit_cache.dir
-/Users/pcyfox/AndroidProjects/MultiContorlPlayer/UDP_Player_Java/lib_rtsp_player/.cxx/cmake/release/armeabi-v7a/CMakeFiles/rtp_player.dir

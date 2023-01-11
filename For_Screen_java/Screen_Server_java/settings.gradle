@@ -1,2 +1,0 @@
-include ':lib_rtspserver'
-include ':app', ':rtmp', ':encoder', ':rtsp', ':rtplibrary'
