@@ -1,6 +1,6 @@
 # For more information about using CMake with Android Studio, read the
 # documentation: https://d.android.com/studio/projects/add-native-code.html
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.22.)
 set(CMAKE_BUILD_TYPE "Debug")
 
 project("rtp_lib")

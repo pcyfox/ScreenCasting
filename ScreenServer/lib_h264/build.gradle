@@ -28,7 +28,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version '3.18.1'
+            version '3.22.1'
         }
     }
 
@@ -39,7 +39,7 @@ android {
         }
     }
 
-    ndkVersion '21.4.7075529'
+    ndkVersion '25.1.8937393'
 }
 
 
