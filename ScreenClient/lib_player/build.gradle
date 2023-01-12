@@ -28,7 +28,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
+            version "3.22.1"
         }
     }
 
@@ -42,9 +42,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
-    namespace 'com.pcyfox.lib_udp_player'
 
-    ndkVersion '21.4.7075529'
+    namespace 'com.pcyfox.lib_udp_player'
+    ndkVersion '25.1.8937393'
 }
 
 dependencies {
