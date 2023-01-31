@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <application>
+        <service
+            android:name="com.df.lib_push.service.ScreenRecorderService"
+            android:enabled="true"
+            android:foregroundServiceType="mediaProjection" />
+    </application>
 </manifest>

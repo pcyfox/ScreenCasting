@@ -9,8 +9,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!--needed by background Rtp service to keep service alive-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -33,10 +31,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name="com.df.lib_push.service.ScreenRecorderService"
-            android:enabled="true"
-            android:foregroundServiceType="mediaProjection" />
     </application>
 
 </manifest>

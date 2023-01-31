@@ -30,6 +30,7 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
             PermissionConstants.STORAGE,
             PermissionConstants.ACTIVITY_RECOGNITION
         ).request()
+
         initTestVideo()
     }
 
@@ -65,10 +66,12 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
             R.id.btn_start_screen -> {
                 if (btn_start_screen.text.toString() == "START") {
                     btn_start_screen.text = "STOP"
+
                     startActivityForResult(
                         (getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager).createScreenCaptureIntent(),
                         REQUEST_CODE
                     )
+
                 } else {
                     btn_start_screen.text = "START"
                     ScreenRecorderService.stop(this)
