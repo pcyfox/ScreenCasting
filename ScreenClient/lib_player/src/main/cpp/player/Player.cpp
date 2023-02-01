@@ -45,7 +45,8 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
                           uint8_t *sps,
                           int spsSize,
                           uint8_t *pps, int ppsSize,
-                          ANativeWindow *window, const char *mine) {
+                          ANativeWindow *window,
+                          const char *mine) {
 
     LOGI("createAMediaCodec() called width=%d,height=%d,spsSize=%d,ppsSize=%d,mine=%s\n", width,
          height,
@@ -75,10 +76,10 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
     AMediaFormat_setInt32(videoFormat, AMEDIAFORMAT_KEY_WIDTH, width); // 视频宽度
     AMediaFormat_setInt32(videoFormat, AMEDIAFORMAT_KEY_HEIGHT, height); // 视频高度
 
-    if (spsSize > 0 && sps) {
+    if (spsSize > 0) {
         AMediaFormat_setBuffer(videoFormat, "csd-0", sps, spsSize); // sps
     }
-    if (ppsSize > 0 && pps) {
+    if (ppsSize > 0) {
         AMediaFormat_setBuffer(videoFormat, "csd-1", pps, ppsSize); // pps
     }
     media_status_t status = AMediaCodec_configure(*mMediaCodec, videoFormat, window, NULL, 0);
@@ -89,20 +90,19 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
         return PLAYER_RESULT_ERROR;
     } else {
         playerInfo->videoFormat = videoFormat;
+        playerInfo->window = window;
         LOGD("configure AMediaCodec success!");
     }
     return PLAYER_RESULT_OK;
 }
 
 
-void *Player::Decode(void *info) {
-    auto *pInfo = (PlayerInfo *) info;
-    AMediaCodec *codec = pInfo->AMediaCodec;
-    while (pInfo->GetPlayState() == STARTED) {
-        AVPacket *packet = NULL;
-        pInfo->packetQueue.get(&packet);
-
-        if (packet == NULL || packet->data == NULL) {
+void *Player::Decode(void *) {
+    AMediaCodec *codec = playerInfo->AMediaCodec;
+    while (playerInfo->GetPlayState() == STARTED) {
+        AVPacket *packet = nullptr;
+        playerInfo->packetQueue.get(&packet);
+        if (packet == nullptr || packet->data == nullptr) {
             continue;
         }
         // 获取buffer的索引
@@ -111,7 +111,7 @@ void *Player::Decode(void *info) {
             size_t out_size;
             int length = packet->size;
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
-            if (inputBuf != NULL && length <= out_size) {
+            if (inputBuf != nullptr && length <= out_size) {
                 // 将待解码的数据copy到解码器（DSP）缓冲区中
                 memcpy(inputBuf, packet->data, length);
                 int64_t pts = packet->pts;
@@ -158,7 +158,7 @@ void *Player::Decode(void *info) {
     }
 
     LOGD("-------Decode over!---------");
-    return NULL;
+    return nullptr;
 }
 
 
@@ -293,7 +293,6 @@ void unpackCallback(H264Pkt result) {
     avPacket->data = result->data;
     avPacket->size = result->length;
     playerInfo->packetQueue.put(avPacket);
-
     free(result), result = nullptr;
 }
 

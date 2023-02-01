@@ -43,12 +43,15 @@ RTP_FIXED_HEADER:
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 FU-A:
+
+FU indicator:
 							+---------------+
 +-+-+-+-+-+-+-+-+           |0|1|2|3|4|5|6|7|
 | FU indicator  |  < == >   +-+-+-+-+-+-+-+-+
 +-+-+-+-+-+-+-+-+           |F|NRI|  Type   |
 							+---------------+
 
+FU header:
 							+---------------+
 +-+-+-+-+-+-+-+-+           |0|1|2|3|4|5|6|7|
 | FU header     |   < == >  +-+-+-+-+-+-+-+-+
@@ -63,7 +66,7 @@ FU-A:
 *并把混合器作为组合RTP报文的 SSRC,而将原来所有的SSRC都作为CSRC传送给接收者，使接收者知道组成组合报文的各个SSRC。
  *
  *FU indicator :
- *F、 NRI 来自 NAL Header 中的 F、 NRI
+ *F、 NRI 来自 NAL Header 中的 F、NRI
  *FU-A的Type是固定的28
 
  *FU Header：
@@ -191,8 +194,9 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
      * -------------------第2个字节---------------------------------
      * M(1 bit) 标记，不同的有效载荷有不同的含义，对于视频，标记一帧的结束；对于音频，标记会话的开始。
      * PT(7 bit) PlayLoad Type,有效载荷类型，用于说明RTP报文中有效载荷的类型，如GSM音频、JPEM图像等,在流媒体中大部分是用来区分音频流和视频流的，这样便于客户端进行解析：
-     *264的PT值为96
-     *有些负载类型由于诞生的较晚，没有具体的PT值，只能使用动态（dynamic）PT值，即96到127，这就是为什么大家普遍指定H264的PT值为96
+     *
+     * H264的PT值为96
+     * 有些负载类型由于诞生的较晚，没有具体的PT值，只能使用动态（dynamic）PT值，即96到127，这就是为什么大家普遍指定H264的PT值为96
      *
      * -------------------第3、4字节---------------------------------
      *sequence number(16 bit) 序列号，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的
@@ -209,20 +213,21 @@ AddRTPHeader(const unsigned long ts, const unsigned long marker_bit, unsigned lo
      */
 
     unsigned char *RTPData = result->data;
-    RTPData[0] = 0x80;//V P X CC->10 0 0 0000=0x80\十进制的28
-    // H264 payload  is dynamic  payload(96-127) and marker bit
-    RTPData[1] = 0x60 + (marker_bit << 7);
-    //add sequence number
+    //1、add V P X CC->10 0 0 0000=0x80
+    RTPData[0] = 0x80;
+    //2、add M(1bit) PT(7bit)
+    //M(marker_bit),0:stream start,1:stream end
+    //H264 PT=96=0x60
+    RTPData[1] = (marker_bit << 7) + 0x60;
+    //3、add sequence number(16 bit) 序列号
     setLong(RTPData, ++cq, 2, 4);
-    //添加4bit的的时间戳
+    //4、add Timestamp(32bit) 时间戳
     unsigned long timestamp = ts * clock / TIME_BASE;
     setLong(RTPData, timestamp, 4, 8);
-
-    if (ssrc == 0) {
-        ssrc = rand();
-    }
-    //同步信源(SSRC)标识符：占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC
+    //5、add SSRC(32 bit)
+    if (ssrc == 0)ssrc = rand();
     setLong(RTPData, ssrc, 8, 12);
+    //6。add RTP Header
     memcpy(RTPData + headerLen, data + result->h264StartCodeLen, len - result->h264StartCodeLen);
     return result;
 }
@@ -237,7 +242,7 @@ Result GetSPS_PPS_RTP_STAP_Pkt(const unsigned long ts, unsigned long clock) {
 
 
 Result GetScreenInfo(const unsigned long ts, unsigned long clock) {
-    if(screenInfo){
+    if (screenInfo) {
         return AddRTPHeader(ts, 1, clock, screenInfo->pkt, screenInfo->len);
     }
 
@@ -278,51 +283,53 @@ int PackRTP(unsigned char *h264Pkt,
         Result result = AddRTPHeader(ts, 1, clock, h264Pkt, length);
         callback(result);
         //printCharsHex(result->data, length, 20, "Single Raw Small");
-    } else {
-        //create FU-A pkt
-        unsigned int currentIndex = 0;
-        unsigned int remainLen;
+        goto FINISH;
+    }
+    //create FU-A pkt
+    //RTP Header(12 bit) +FU indicator(1 bit) +FU header(1 bit)+FU payload
+    unsigned int currentIndex = 0;
+    unsigned int remainLen;
+    while (currentIndex < length) {
+        remainLen = length - currentIndex;
+        if (remainLen <= 0) break;
 
-        while (currentIndex < length) {
-            remainLen = length - currentIndex;
-            if (remainLen <= 0) {
-                break;
-            }
-            unsigned int bufSize = maxPktLen - headerLen;
-            unsigned char *buf = calloc(bufSize, sizeof(char));
-            //1、add RTP header
-            Result result = AddRTPHeader(ts, currentIndex == 0 ? 0 : 1, clock, buf, bufSize);
-            free(buf);
-            buf = NULL;
-            unsigned char NALU_header = h264Pkt[4];
+        unsigned int bufSize = maxPktLen - headerLen;
+        unsigned char *buf = calloc(bufSize, sizeof(char));
 
-            //2、set FU-Indicator at  NALU-Header position
-            //FU-Indicator的F、 NRI 来自 NAL Header 中的 F、 NRI
-            //FU-A类型分片的Type是固定的28
-            //取NALU Header中的前三位（11100000=0ce0）加上type=28=0x1c;
-            result->data[headerLen] = (NALU_header & 0xe0) | 0x1c;
+        //1、add RTP header
+        Result result = AddRTPHeader(ts, currentIndex == 0 ? 0 : 1, clock, buf, bufSize);
+        free(buf), buf = NULL;
 
-            //3、set FU-Header
-            //RTP Header(12 bit) +FU indicator(1 bit) +FU header(1 bit)
-            unsigned int copyLen = min(remainLen, maxPktLen - headerLen - 2);
-            if (currentIndex + copyLen == length) {
-                result->data[headerLen + 1] = 0x40 | naluType;//mark end
+        //2、set FU-Indicator at  NALU-Header position
+        //FU-Indicator的F、NRI 来自 NAL Header 中的 F、NRI
+        //FU-A类型分片的Type是固定的28
+        //即取NALU Header中的前三位（11100000=0ce0）+ FU-A type=28=0x1c;
+        unsigned char NALU_header = h264Pkt[4];
+        result->data[headerLen] = (NALU_header & 0xe0) | 0x1c;
+
+        //3、set FU-Header
+        unsigned int copyLen = min(remainLen, maxPktLen - headerLen - 2);
+        unsigned int FUHerderIndex = headerLen + 1;
+        if (currentIndex + copyLen == length) {
+            result->data[FUHerderIndex] = 0x40 | naluType;//mark end
+        } else {
+            if (currentIndex == 0) {
+                currentIndex = startCodeLen + 1;
+                result->data[FUHerderIndex] = 0x80 | naluType;//mark start
             } else {
-                if (currentIndex == 0) {
-                    currentIndex = startCodeLen + 1;
-                    result->data[headerLen + 1] = 0x80 | naluType;//mark start
-                } else {
-                    result->data[headerLen + 1] = 0x00 | naluType;//mark mid
-                }
+                result->data[FUHerderIndex] = 0x00 | naluType;//mark mid
             }
-            //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
-            memcpy(result->data + headerLen + 2, h264Pkt + currentIndex, copyLen);
-            //    printCharsHex(result->data, result->length, 16, "FU-A After Packed");
-            callback(result);
-            currentIndex += copyLen;
         }
+        //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
+
+        //4、add payload
+        memcpy(result->data + FUHerderIndex + 1, h264Pkt + currentIndex, copyLen);
+        //    printCharsHex(result->data, result->length, 16, "FU-A After Packed");
+        callback(result);
+        currentIndex += copyLen;
     }
 
+    FINISH:
     free(h264Pkt);
     return RESULT_OK;
 }
@@ -385,13 +392,13 @@ void UpdateScreen(int w, int h) {
     if (!screenInfo) {
         screenInfo = malloc(sizeof(Pkt));
         screenInfo->pkt = calloc(5, sizeof(char));
-        screenInfo->pkt[0]=0x24;
+        screenInfo->pkt[0] = 0x24;
     }
 
-    screenInfo->pkt[1] = w>> 8;//前8位
-    screenInfo->pkt[2] = w& 0xFF;//后8位
+    screenInfo->pkt[1] = w >> 8;//前8位
+    screenInfo->pkt[2] = w & 0xFF;//后8位
 
-    screenInfo->pkt[3] = h>> 8;//前8位
-    screenInfo->pkt[4] = h& 0xFF;//后8位
+    screenInfo->pkt[3] = h >> 8;//前8位
+    screenInfo->pkt[4] = h & 0xFF;//后8位
 
 }

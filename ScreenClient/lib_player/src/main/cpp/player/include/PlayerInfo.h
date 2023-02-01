@@ -20,10 +20,11 @@ class PlayerInfo {
 public:
     AMediaFormat *videoFormat = NULL;
     AMediaCodec *AMediaCodec = NULL;
+    ANativeWindow *window = NULL;
+
     unsigned int width, height;
     AsyncQueue<AVPacket> packetQueue;
     pthread_t decode_thread = 0;
-    ANativeWindow *window = NULL;
 
     unsigned int windowWith = 0;
     unsigned int windowHeight = 0;

@@ -256,10 +256,10 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
     unsigned long long currSq = ((rtpData[2] & 0xFF) << 8) + (rtpData[3] & 0xFF);
     rtpPkt->curr_Sq = currSq;
     //第13个字节
-    rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
+    int rtpType = rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
 
     //printCharsHex(rtpData, length, 20, "---RTP---");
-    switch (rtpPkt->type) {
+    switch (rtpType) {
         // STAP-A:RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+.....
         case 24: {
             //   printCharsHex(rtpData, length, 20, "---STAP-RTP---");
@@ -378,6 +378,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             //single NALU RTP
             // RTP header(12bytes) +(NALU header (1byte) + NALU payload)+......
         case 1:
+        case 7:
         case 5: {
             //I\P
             // printCharsHex(rtpData, length, 20, "---Single RTP---");
@@ -391,6 +392,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             callback(pkt);
             break;
         }
+
         default: {
             LOGE("not support NALU type=%d", rtpPkt->type);
         }
