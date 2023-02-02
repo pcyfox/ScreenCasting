@@ -124,21 +124,14 @@ int updateCodec(uint8_t *sps,
 
 void *Player::Decode(void *) {
     AMediaCodec *codec = playerInfo->AMediaCodec;
+    size_t out_size = 0;
+    ssize_t outIndex = 0;
+    AVPacket *packet = nullptr;
     while (playerInfo->GetPlayState() == STARTED) {
-        AVPacket *packet = nullptr;
         playerInfo->packetQueue.get(&packet);
-        if (packet == nullptr || packet->data == nullptr) {
-            continue;
-        }
-
-        if (GetNALUType(packet) == 7) {
-            //   updateCodec(packet->data, packet->size, nullptr, 0);
-            continue;
-        }
-
+        if (packet == nullptr || packet->data == nullptr)continue;
         // 获取buffer的索引
         ssize_t index = AMediaCodec_dequeueInputBuffer(codec, 10000);
-        size_t out_size = 0;
         if (index >= 0) {
             int length = packet->size;
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
@@ -149,7 +142,6 @@ void *Player::Decode(void *) {
                 if (pts < 0 || !pts) {
                     pts = getCurrentTime();
                 }
-                delete packet, packet = nullptr;
                 media_status_t status = AMediaCodec_queueInputBuffer(codec, index, 0, length, pts,
                                                                      0);
                 if (status != AMEDIA_OK) {
@@ -160,7 +152,9 @@ void *Player::Decode(void *) {
             LOGE("Decode dequeue buffer error ");
             continue;
         }
-        ssize_t outIndex = 0;
+
+        delete packet, packet = nullptr;
+
         do {
             auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
             outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 10000);
@@ -170,7 +164,6 @@ void *Player::Decode(void *) {
                     LOGE("Decode() video producer output EOS");
                     break;
                 } else { continue; }
-
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
                 LOGE("Decode() video output buffers changed");
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
