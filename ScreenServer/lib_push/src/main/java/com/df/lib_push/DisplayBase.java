@@ -161,7 +161,6 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
      * @return true if success, false if you get a error (Normally because the encoder selected
      * doesn't support any configuration seated or your device hasn't a H264 encoder).
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean prepareVideo() {
         return prepareVideo(640, 480, 30, 1200 * 1024, 0, 320);
     }
@@ -210,7 +209,6 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         this.data = data;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public void startStream(String url) {
         streaming = true;
         if (!isRunning) {
@@ -244,7 +242,6 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void resetVideoEncoder() {
         virtualDisplay.setSurface(null);
         videoEncoder.reset();
@@ -297,7 +294,6 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     /**
      * Replace with reTry(long delay, String reason);
      */
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Deprecated
     public void reTry(long delay) {
         resetVideoEncoder();

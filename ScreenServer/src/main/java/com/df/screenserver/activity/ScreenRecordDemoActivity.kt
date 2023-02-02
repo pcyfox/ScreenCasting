@@ -2,8 +2,10 @@ package com.df.screenserver.activity
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -16,11 +18,17 @@ import com.df.lib_push.VideoEncodeParam
 import com.df.screenserver.R
 import com.df.lib_push.service.ScreenRecorderService
 import kotlinx.android.synthetic.main.activity_screen_record.*
+import kotlin.random.Random
 
 
 class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
     private val TAG = "ScreenRecordDemoActivit"
     private val REQUEST_CODE = 202
+
+    private val colors =
+        arrayListOf(Color.RED, Color.BLACK, Color.BLUE, Color.CYAN, Color.GREEN, Color.DKGRAY)
+    private var index = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -39,39 +47,39 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         vv_test.setOnPreparedListener {
             vv_test.start()
             it.isLooping = true
-
         }
 
 //        val w = ScreenUtils.getScreenWidth()
 //        val h = ScreenUtils.getScreenHeight()
 
-        val w = 1920
-        val h = 1080
+        val w = 640
+        val h = 480
 
         et_w.setText(w.toString())
         et_h.setText(h.toString())
         //val bitrate =1.2*1024*1024
 
         val fps = et_fps.text.toString().toInt()
-        val bitRate: Int = (w * h * fps * 0.05).toInt()
+        val bitRate: Int = (w * h * fps * 0.03).toInt()
 
-        et_udp_max_len.setText((com.df.lib_push.Publisher.MAX_PKT_LEN).toString())
+        et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
         et_bitrate.setText(bitRate.toString())
-
     }
 
 
     override fun onClick(view: View) {
         when (view.id) {
+            R.id.btn_change_color -> {
+                val i = index++ % (colors.size - 1)
+                container.setBackgroundColor(colors[i])
+            }
             R.id.btn_start_screen -> {
                 if (btn_start_screen.text.toString() == "START") {
                     btn_start_screen.text = "STOP"
-
                     startActivityForResult(
                         (getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager).createScreenCaptureIntent(),
                         REQUEST_CODE
                     )
-
                 } else {
                     btn_start_screen.text = "START"
                     ScreenRecorderService.stop(this)

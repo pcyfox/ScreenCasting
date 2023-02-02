@@ -7,8 +7,7 @@
 
 #include <sys/time.h>
 
-static int64_t getCurrentTime()
-{
+static int64_t getCurrentTime() {
     struct timeval tv;
     gettimeofday(&tv, NULL); //该函数在sys/time.h头文件中
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
@@ -27,5 +26,10 @@ static int64_t getCurrentTime()
     ((((const uint8_t*)(x))[0] << 8) |          \
       ((const uint8_t*)(x))[1])
 
+
+int min(int a, int b) {
+    if (a < b)return a;
+    return b;
+}
 
 #endif //TCTS_EDU_APP_RECODER_UTILS_H

@@ -169,6 +169,7 @@ ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
         receiveDataInfo->last_Sq = 0;
         receiveDataInfo->receive_count = 0;
     }
+
     unsigned long currSq = ((rtpPacket[2] & 0xFF) << 8) + (rtpPacket[3] & 0xFF);
     if (currSq <= 1) {
         ResetReceiveDataInfo();
@@ -177,12 +178,12 @@ ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
 
 //    LOGD("analysePkt()--------->receive_count=%ld,curr_Sq %ld,lsat_Sq=%ld",
 //         receiveDataInfo->receive_count, currSq, receiveDataInfo->last_Sq);
-
     receiveDataInfo->receive_count++;
-    if (currSq != 1 && currSq - receiveDataInfo->last_Sq - 1 != 0) {
-        receiveDataInfo->lost_count += abs(receiveDataInfo->curr_Sq - receiveDataInfo->last_Sq);
-        LOGW("analysePkt() maybe lost %d frame lastSq=%ld,currSq=%ld", receiveDataInfo->lost_count,
+    int lostCount = currSq - receiveDataInfo->last_Sq;
+    if (currSq != 1 && lostCount != 1) {
+        LOGW("analysePkt() maybe lost %d frame lastSq=%ld,currSq=%ld", lostCount,
              receiveDataInfo->last_Sq, receiveDataInfo->curr_Sq);
+        receiveDataInfo->lost_count += abs(lostCount);
     }
 
     int64_t currentTime = getCurrentTime();
@@ -380,8 +381,10 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
         case 1:
         case 7:
         case 5: {
+            if (rtpType == 7) {
+                printCharsHex(rtpData, length, min(28, length), "---Single RTP---");
+            }
             //I\P
-            // printCharsHex(rtpData, length, 20, "---Single RTP---");
             unsigned char *data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
             data[3] = HEAD_4;
             memcpy(data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);

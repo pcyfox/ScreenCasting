@@ -44,7 +44,8 @@ int
 Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigned int height,
                           uint8_t *sps,
                           int spsSize,
-                          uint8_t *pps, int ppsSize,
+                          uint8_t *pps,
+                          int ppsSize,
                           ANativeWindow *window,
                           const char *mine) {
 
@@ -97,6 +98,30 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
 }
 
 
+int updateCodec(uint8_t *sps,
+                int spsSize,
+                uint8_t *pps,
+                int ppsSize) {
+
+    // AMediaCodec_flush(playerInfo->AMediaCodec);
+    //AMediaCodec_stop(playerInfo->AMediaCodec);
+    if (spsSize > 0) {
+        AMediaFormat_setBuffer(playerInfo->videoFormat, "csd-0", sps, spsSize); // sps
+    }
+    if (ppsSize > 0) {
+        AMediaFormat_setBuffer(playerInfo->videoFormat, "csd-1", pps, ppsSize); // pps
+    }
+
+    media_status_t status = AMediaCodec_configure(playerInfo->AMediaCodec, playerInfo->videoFormat,
+                                                  playerInfo->window, nullptr, 0);
+    if (status == AMEDIA_OK) {
+        //   status = AMediaCodec_start(playerInfo->AMediaCodec);
+    } else {
+        LOGE("called updateCodec() error!");
+    }
+    return status;
+}
+
 void *Player::Decode(void *) {
     AMediaCodec *codec = playerInfo->AMediaCodec;
     while (playerInfo->GetPlayState() == STARTED) {
@@ -105,10 +130,16 @@ void *Player::Decode(void *) {
         if (packet == nullptr || packet->data == nullptr) {
             continue;
         }
+
+        if (GetNALUType(packet) == 7) {
+            //   updateCodec(packet->data, packet->size, nullptr, 0);
+            continue;
+        }
+
         // 获取buffer的索引
-        ssize_t index = AMediaCodec_dequeueInputBuffer(codec, 500);
+        ssize_t index = AMediaCodec_dequeueInputBuffer(codec, 10000);
+        size_t out_size = 0;
         if (index >= 0) {
-            size_t out_size;
             int length = packet->size;
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
             if (inputBuf != nullptr && length <= out_size) {
@@ -125,38 +156,33 @@ void *Player::Decode(void *) {
                     LOGE("Decode queue input buffer error status=%d", status);
                 }
             }
-        }
-
-        auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
-        ssize_t status = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 100);
-
-        if (status >= 0 && bufferInfo != nullptr) {
-            AMediaFormat *format = playerInfo->videoFormat;
-            int32_t width = -1;
-            AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_MAX_HEIGHT, &width);
-            int32_t height = -1;
-            AMediaFormat_getInt32(format, AMEDIAFORMAT_KEY_MAX_HEIGHT, &height);
-            if (width > 0 && height > 0) {
-                LOGD("video format:w=%d,h=%d", width, height);
-                if (playerInfo->height * playerInfo->width != width * height) {
-                }
-            }
-            AMediaCodec_releaseOutputBuffer(codec, status, bufferInfo->size != 0);
-            if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
-                LOGE("Decode() video producer output EOS");
-            }
-        } else if (status == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
-            LOGE("Decode() output buffers changed");
-        } else if (status == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
-        } else if (status == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-            //     LOGE("Decode() video no output buffer right now");
         } else {
-            LOGE("Decode() unexpected info code: %zd", status);
+            LOGE("Decode dequeue buffer error ");
+            continue;
         }
+        ssize_t outIndex = 0;
+        do {
+            auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
+            outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 10000);
+            if (outIndex >= 0) {
+                AMediaCodec_releaseOutputBuffer(codec, outIndex, bufferInfo->size != 0);
+                if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
+                    LOGE("Decode() video producer output EOS");
+                    break;
+                } else { continue; }
 
-        free(bufferInfo);
+            } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
+                LOGE("Decode() video output buffers changed");
+            } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
+                LOGE("Decode() video output format changed");
+            } else if (outIndex == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
+                LOGE("Decode() video no output buffer right now");
+            } else {
+                LOGE("Decode() unexpected info code: %zd", outIndex);
+            }
+            free(bufferInfo);
+        } while (outIndex > 0);
     }
-
     LOGD("-------Decode over!---------");
     return nullptr;
 }
