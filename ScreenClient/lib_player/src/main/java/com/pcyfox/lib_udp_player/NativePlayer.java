@@ -44,7 +44,6 @@ public class NativePlayer {
 
     public native int configPlayer(Surface surface, int w, int h);
 
-    public native int changeSurface(Surface surface, int w, int h);
 
     public native int handlePkt(byte[] rtpPkt, int pktLen, int maxFrameLen, boolean isLiteMod);
 

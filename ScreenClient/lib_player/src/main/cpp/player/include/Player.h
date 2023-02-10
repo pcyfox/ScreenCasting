@@ -24,8 +24,6 @@ public:
 
     int Configure(ANativeWindow *window, int w, int h);
 
-    int ChangeWindow(ANativeWindow *window, int w, int h);
-
     int
     HandleRTPPkt(unsigned char *pkt, unsigned int pktLen, unsigned int maxFrameLen, int isLiteMod);
 

@@ -107,7 +107,7 @@ class Publisher(
 
     companion object {
         const val MULTI_CAST_IP = "239.0.0.200"
-        const val TARGET_PORT = 2021
+        const val TARGET_PORT = 9527
 
         const val MAX_PKT_LEN = 62000
     }

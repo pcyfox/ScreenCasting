@@ -21,6 +21,7 @@ public class MultiCastPlayerView extends RelativeLayout {
     //MediaCodec variable
     private volatile boolean isPlaying = false;
     private volatile boolean isPause = false;
+    private volatile boolean hasReceivedData = false;
 
     static String multiCastHost = "239.0.0.200";
     private int videoPort = 2021;
@@ -62,6 +63,7 @@ public class MultiCastPlayerView extends RelativeLayout {
     public void config(String host, int port, int maxFrameLen) {
         Log.d(TAG, "config() called with: host = [" + host + "], port = [" + port + "], maxFrameLen = [" + maxFrameLen + "]");
         if (isPlaying) {
+            Log.e(TAG, "config() fail,is playing!");
             return;
         }
         multiCastHost = host;
@@ -94,21 +96,26 @@ public class MultiCastPlayerView extends RelativeLayout {
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                int width = surfaceView.getWidth();
-                int height = surfaceView.getHeight();
-                holder.setKeepScreenOn(true);
-                holder.setFixedSize(width, height);
-                nativeUDPPlayer.configPlayer(holder.getSurface(), width, height);
-                if (nativeUDPPlayer.getState() == PlayState.PAUSE) {
-                    nativeUDPPlayer.play();
-                    isPause = false;
-                }
+//                Log.d(TAG, "surfaceCreated() called with: holder = [" + holder + "]");
+//                int width = surfaceView.getWidth();
+//                int height = surfaceView.getHeight();
+//                holder.setKeepScreenOn(true);
+//                holder.setFixedSize(width, height);
+//                nativeUDPPlayer.configPlayer(holder.getSurface(), width, height);
+//                if (nativeUDPPlayer.getState() == PlayState.PAUSE) {
+//                    nativeUDPPlayer.play();
+//                    isPause = false;
+//                }
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 Log.d(TAG, "surfaceChanged() called with: holder = [" + holder + "], format = [" + format + "], width = [" + width + "], height = [" + height + "]");
-                nativeUDPPlayer.changeSurface(holder.getSurface(), width, height);
+                PlayState state = nativeUDPPlayer.getState();
+                if (state == PlayState.STARTED || state == PlayState.PAUSE) {
+                    nativeUDPPlayer.stop();
+                }
+                nativeUDPPlayer.configPlayer(holder.getSurface(), surfaceView.getWidth(), surfaceView.getHeight());
             }
 
             @Override
@@ -130,6 +137,10 @@ public class MultiCastPlayerView extends RelativeLayout {
             try {
                 multicastSocket.receive(dataPacket);
                 nativeUDPPlayer.handlePkt(receiveByte, dataPacket.getLength(), maxFrameLen, true);
+                if (!hasReceivedData) {
+                    Log.d(TAG, "startReceiveData() --------- hasReceivedData----------");
+                    hasReceivedData = true;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -144,6 +155,7 @@ public class MultiCastPlayerView extends RelativeLayout {
             isPlaying = true;
             nativeUDPPlayer.play();
             handler.post(this::startReceiveData);
+            Log.d(TAG, "startPlay() called");
         }
     }
 
@@ -151,7 +163,7 @@ public class MultiCastPlayerView extends RelativeLayout {
     public void stopPlay() {
         Log.d(TAG, "stopPlay() called");
         if (!isPlaying) {
-            Log.e(TAG, "stopPlay() called,fuck player is not start");
+            Log.e(TAG, "stopPlay() called,fuck, this player is not start");
             return;
         }
         isPause = false;

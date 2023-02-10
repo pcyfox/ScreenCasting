@@ -55,17 +55,19 @@ public class MultiCastPlayer {
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                nativeUDPPlayer.configPlayer(holder.getSurface(), surfaceView.getWidth(), surfaceView.getHeight());
-
-                if (nativeUDPPlayer.getState() == PlayState.PAUSE) {
-                    nativeUDPPlayer.play();
-                }
+                Log.d(TAG, "surfaceCreated() called with: holder = [" + holder + "]");
+//                nativeUDPPlayer.configPlayer(holder.getSurface(), surfaceView.getWidth(), surfaceView.getHeight());
+//                if (nativeUDPPlayer.getState() == PlayState.PAUSE) {
+//                    nativeUDPPlayer.play();
+//                }
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 Log.d(TAG, "surfaceChanged() called with: holder = [" + holder + "], format = [" + format + "], width = [" + width + "], height = [" + height + "]");
-                nativeUDPPlayer.changeSurface(holder.getSurface(), width, height);
+                nativeUDPPlayer.stop();
+                nativeUDPPlayer.configPlayer(holder.getSurface(), surfaceView.getWidth(), surfaceView.getHeight());
+                nativeUDPPlayer.play();
             }
 
             @Override

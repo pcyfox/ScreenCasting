@@ -48,21 +48,20 @@ class ScreenRecorderService : Service() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i(TAG, "RTP Display service started")
         intent?.run {
-            when (intent.getIntExtra(KEY_STATE, -1)) {
+            val state = getIntExtra(KEY_STATE, -1)
+            Log.d(
+                TAG,
+                "onStartCommand() called with: state= $state"
+            )
+            when (state) {
                 0 -> {//stop
                     serverDisplay?.stopStream()
                     stopSelf()
                     return -1
                 }
                 //start
-                1 -> serverDisplay?.run {
-                    if (isStreaming) {
-                        return -1
-                    }
-                }
-
+                1 -> start()
                 //pause
                 2 -> serverDisplay?.run {
                     pause()
@@ -76,13 +75,30 @@ class ScreenRecorderService : Service() {
             }
         }
 
+        return START_STICKY
+    }
+
+
+    private fun changeState() {
+
+    }
+
+    private fun start() {
+        if (isStreaming()) {
+            Log.d(TAG, "start() called fail,is streaming...")
+            return
+        }
+        if (requestDisplayIntent == null) {
+            Log.d(TAG, "start() called fail,requestDisplayIntent is null")
+            return
+        }
+
         requestDisplayIntent?.run {
+            Log.d(TAG, "start() startStreamRtp...")
             serverDisplay = ScreenDisplay(applicationContext, ip, port, maxUdpPktLen)
             serverDisplay?.setIntentResult(resultCode, this)
             startStreamRtp(videoEncodeParam)
         }
-
-        return START_STICKY
     }
 
 
@@ -180,7 +196,7 @@ class ScreenRecorderService : Service() {
 
             Log.d(
                 TAG,
-                "start() called with: context = $context, resultCode = $resultCode, requestDisplayIntent = $requestDisplayIntent, videoEncodeParam = $videoEncodeParam, maxUdpPktLen = $maxUdpPktLen, ip = $ip, port = $port"
+                "start() called with:  resultCode = $resultCode, videoEncodeParam = $videoEncodeParam, maxUdpPktLen = $maxUdpPktLen, ip = $ip, port = $port"
             )
             val startIntent = Intent()
             startIntent.setClass(context, ScreenRecorderService::class.java)

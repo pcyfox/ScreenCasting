@@ -52,7 +52,7 @@ const void *onStateChange(PlayState state) {
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_pcyfox_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
-                                                  jboolean is_debug) {
+                                                   jboolean is_debug) {
     player = new Player();
     player->SetDebug(is_debug);
     playerEnv.object = env->NewGlobalRef(thiz);
@@ -68,8 +68,8 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_pcyfox_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject thiz,
-                                                          jobject surface,
-                                                          jint w, jint h) {
+                                                           jobject surface,
+                                                           jint w, jint h) {
 
     if (player == NULL) {
         LOGE("player not init,it is null");
@@ -81,26 +81,6 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject 
     }
     player->SetStateChangeListener(reinterpret_cast<void (*)(PlayState)>(onStateChange));
     return player->Configure(window, w, h);
-}
-
-
-
-
-extern "C"
-JNIEXPORT jint JNICALL
-Java_com_pcyfox_lib_1udp_1player_NativePlayer_changeSurface(JNIEnv *env, jobject thiz,
-                                                           jobject surface, jint w,
-                                                           jint h) {
-    if (player == NULL) {
-        LOGE("player not init,it is null");
-        return PLAYER_RESULT_ERROR;
-    }
-
-    ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
-    if (!window) {
-        PLAYER_RESULT_ERROR;
-    }
-    return player->ChangeWindow(window, w, h);
 }
 
 
@@ -150,9 +130,9 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_pause(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thiz,
-                                                       jbyteArray pkt, int len,
-                                                       int maxFrameLen,
-                                                       jboolean isLiteMode) {
+                                                        jbyteArray pkt, int len,
+                                                        int maxFrameLen,
+                                                        jboolean isLiteMode) {
 
     if (player == NULL) {
         LOGE("player not init,it is null");

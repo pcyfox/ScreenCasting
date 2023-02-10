@@ -13,7 +13,7 @@
         android:theme="@style/Theme.UDP_Player">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ClientMainActivity"
             android:screenOrientation="landscape"
             android:turnScreenOn="true"
             android:exported="true">

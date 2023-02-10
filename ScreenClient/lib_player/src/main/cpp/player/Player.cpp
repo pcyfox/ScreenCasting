@@ -58,13 +58,13 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
         return PLAYER_RESULT_ERROR;
     }
 
-    if (*mMediaCodec == NULL) {
+    if (*mMediaCodec == nullptr) {
         AMediaCodec *mediaCodec = AMediaCodec_createDecoderByType(mine);
         if (!mediaCodec) {
-            LOGE("createAMediaCodec() fail!");
+            LOGE("createAMediaCodec() createDecoder fail!");
             return PLAYER_RESULT_ERROR;
         } else {
-            LOGI("createAMediaCodec() success!");
+            LOGI("createAMediaCodec() createDecoder success!");
             *mMediaCodec = mediaCodec;
         }
     } else {
@@ -87,12 +87,12 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
     if (status != AMEDIA_OK) {
         LOGE("configure AMediaCodec fail!,ret=%d", status);
         AMediaCodec_delete(*mMediaCodec);
-        mMediaCodec = NULL;
+        mMediaCodec = nullptr;
         return PLAYER_RESULT_ERROR;
     } else {
         playerInfo->videoFormat = videoFormat;
         playerInfo->window = window;
-        LOGD("configure AMediaCodec success!");
+        LOGD("createAMediaCodec() set AMediaCodec  configure success!");
     }
     return PLAYER_RESULT_OK;
 }
@@ -169,7 +169,7 @@ void *Player::Decode(void *) {
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
                 LOGE("Decode() video output format changed");
             } else if (outIndex == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-                LOGE("Decode() video no output buffer right now");
+               // LOGE("Decode() video no output buffer right now");
             } else {
                 LOGE("Decode() unexpected info code: %zd", outIndex);
             }
@@ -197,7 +197,7 @@ void Player::SetDebug(bool debug) {
 
 
 int Player::Configure(ANativeWindow *window, int w, int h) {
-    LOGD("----------Configure() called with: w=%d,h=%d", w, h);
+    LOGD("Configure() called with: w=%d,h=%d", w, h);
     if (playerInfo->GetPlayState() != ERROR) {
         playerInfo->window = window;
         playerInfo->windowWith = w;
@@ -209,41 +209,14 @@ int Player::Configure(ANativeWindow *window, int w, int h) {
                                     NULL,
                                     NULL,
                                     playerInfo->window, playerInfo->mine);
+
         if (ret == PLAYER_RESULT_ERROR) {
             return ret;
         } else {
             playerInfo->SetPlayState(PREPARED);
         }
     } else {
-        LOGE("can't configure due to init player ERROR\n");
-        return PLAYER_RESULT_ERROR;
-    }
-    LOGD("----------Configure Over-------------");
-    return PLAYER_RESULT_OK;
-}
-
-int Player::ChangeWindow(ANativeWindow *window, int w, int h) {
-    LOGI("--------ChangeWindow() called with w=%d,h=%d", w, h);
-    if (playerInfo->GetPlayState() == PAUSE) {
-        playerInfo->window = window;
-        playerInfo->windowWith = w;
-        playerInfo->windowHeight = h;
-        int ret = createAMediaCodec(&playerInfo->AMediaCodec, playerInfo->windowWith,
-                                    playerInfo->windowHeight,
-                                    NULL,
-                                    NULL,
-                                    NULL,
-                                    NULL,
-                                    playerInfo->window, playerInfo->mine);
-
-        AMediaCodec_start(playerInfo->AMediaCodec);
-        if (ret == PLAYER_RESULT_OK) {
-            LOGI("--------OnWindowChange() success! ");
-            playerInfo->SetPlayState(STARTED);
-            StartDecodeThread();
-        }
-    } else {
-        LOGE("player not init or it not pause");
+        LOGE("Configure() fail!,can't configure due to init player ERROR\n");
         return PLAYER_RESULT_ERROR;
     }
     return PLAYER_RESULT_OK;
@@ -262,18 +235,18 @@ int Player::Play() {
         return PLAYER_RESULT_OK;
     }
     if (playerInfo->GetPlayState() != PREPARED) {
-        LOGE("player is not PREPARED!\n");
+        LOGE("play() fail,player is not PREPARED!\n");
         return PLAYER_RESULT_ERROR;
     }
 
     media_status_t status = AMediaCodec_start(playerInfo->AMediaCodec);
     if (status != AMEDIA_OK) {
-        LOGE("start AMediaCodec fail!\n");
+        LOGE("play() error!,start AMediaCodec fail!\n");
         AMediaCodec_delete(playerInfo->AMediaCodec);
         playerInfo->AMediaCodec = NULL;
         return PLAYER_RESULT_ERROR;
     } else {
-        LOGI("------------AMediaCodec start success!!\n");
+        LOGI("play(),AMediaCodec start success!!\n");
     }
     playerInfo->SetPlayState(STARTED);
     StartDecodeThread();
@@ -294,15 +267,18 @@ int Player::Pause(int delay) {
 
 int Player::Stop() {
     LOGI("--------Stop()  called-------");
-    if (!playerInfo || playerInfo->GetPlayState() != STARTED) {
-        LOGE("playerInfo is not started");
+    if (playerInfo == nullptr) {
+        return PLAYER_RESULT_ERROR;
+    }
+    PlayState state = playerInfo->GetPlayState();
+    if (state != STARTED && state != PAUSE) {
+        LOGW("Stop(),fail ,playerInfo is not started");
         return PLAYER_RESULT_ERROR;
     }
     playerInfo->SetPlayState(STOPPED);
     AMediaCodec_stop(playerInfo->AMediaCodec);
     delete playerInfo;
-    playerInfo = NULL;
-    LOGD("--------Stop Over------");
+    playerInfo = nullptr;
     return PLAYER_RESULT_OK;
 }
 
