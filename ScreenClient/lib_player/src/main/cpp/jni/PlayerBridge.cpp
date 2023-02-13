@@ -72,7 +72,7 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject 
                                                            jint w, jint h) {
 
     if (player == NULL) {
-        LOGE("player not init,it is null");
+        LOGE("configPlayer() called fail!,player is null");
         return PLAYER_RESULT_ERROR;
     }
     ANativeWindow *window = ANativeWindow_fromSurface(env, surface);

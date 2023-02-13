@@ -49,7 +49,7 @@ class ClientMainActivity : AppCompatActivity() {
             config(multiCastHost, videoPort, maxFrameLen)
             postDelayed({
                 playerView?.startPlay()
-            }, 100)
+            }, 200)
         }
     }
 
@@ -64,6 +64,8 @@ class ClientMainActivity : AppCompatActivity() {
 
             if (isPlaying && !isVisible) {
                 stopPlay()
+            } else {
+                configAndStart()
             }
         }
 

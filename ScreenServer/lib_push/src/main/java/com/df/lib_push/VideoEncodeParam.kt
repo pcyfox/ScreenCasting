@@ -9,7 +9,7 @@ data class VideoEncodeParam(
     var bitRate: Int = (w * h * fps * 0.12).toInt(),
     var iFrameInterval: Int = 5
 ) {
-
+    var q: Float = 0.06f
     var avcProfile = -1
     var avcProfileLevel = -1
 }

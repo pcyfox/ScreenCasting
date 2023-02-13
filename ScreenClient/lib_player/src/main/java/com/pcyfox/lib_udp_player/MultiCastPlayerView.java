@@ -90,22 +90,16 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
 
-    private void initNativePlayer() {
+    private void buildPlayer(){
         nativeUDPPlayer = new NativePlayer();
         nativeUDPPlayer.init(BuildConfig.DEBUG);
+    }
+
+    private void initNativePlayer() {
+        buildPlayer();
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-//                Log.d(TAG, "surfaceCreated() called with: holder = [" + holder + "]");
-//                int width = surfaceView.getWidth();
-//                int height = surfaceView.getHeight();
-//                holder.setKeepScreenOn(true);
-//                holder.setFixedSize(width, height);
-//                nativeUDPPlayer.configPlayer(holder.getSurface(), width, height);
-//                if (nativeUDPPlayer.getState() == PlayState.PAUSE) {
-//                    nativeUDPPlayer.play();
-//                    isPause = false;
-//                }
             }
 
             @Override
@@ -115,6 +109,7 @@ public class MultiCastPlayerView extends RelativeLayout {
                 if (state == PlayState.STARTED || state == PlayState.PAUSE) {
                     nativeUDPPlayer.stop();
                 }
+                buildPlayer();
                 nativeUDPPlayer.configPlayer(holder.getSurface(), surfaceView.getWidth(), surfaceView.getHeight());
             }
 
@@ -178,6 +173,7 @@ public class MultiCastPlayerView extends RelativeLayout {
         }
         if (nativeUDPPlayer != null) {
             nativeUDPPlayer.stop();
+            nativeUDPPlayer = null;
         }
 
         if (surfaceView != null) {
