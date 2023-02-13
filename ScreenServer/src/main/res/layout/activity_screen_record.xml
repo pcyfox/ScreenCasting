@@ -8,8 +8,8 @@
 
         <VideoView
             android:id="@+id/vv_test"
-            android:layout_width="480dp"
-            android:layout_height="320dp" />
+            android:layout_width="640dp"
+            android:layout_height="480dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,24 +45,36 @@
                 android:layout_marginTop="12dp"
                 android:hint="fps"
                 android:inputType="number"
-                android:text="26"
+                android:text="22"
+                android:textColor="@android:color/white" />
+
+
+            <EditText
+                android:id="@+id/et_q"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="q"
+                android:inputType="numberDecimal"
+                android:text="0.005"
                 android:textColor="@android:color/white" />
 
             <EditText
+
                 android:id="@+id/et_bitrate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="bitRate"
                 android:inputType="number"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_blue_light" />
 
 
             <EditText
                 android:id="@+id/et_udp_max_len"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="22dp"
                 android:hint="udp_max_len"
                 android:inputType="number"
                 android:textColor="@android:color/white" />

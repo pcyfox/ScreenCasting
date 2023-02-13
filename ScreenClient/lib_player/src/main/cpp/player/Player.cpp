@@ -131,7 +131,7 @@ void *Player::Decode(void *) {
         playerInfo->packetQueue.get(&packet);
         if (packet == nullptr || packet->data == nullptr)continue;
         // 获取buffer的索引
-        ssize_t index = AMediaCodec_dequeueInputBuffer(codec, 10000);
+        ssize_t index = AMediaCodec_dequeueInputBuffer(codec, 1000);
         if (index >= 0) {
             int length = packet->size;
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
@@ -157,19 +157,23 @@ void *Player::Decode(void *) {
 
         do {
             auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
-            outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 10000);
+            outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 1000);
             if (outIndex >= 0) {
                 AMediaCodec_releaseOutputBuffer(codec, outIndex, bufferInfo->size != 0);
                 if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
                     LOGE("Decode() video producer output EOS");
                     break;
-                } else { continue; }
+                } else {
+                    continue;
+                }
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
                 LOGE("Decode() video output buffers changed");
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
                 LOGE("Decode() video output format changed");
             } else if (outIndex == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-               // LOGE("Decode() video no output buffer right now");
+                if (IS_DEBUG) {
+                    LOGE("Decode() video no output buffer right now");
+                }
             } else {
                 LOGE("Decode() unexpected info code: %zd", outIndex);
             }

@@ -35,8 +35,7 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         setContentView(R.layout.activity_screen_record)
 
         PermissionUtils.permission(
-            PermissionConstants.STORAGE,
-            PermissionConstants.ACTIVITY_RECOGNITION
+            PermissionConstants.STORAGE, PermissionConstants.ACTIVITY_RECOGNITION
         ).request()
 
         initTestVideo()
@@ -52,7 +51,7 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
 //        val w = ScreenUtils.getScreenWidth()
 //        val h = ScreenUtils.getScreenHeight()
 
-        val w = 640
+        val w = 720
         val h = 480
 
         et_w.setText(w.toString())
@@ -60,7 +59,9 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         //val bitrate =1.2*1024*1024
 
         val fps = et_fps.text.toString().toInt()
-        val bitRate: Int = (w * h * fps * 0.03).toInt()
+        val q = et_q.text.toString().toFloat()
+
+        val bitRate: Int = (w * h * fps * q).toInt()
 
         et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
         et_bitrate.setText(bitRate.toString())
@@ -112,11 +113,7 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
             resultCode,
             data,
             VideoEncodeParam(
-                w,
-                h,
-                fps,
-                resources.displayMetrics.densityDpi,
-                bitrate.toInt()
+                w, h, fps, resources.displayMetrics.densityDpi, bitrate.toInt()
             ),
 
             maxUdpPktLen,

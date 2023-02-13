@@ -128,6 +128,7 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
     private void startReceiveData() {
+        Log.d(TAG, "startReceiveData() called");
         byte[] receiveByte = new byte[MAX_UDP_PACKET_LEN];
         DatagramPacket dataPacket = new DatagramPacket(receiveByte, receiveByte.length);
         while (isPlaying) {
