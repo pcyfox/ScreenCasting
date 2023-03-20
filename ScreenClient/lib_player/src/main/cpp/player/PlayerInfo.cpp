@@ -28,7 +28,6 @@ PlayerInfo::~PlayerInfo() {
     LOGW("-------PlayerInfo Delete Over---------");
 }
 
-
 void PlayerInfo::SetPlayState(PlayState s) volatile {
     playState = s;
     if (stateListener) {
@@ -37,14 +36,20 @@ void PlayerInfo::SetPlayState(PlayState s) volatile {
     LOGD("PlayerInfo SetPlayState() :%d", s);
 }
 
-
 PlayState PlayerInfo::GetPlayState() {
     return playState;
 }
 
-
 void PlayerInfo::SetStateListener(void (*listener)(PlayState)) {
     this->stateListener = listener;
+}
+
+void PlayerInfo::SetDeCodecStateListener(void (*listener)(int)) {
+    this->decodecStateListener = listener;
+}
+
+void PlayerInfo::SetDeCodecState(int state) const {
+    if (decodecStateListener != nullptr)decodecStateListener(state);
 }
 
 

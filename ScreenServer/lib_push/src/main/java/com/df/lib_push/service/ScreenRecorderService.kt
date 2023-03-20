@@ -138,7 +138,7 @@ class ScreenRecorderService : Service() {
                     videoEncodeParam.dpi,
                     videoEncodeParam.iFrameInterval,
                     videoEncodeParam.avcProfile,
-                    videoEncodeParam.avcProfile
+                    videoEncodeParam.avcProfileLevel
                 )
             ) {
                 startStream()

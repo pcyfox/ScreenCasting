@@ -33,8 +33,9 @@ public:
 
     int Stop();
 
-    void SetStateChangeListener(void (*listener)(PlayState));
+    static void SetStateChangeListener(void (*listener)(PlayState));
 
+    static void SetDecodecStateChangeListener(void (*listener)(int));
 
 
 private:

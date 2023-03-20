@@ -8,15 +8,22 @@ import java.lang.annotation.Native;
 
 public class NativePlayer {
     private static final String TAG = "NativePlayer";
+
     static {
         System.loadLibrary("udp_player");
     }
+
     private PlayState state;
 
     private OnPlayStateChangeListener onStateChangeListener;
+    private OnDecodeStateChangeListener onDecodeStateChangeListener;
 
     public void setOnStateChangeListener(OnPlayStateChangeListener onStateChangeListener) {
         this.onStateChangeListener = onStateChangeListener;
+    }
+
+    public void setOnDecodeStateChangeListener(OnDecodeStateChangeListener onDecodeStateChangeListener) {
+        this.onDecodeStateChangeListener = onDecodeStateChangeListener;
     }
 
     public PlayState getState() {
@@ -30,11 +37,18 @@ public class NativePlayer {
         for (PlayState s : PlayState.values()) {
             if (state == s.ordinal()) {
                 this.state = s;
-
                 if (onStateChangeListener != null) {
                     onStateChangeListener.onStateChange(s);
                 }
             }
+        }
+    }
+
+    //call in native
+    public void onDecodeStateChange(int state) {
+        Log.d(TAG, "onDecodeStateChange() called with: state = [" + state + "]");
+        if (onDecodeStateChangeListener != null){
+            onDecodeStateChangeListener.onStateChange(state);
         }
     }
 
@@ -54,8 +68,6 @@ public class NativePlayer {
     public native int pause();
 
     public native void release();
-
-
 
 
 }

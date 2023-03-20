@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 static PlayerInfo *playerInfo;
+static long timeoutUs = 500;
 
 Player::Player() {
     playerInfo = new PlayerInfo;
@@ -131,7 +132,7 @@ void *Player::Decode(void *) {
         playerInfo->packetQueue.get(&packet);
         if (packet == nullptr || packet->data == nullptr)continue;
         // 获取buffer的索引
-        ssize_t index = AMediaCodec_dequeueInputBuffer(codec, 1000);
+        ssize_t index = AMediaCodec_dequeueInputBuffer(codec, timeoutUs);
         if (index >= 0) {
             int length = packet->size;
             uint8_t *inputBuf = AMediaCodec_getInputBuffer(codec, index, &out_size);
@@ -157,10 +158,12 @@ void *Player::Decode(void *) {
 
         do {
             auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
-            outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, 1000);
+            outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, timeoutUs);
+
             if (outIndex >= 0) {
                 AMediaCodec_releaseOutputBuffer(codec, outIndex, bufferInfo->size != 0);
                 if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
+                    playerInfo->SetDeCodecState(AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM);
                     LOGE("Decode() video producer output EOS");
                     break;
                 } else {
@@ -168,14 +171,17 @@ void *Player::Decode(void *) {
                 }
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
                 LOGE("Decode() video output buffers changed");
+                playerInfo->SetDeCodecState(outIndex);
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
                 LOGE("Decode() video output format changed");
+                playerInfo->SetDeCodecState(outIndex);
             } else if (outIndex == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
                 if (IS_DEBUG) {
                     LOGE("Decode() video no output buffer right now");
                 }
             } else {
                 LOGE("Decode() unexpected info code: %zd", outIndex);
+                playerInfo->SetDeCodecState(outIndex);
             }
             free(bufferInfo);
         } while (outIndex > 0);
@@ -226,9 +232,12 @@ int Player::Configure(ANativeWindow *window, int w, int h) {
     return PLAYER_RESULT_OK;
 }
 
-
 void Player::SetStateChangeListener(void (*listener)(PlayState)) {
     playerInfo->SetStateListener(listener);
+}
+
+void Player::SetDecodecStateChangeListener(void (*listener)(int)) {
+    playerInfo->decodecStateListener = listener;
 }
 
 
@@ -298,7 +307,8 @@ void unpackCallback(H264Pkt result) {
 
 int Player::HandleRTPPkt(unsigned char *pkt, unsigned int len, unsigned int maxFrameLen,
                          int isLiteMod) {
-    if (playerInfo->GetPlayState() != STARTED) {
+    PlayState state = playerInfo->GetPlayState();
+    if (state != STARTED) {
         LOGE("HandleRTPPkt() fail,player not started!");
         return PLAYER_RESULT_ERROR;
     }

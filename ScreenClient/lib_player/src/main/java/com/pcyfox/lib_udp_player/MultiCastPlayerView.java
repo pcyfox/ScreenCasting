@@ -53,6 +53,14 @@ public class MultiCastPlayerView extends RelativeLayout {
         setBackgroundColor(Color.WHITE);
     }
 
+    public void setOnStateChangeListener(OnPlayStateChangeListener onStateChangeListener) {
+        buildPlayer().setOnStateChangeListener(onStateChangeListener);
+    }
+
+    public void setOnDecodeStateChangeListener(OnDecodeStateChangeListener onDecodeStateChangeListener) {
+        buildPlayer().setOnDecodeStateChangeListener(onDecodeStateChangeListener);
+    }
+
     private void addSurfaceView() {
         surfaceView = new SurfaceView(getContext());
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -90,9 +98,11 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
 
-    private void buildPlayer(){
+    private NativePlayer buildPlayer() {
+        if (nativeUDPPlayer != null) return nativeUDPPlayer;
         nativeUDPPlayer = new NativePlayer();
         nativeUDPPlayer.init(BuildConfig.DEBUG);
+        return nativeUDPPlayer;
     }
 
     private void initNativePlayer() {
@@ -230,7 +240,6 @@ public class MultiCastPlayerView extends RelativeLayout {
     public boolean isPlaying() {
         return isPlaying;
     }
-
 
     public void release() {
         Log.e(TAG, "release() called");

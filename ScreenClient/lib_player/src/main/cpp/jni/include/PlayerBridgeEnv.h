@@ -14,6 +14,7 @@ public:
     JNIEnv *env{};
     jobject object = NULL;
     jmethodID jMid_onStateChangeId = NULL;
+    jmethodID jMid_onDecodeStateChangeId = NULL;
 };
 
 

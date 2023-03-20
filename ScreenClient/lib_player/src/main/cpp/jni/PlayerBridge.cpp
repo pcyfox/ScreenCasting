@@ -22,7 +22,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-void *ChangeState(void *s) {
+void *notifyPlayStateChange(void *s) {
     if (playerEnv.object != NULL) {
         JNIEnv *env = NULL;
         int ret = playerEnv.vm->AttachCurrentThread(&env, NULL);
@@ -38,14 +38,33 @@ void *ChangeState(void *s) {
 }
 
 
+void notifyDecodeStateChange(int state) {
+    if (playerEnv.object != nullptr) {
+        JNIEnv *env = nullptr;
+        int ret = playerEnv.vm->AttachCurrentThread(&env, nullptr);
+        if (ret == 0 && env) {
+            env->CallVoidMethod(playerEnv.object, playerEnv.jMid_onDecodeStateChangeId, state);
+        } else {
+            LOGE("onStateChange() get jEnv error");
+        }
+        playerEnv.vm->DetachCurrentThread();
+    }
+}
+
+
 const void *onStateChange(PlayState state) {
     if (playerEnv.object != NULL) {
         pthread_t thread = NULL;
-        changeState = state;
-        pthread_create(&thread, NULL, ChangeState, &changeState);
+        pthread_create(&thread, NULL, notifyPlayStateChange, &state);
         pthread_detach(pthread_self());
     }
-    return NULL;
+    return nullptr;
+}
+
+
+const void *onDecodeStateChange(int state) {
+    notifyDecodeStateChange(state);
+    return nullptr;
 }
 
 
@@ -60,6 +79,7 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_init(JNIEnv *env, jobject thiz,
     playerEnv.clazz = clazz;
     playerEnv.env = env;
     playerEnv.jMid_onStateChangeId = env->GetMethodID(clazz, "onPlayerStateChange", "(I)V");
+    playerEnv.jMid_onDecodeStateChangeId = env->GetMethodID(clazz, "onDecodeStateChange", "(I)V");
     return PLAYER_RESULT_OK;
 }
 
@@ -71,7 +91,7 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject 
                                                            jobject surface,
                                                            jint w, jint h) {
 
-    if (player == NULL) {
+    if (player == nullptr) {
         LOGE("configPlayer() called fail!,player is null");
         return PLAYER_RESULT_ERROR;
     }
@@ -79,7 +99,8 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_configPlayer(JNIEnv *env, jobject 
     if (!window) {
         PLAYER_RESULT_ERROR;
     }
-    player->SetStateChangeListener(reinterpret_cast<void (*)(PlayState)>(onStateChange));
+    Player::SetStateChangeListener(reinterpret_cast<void (*)(PlayState)>(onStateChange));
+    Player::SetDecodecStateChangeListener(reinterpret_cast<void (*)(int)>(onDecodeStateChange));
     return player->Configure(window, w, h);
 }
 

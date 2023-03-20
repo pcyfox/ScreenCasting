@@ -37,6 +37,8 @@ public:
 
     void (*stateListener)(PlayState) = NULL;
 
+    void (*decodecStateListener)(int) = NULL;
+
 
 public:
 
@@ -44,11 +46,15 @@ public:
 
     ~PlayerInfo();
 
-    void SetPlayState(PlayState s) volatile;
-
     PlayState GetPlayState();
 
+    void SetPlayState(PlayState s) volatile;
+
     void SetStateListener(void (*stateListener)(PlayState));
+
+    void SetDeCodecState(int state) const;
+
+    void SetDeCodecStateListener(void (*listener)(int));
 
 };
 

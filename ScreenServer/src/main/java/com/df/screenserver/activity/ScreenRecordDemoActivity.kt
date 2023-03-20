@@ -108,14 +108,18 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         val fps = Integer.parseInt(et_fps.text.toString())
         val maxUdpPktLen = Integer.parseInt(et_udp_max_len.text.toString())
 
+
+        var encodeParam = VideoEncodeParam(720, 480, 20, 1, (720 * 480 * 20 * 0.04).toInt(), 5)
+
+//        VideoEncodeParam(
+//            w, h, fps, resources.displayMetrics.densityDpi, bitrate.toInt()
+//        ),
+
         ScreenRecorderService.start(
             this,
             resultCode,
             data,
-            VideoEncodeParam(
-                w, h, fps, resources.displayMetrics.densityDpi, bitrate.toInt()
-            ),
-
+            encodeParam,
             maxUdpPktLen,
             Publisher.MULTI_CAST_IP,
             Publisher.TARGET_PORT,
