@@ -155,15 +155,15 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thi
                                                         int maxFrameLen,
                                                         jboolean isLiteMode) {
 
-    if (player == NULL) {
-        LOGE("player not init,it is null");
+    if (player == nullptr) {
+        LOGE("player is not init,it is null");
         return PLAYER_RESULT_ERROR;
     }
-    jbyte *data = (env->GetByteArrayElements(pkt, JNI_FALSE));
-    auto *dataCopy = (unsigned char *) calloc(len, sizeof(char));
-    memcpy(dataCopy, data, len);
-    env->ReleaseByteArrayElements(pkt, data, JNI_FALSE);
-    return player->HandleRTPPkt(dataCopy, len, maxFrameLen, isLiteMode);
+
+    char *data = (char *) malloc(len);
+    if (!data)return PLAYER_RESULT_ERROR;
+    env->GetByteArrayRegion(pkt, 0, len, (jbyte *) data);
+    return player->HandleRTPPkt((unsigned char *) data, len, maxFrameLen, isLiteMode);
 }extern "C"
 
 JNIEXPORT void JNICALL

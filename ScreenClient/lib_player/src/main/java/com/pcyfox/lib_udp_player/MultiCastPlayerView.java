@@ -142,7 +142,9 @@ public class MultiCastPlayerView extends RelativeLayout {
             }
             try {
                 multicastSocket.receive(dataPacket);
-                nativeUDPPlayer.handlePkt(receiveByte, dataPacket.getLength(), maxFrameLen, true);
+                int len = dataPacket.getLength();
+                if (len <= 1) continue;
+                nativeUDPPlayer.handlePkt(receiveByte, len, maxFrameLen, true);
                 if (!hasReceivedData) {
                     Log.d(TAG, "startReceiveData() --------- hasReceivedData----------");
                     hasReceivedData = true;
