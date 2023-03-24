@@ -34,7 +34,7 @@ void *notifyPlayStateChange(void *s) {
         }
         playerEnv.vm->DetachCurrentThread();
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -53,10 +53,10 @@ void notifyDecodeStateChange(int state) {
 
 
 const void *onStateChange(PlayState state) {
-    if (playerEnv.object != NULL) {
+    if (playerEnv.object != nullptr && state) {
         pthread_t thread = NULL;
-        pthread_create(&thread, NULL, notifyPlayStateChange, &state);
-        pthread_detach(pthread_self());
+        pthread_create(&thread, nullptr, notifyPlayStateChange, &state);
+        pthread_setname_np(thread, "onStateChange");
     }
     return nullptr;
 }
