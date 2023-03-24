@@ -155,6 +155,7 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thi
                                                         int maxFrameLen,
                                                         jboolean isLiteMode) {
 
+    if (pkt == nullptr || len <= 0) return PLAYER_RESULT_ERROR;
     if (player == nullptr) {
         LOGE("player is not init,it is null");
         return PLAYER_RESULT_ERROR;
