@@ -46,14 +46,14 @@ struct TempPacket {
 struct H264Packet {
     unsigned int length;
     unsigned char type;
-    unsigned char *data;
+    char *data;
 } typedef *H264Pkt;
 
 
 typedef void (*Callback)(H264Pkt
 pkt);
 
-int UnPacket(unsigned char *rtpPacket, const unsigned int length, const unsigned int maxFrameLen,
+int UnPacket(char *rtpPacket, const unsigned int length, const unsigned int maxFrameLen,
              unsigned int isLiteMod,
              const Callback callback);
 

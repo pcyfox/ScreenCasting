@@ -27,7 +27,7 @@ Player::Player() {
 
 int GetNALUType(AVPacket *packet) {
     int nalu_type = -1;
-    const unsigned char *buf = packet->data;
+    const char *buf = packet->data;
     bool hasLongStartCode = buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] == 1;
     bool hasShortStartCode = buf[0] == 0 && buf[1] == 0 && buf[2] == 1;
     if (hasLongStartCode || hasShortStartCode) {
@@ -305,7 +305,7 @@ void unpackCallback(H264Pkt result) {
 }
 
 
-int Player::HandleRTPPkt(unsigned char *pkt, unsigned int len, unsigned int maxFrameLen,
+int Player::HandleRTPPkt(char *pkt, unsigned int len, unsigned int maxFrameLen,
                          int isLiteMod) {
     PlayState state = playerInfo->GetPlayState();
     if (state != STARTED) {

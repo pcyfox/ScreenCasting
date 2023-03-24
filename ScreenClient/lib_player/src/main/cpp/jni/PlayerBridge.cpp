@@ -164,7 +164,8 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thi
     char *data = (char *) malloc(len);
     if (!data)return PLAYER_RESULT_ERROR;
     env->GetByteArrayRegion(pkt, 0, len, (jbyte *) data);
-    return player->HandleRTPPkt((unsigned char *) data, len, maxFrameLen, isLiteMode);
+    LOGI("GetByteArrayRegion() ret=%d", *data);
+    return player->HandleRTPPkt((char *) data, len, maxFrameLen, isLiteMode);
 }extern "C"
 
 JNIEXPORT void JNICALL

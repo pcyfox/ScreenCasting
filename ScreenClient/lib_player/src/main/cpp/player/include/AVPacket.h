@@ -8,7 +8,7 @@
 
 class AVPacket {
 public:
-    unsigned char *data;
+    char *data;
     unsigned int size;
     int pts = -1;
 

@@ -4,6 +4,7 @@
 
 #ifndef PLAYER_PLAYER_H
 #define PLAYER_PLAYER_H
+
 #include <android/native_window_jni.h>
 #include <media/NdkMediaCodec.h>
 #include "StateListener.h"
@@ -24,8 +25,7 @@ public:
 
     int Configure(ANativeWindow *window, int w, int h);
 
-    int
-    HandleRTPPkt(unsigned char *pkt, unsigned int pktLen, unsigned int maxFrameLen, int isLiteMod);
+    int HandleRTPPkt(char *pkt, unsigned int pktLen, unsigned int maxFrameLen, int isLiteMod);
 
     int Play();
 

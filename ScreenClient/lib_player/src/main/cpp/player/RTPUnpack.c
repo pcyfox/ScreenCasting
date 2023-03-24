@@ -162,7 +162,7 @@ void ResetReceiveDataInfo() {
     receiveDataInfo->lost_rate = 0;
 }
 
-ReceiveDataInfo analysePkt(const unsigned char *rtpPacket) {
+ReceiveDataInfo analysePkt(const char *rtpPacket) {
     if (receiveDataInfo == NULL) {
         receiveDataInfo = malloc(sizeof(struct RTPDataInfo));
         receiveDataInfo->start_time = getCurrentTime();
@@ -241,7 +241,7 @@ void resetTempPkt() {
 }
 
 
-int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned int maxFrameLen,
+int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFrameLen,
              unsigned int tag, Callback callback) {
 
     int offHeadSize = length - RTP_HEAD_LEN;
@@ -267,7 +267,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             //--------------SPS------------------------------
             H264Pkt spsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             unsigned int spsSize = (rtpData[RTP_HEAD_LEN + 1] << 8) + rtpData[RTP_HEAD_LEN + 2];
-            unsigned char *sps = (unsigned char *) calloc(spsSize + START_CODE_LEN, sizeof(char));
+            char *sps = (char *) calloc(spsSize + START_CODE_LEN, sizeof(char));
             sps[3] = HEAD_4;
             memcpy(sps + START_CODE_LEN, rtpData + RTP_HEAD_LEN + 3, spsSize);
             spsPkt->length = spsSize + START_CODE_LEN;
@@ -281,7 +281,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             unsigned int ppsSizeEnd = ppsSizeStart + 1;
             int ppsSize = ((rtpData[ppsSizeStart] & 0xff) << 8) + rtpData[ppsSizeEnd] & 0xff;
             unsigned len = ppsSize + START_CODE_LEN;
-            unsigned char *pps = (unsigned char *) calloc(len, sizeof(char));
+            char *pps = (char *) calloc(len, sizeof(char));
             pps[3] = HEAD_4;
             memcpy(pps + START_CODE_LEN, rtpData + ppsSizeEnd + 1, ppsSize);
             ppsPkt->length = len;
@@ -293,7 +293,7 @@ int UnPacket(unsigned char *rtpData, const unsigned int length, const unsigned i
             int retain = length - ppsSizeEnd + ppsSize - 1;
             if (retain > 0) {
                 //maybe a P frame
-                unsigned char *idr = (unsigned char *) calloc(retain + 5, sizeof(char));
+                char *idr = (char *) calloc(retain + 5, sizeof(char));
                 idr[3] = HEAD_4;
                 idr[4] = TYPE_IDR;
                 memcpy(idr + 5, rtpData + ppsSizeEnd + ppsSize + 1, retain);
