@@ -170,15 +170,13 @@ void *Player::Decode(void *) {
                     continue;
                 }
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_BUFFERS_CHANGED) {
-                LOGE("Decode() video output buffers changed");
+                LOGW("Decode() video output buffers changed");
                 playerInfo->SetDeCodecState(outIndex);
             } else if (outIndex == AMEDIACODEC_INFO_OUTPUT_FORMAT_CHANGED) {
-                LOGE("Decode() video output format changed");
+                LOGW("Decode() video output format changed");
                 playerInfo->SetDeCodecState(outIndex);
             } else if (outIndex == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-                if (IS_DEBUG) {
-                    LOGE("Decode() video no output buffer right now");
-                }
+                LOGD("Decode() video no output buffer right now");
             } else {
                 LOGE("Decode() unexpected info code: %zd", outIndex);
                 playerInfo->SetDeCodecState(outIndex);
@@ -307,6 +305,7 @@ void unpackCallback(H264Pkt result) {
 
 int Player::HandleRTPPkt(char *pkt, unsigned int len, unsigned int maxFrameLen,
                          int isLiteMod) {
+
     PlayState state = playerInfo->GetPlayState();
     if (state != STARTED) {
         LOGE("HandleRTPPkt() fail,player not started!");

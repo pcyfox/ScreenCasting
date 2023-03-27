@@ -207,15 +207,14 @@ ReceiveDataInfo analysePkt(const char *rtpPacket) {
 }
 
 
-int initTempPkt(unsigned int maxFrameLen) {
-    if (tempPkt) {
-        return 1;
-    }
-
+int initTempPkt(int maxFrameLen) {
+    if (tempPkt)return 1;
+    if (maxFrameLen <= 0)return -1;
     tempPkt = (TempPkt) malloc(sizeof(struct TempPacket));
+    if (!tempPkt)return -1;
     tempPkt->data = (unsigned char *) calloc(maxFrameLen, sizeof(char));
     tempPkt->len = maxFrameLen;
-    if (tempPkt->data == NULL) {
+    if (!tempPkt->data) {
         LOGE("FU-A frame calloc fail!,size=%d", maxFrameLen);
         return -1;
     }
@@ -232,10 +231,7 @@ void freeTempPkt() {
 }
 
 void resetTempPkt() {
-    if (tempPkt == NULL || tempPkt->data == NULL) {
-        return;
-    }
-
+    if (tempPkt == NULL || tempPkt->data == NULL)return;
     memset(tempPkt->data, 0, tempPkt->len);
     tempPkt->index = 0;
 }
@@ -251,7 +247,6 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
     }
 
     analysePkt(rtpData);
-
     RTPPkt rtpPkt = (RTPPkt) malloc(sizeof(struct RtpPacketInfo));
     rtpPkt->length = 0;
     unsigned long long currSq = ((rtpData[2] & 0xFF) << 8) + (rtpData[3] & 0xFF);
@@ -309,70 +304,62 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
 
             // FU-A: RTP header (12bytes)+ FU Indicator (1byte)  +  FU header(1 byte) + NALU payload
         case 28: {
-            //     printCharsHex(rtpData, length, 20, "---FU-A RTP---");
+            //printCharsHex(rtpData, length, 20, "---FU-A RAW  RTP---");
             // For these NALUs, the first two bytes are the FU indicator （at 13） and the FU header (14).
             // If the start bit is set, we reconstruct the original NAL header into byte 1:
-            unsigned char FUHeader = rtpData[RTP_HEAD_LEN + 1];
-            int startCode = FUHeader >> 7;
-            int endCode = (FUHeader & 0x40) >> 6;
-
-            //  LOGD("---FU-A Header=%02x,startCode=%d,endCode=%d", FUHeader, startCode, endCode);
+            char FU_Header = rtpData[RTP_HEAD_LEN + 1];//after FU Indicator
+            int startCode = FU_Header >> 7;
+            int endCode = (FU_Header & 0x40) >> 6;
+            LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode, endCode);
             if (tempPkt != NULL && tempPkt->index >= maxFrameLen) {
-                break;
                 LOGE("---FU-A pack data error,frameLen>=maxFrameLen!");
+                break;
             }
+
             //start
             if (startCode == 1) {
-                if (!initTempPkt(maxFrameLen)) {
+                if (initTempPkt(maxFrameLen) < 0) {
+                    LOGE("---FU-A pack data error,cao not init temp pkt!");
                     return -1;
                 }
                 tempPkt->data[3] = HEAD_4;
-                int naluType = FUHeader & 0x1F;
-                if (naluType == 5) {
-                    //I Frame start
+                int NALU_Type = FU_Header & 0x1F;
+                if (NALU_Type == 5) {//I Frame start
                     rtpPkt->type = tempPkt->data[START_CODE_LEN] = TYPE_IDR;
-                } else if (naluType == 1) {
-                    //P Frame start
+                } else if (NALU_Type == 1) {//P Frame start
                     rtpPkt->type = tempPkt->data[START_CODE_LEN] = TYPE_P;
                 } else {
-                    LOGW("maybe some thing is wrong in this start packet,type=%d", naluType);
+                    LOGW("maybe some thing is wrong in this start packet,type=%d", NALU_Type);
                 }
-
                 //printCharsHex(rtpData, length, 20, "PKT-raw");
-                //14=RTP Header len +FU-Indicator+FU-Header
+                //FU payload start at :RTP Header len +FU-Indicator(1byte)+FU-Header(1byte)=14
                 int copyLen = offHeadSize - 2;
-                memcpy(tempPkt->data + START_CODE_LEN + 1, rtpData + RTP_HEAD_LEN + 2, copyLen);
+                memcpy(tempPkt->data + START_CODE_LEN, rtpData + RTP_HEAD_LEN + 2, copyLen);
                 tempPkt->index = START_CODE_LEN + copyLen;
-                //printCharsHex(FU_frame, length, 20, "PKT-copy");
+                //printCharsHex(tempPkt, length, 20, "---FU-A  START PackedRTP---");
                 break;
             }
 
-            //mid
+            //end or mid
             if (endCode == 1 || startCode == 0 && endCode == 0) {
-                if (tempPkt == NULL) {
-                    LOGW("temPkt been freed!");
-                    return -1;
-                }
-                //14=RTP Header len +FU-Indicator+FU-Header
+                if (tempPkt == NULL) return -1;
                 int copyLen = offHeadSize - 2;
-                memcpy(tempPkt->data + tempPkt->index + 1, rtpData + RTP_HEAD_LEN + 2, copyLen);
+                memcpy(tempPkt->data + tempPkt->index, rtpData + RTP_HEAD_LEN + 2, copyLen);
                 tempPkt->index += copyLen;
-                if (endCode != 1) {
-                    break;
-                }
+                if (endCode != 1) break;
             }
 
             //end
             if (endCode == 1) {
                 H264Pkt h264_pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
-                h264_pkt->data = (unsigned char *) calloc(tempPkt->index, sizeof(char));
+                h264_pkt->data = (char *) calloc(tempPkt->index, sizeof(char));
                 memcpy(h264_pkt->data, tempPkt->data, tempPkt->index);
                 h264_pkt->length = tempPkt->index;
-                //    printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A After PackedRTP---");
+               printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A  END PackedRTP---");
                 callback(h264_pkt);
                 resetTempPkt();
-                break;
             }
+
             break;
         }
 
@@ -385,7 +372,7 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
                 printCharsHex(rtpData, length, min(28, length), "---Single RTP---");
             }
             //I\P
-            unsigned char *data = (unsigned char *) calloc(offHeadSize + 4, sizeof(char));
+            char *data = (char *) calloc(offHeadSize + 4, sizeof(char));
             data[3] = HEAD_4;
             memcpy(data + 4, rtpData + RTP_HEAD_LEN, offHeadSize);
             H264Pkt pkt = (H264Pkt) malloc(sizeof(struct H264Packet));

@@ -62,8 +62,9 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         val q = et_q.text.toString().toFloat()
 
         val bitRate: Int = (w * h * fps * q).toInt()
+        //et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
 
-        et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
+        et_udp_max_len.setText((3000).toString())
         et_bitrate.setText(bitRate.toString())
     }
 

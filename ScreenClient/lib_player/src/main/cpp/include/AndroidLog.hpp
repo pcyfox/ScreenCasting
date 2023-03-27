@@ -20,8 +20,8 @@
 #define LOGIX(tag, ...) __android_log_print(ANDROID_LOG_INFO, tag, __VA_ARGS__)
 
 
-
 static void printCharsHex(char *data, int length, int printLen, char *tag) {
+    if (!IS_DEBUG)return;
     LOGD("-------------%s-length=%d,printLen=%d------------->",
          tag,
          length, printLen);

@@ -310,17 +310,17 @@ int PackRTP(unsigned char *h264Pkt,
         //3、set FU-Header
         unsigned int copyLen = min(remainLen, maxPktLen - headerLen - 2);
         unsigned int FUHerderIndex = headerLen + 1;
+
         if (currentIndex + copyLen == length) {
             result->data[FUHerderIndex] = 0x40 | naluType;//mark end
         } else {
             if (currentIndex == 0) {
-                currentIndex = startCodeLen + 1;
+                currentIndex = startCodeLen;
                 result->data[FUHerderIndex] = 0x80 | naluType;//mark start
             } else {
                 result->data[FUHerderIndex] = 0x00 | naluType;//mark mid
             }
         }
-        //LOGD("FU-A - length=%d,currentIndex=%d,copyLen=%d,result.len=%d", length, currentIndex,copyLen,result->length);
 
         //4、add payload
         memcpy(result->data + FUHerderIndex + 1, h264Pkt + currentIndex, copyLen);
