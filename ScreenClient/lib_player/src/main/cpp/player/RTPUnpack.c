@@ -208,7 +208,7 @@ ReceiveDataInfo analysePkt(const char *rtpPacket) {
 
 void resetTempPkt() {
     if (tempPkt == NULL || tempPkt->data == NULL)return;
-    memset(tempPkt->data, 0, tempPkt->len);
+    memset(tempPkt->data, 0, tempPkt->index);
     tempPkt->index = 0;
 }
 
@@ -314,14 +314,14 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
             int startCode = FU_Header >> 7;
             int endCode = (FU_Header & 0x40) >> 6;
             //LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode, endCode);
-            if (tempPkt != NULL && tempPkt->index >= maxFrameLen) {
+            if (tempPkt != NULL && tempPkt->index >= tempPkt->len) {
                 LOGE("---FU-A pack data error,frameLen>=maxFrameLen!");
                 break;
             }
 
             //start
             if (startCode == 1) {
-                if (initTempPkt(maxFrameLen) < 0) {
+                if (initTempPkt((int) maxFrameLen + START_CODE_LEN) < 0) {
                     LOGE("---FU-A pack data error,cao not init temp pkt!");
                     return -1;
                 }
@@ -341,7 +341,7 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
                 tempPkt->index = START_CODE_LEN + copyLen;
                 //printCharsHex(tempPkt, length, 20, "---FU-A  START PackedRTP---");
                 break;
-            }
+            }//
 
             //end or mid
             if (endCode == 1 || startCode == 0 && endCode == 0) {
