@@ -342,7 +342,7 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
 
             //end or mid
             if (endCode == 1 || startCode == 0 && endCode == 0) {
-                if (tempPkt == NULL) return -1;
+                if (tempPkt->index <= START_CODE_LEN)return -1;
                 int copyLen = offHeadSize - 2;
                 memcpy(tempPkt->data + tempPkt->index, rtpData + RTP_HEAD_LEN + 2, copyLen);
                 tempPkt->index += copyLen;
@@ -351,11 +351,12 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
 
             //end
             if (endCode == 1) {
+                if (tempPkt->index <= START_CODE_LEN)return -1;
                 H264Pkt h264_pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
                 h264_pkt->data = (char *) calloc(tempPkt->index, sizeof(char));
                 memcpy(h264_pkt->data, tempPkt->data, tempPkt->index);
                 h264_pkt->length = tempPkt->index;
-               printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A  END PackedRTP---");
+               // printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A  END PackedRTP---");
                 callback(h264_pkt);
                 resetTempPkt();
             }
