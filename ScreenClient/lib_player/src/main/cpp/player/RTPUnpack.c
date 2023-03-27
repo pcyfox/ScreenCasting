@@ -313,7 +313,7 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
             char FU_Header = rtpData[RTP_HEAD_LEN + 1];//after FU Indicator
             int startCode = FU_Header >> 7;
             int endCode = (FU_Header & 0x40) >> 6;
-            LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode, endCode);
+            //LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode, endCode);
             if (tempPkt != NULL && tempPkt->index >= maxFrameLen) {
                 LOGE("---FU-A pack data error,frameLen>=maxFrameLen!");
                 break;
