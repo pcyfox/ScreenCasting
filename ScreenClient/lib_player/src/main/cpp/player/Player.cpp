@@ -176,7 +176,7 @@ void *Player::Decode(void *) {
                 LOGW("Decode() video output format changed");
                 playerInfo->SetDeCodecState(outIndex);
             } else if (outIndex == AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-                LOGD("Decode() video no output buffer right now");
+                //LOGD("Decode() video no output buffer right now");
             } else {
                 LOGE("Decode() unexpected info code: %zd", outIndex);
                 playerInfo->SetDeCodecState(outIndex);
