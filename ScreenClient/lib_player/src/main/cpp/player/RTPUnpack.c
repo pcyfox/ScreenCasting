@@ -194,7 +194,6 @@ ReceiveDataInfo analysePkt(const char *rtpPacket) {
             receiveDataInfo->lost_rate =
                     (float) receiveDataInfo->lost_count /
                     (float) receiveDataInfo->receive_count;
-
             if (receiveDataInfo->lost_rate > 0.) {
                 LOGD("analysePkt() pkt lost rate=%.2f", receiveDataInfo->lost_rate);
             }
@@ -256,7 +255,6 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
     rtpPkt->curr_Sq = currSq;
     //第13个字节
     int rtpType = rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
-
     //printCharsHex(rtpData, length, 20, "---RTP---");
     switch (rtpType) {
         // STAP-A:RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） +NALU1+.....
@@ -304,7 +302,6 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
             }
             break;
         }
-
             // FU-A: RTP header (12bytes)+ FU Indicator (1byte)  +  FU header(1 byte) + NALU payload
         case 28: {
             //printCharsHex(rtpData, length, 20, "---FU-A RAW  RTP---");
@@ -364,7 +361,6 @@ int UnPacket(char *rtpData, const unsigned int length, const unsigned int maxFra
             }
             break;
         }
-
             //single NALU RTP
             // RTP header(12bytes) +(NALU header (1byte) + NALU payload)+......
         case 1:

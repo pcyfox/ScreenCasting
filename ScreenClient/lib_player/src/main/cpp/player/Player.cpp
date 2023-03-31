@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 static PlayerInfo *playerInfo;
-static long timeoutUs = 0;
+static long timeoutUs = 10000;
 
 Player::Player() {
     playerInfo = new PlayerInfo;
