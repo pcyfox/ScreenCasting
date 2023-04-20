@@ -85,4 +85,14 @@ class ClientMainActivity : AppCompatActivity() {
         }
 
     }
+
+    override fun onStop() {
+        super.onStop()
+        playerView?.stopPlay()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        playerView?.release()
+    }
 }

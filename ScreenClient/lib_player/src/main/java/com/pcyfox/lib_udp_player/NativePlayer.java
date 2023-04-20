@@ -47,7 +47,7 @@ public class NativePlayer {
     //call in native
     public void onDecodeStateChange(int state) {
         Log.d(TAG, "onDecodeStateChange() called with: state = [" + state + "]");
-        if (onDecodeStateChangeListener != null){
+        if (onDecodeStateChangeListener != null) {
             onDecodeStateChangeListener.onStateChange(state);
         }
     }
@@ -68,6 +68,5 @@ public class NativePlayer {
     public native int pause();
 
     public native void release();
-
 
 }

@@ -141,6 +141,7 @@ public class MultiCastPlayerView extends RelativeLayout {
         byte[] receiveByte = new byte[MAX_UDP_PACKET_LEN];
         DatagramPacket dataPacket = new DatagramPacket(receiveByte, receiveByte.length);
         while (isPlaying) {
+            if (multicastSocket.isClosed()) return;
             if (isPause) {
                 continue;
             }
@@ -251,7 +252,8 @@ public class MultiCastPlayerView extends RelativeLayout {
     public void release() {
         Log.e(TAG, "release() called");
         isPlaying = false;
+        if (nativeUDPPlayer != null) {
+            nativeUDPPlayer.release();
+        }
     }
-
-
 }
