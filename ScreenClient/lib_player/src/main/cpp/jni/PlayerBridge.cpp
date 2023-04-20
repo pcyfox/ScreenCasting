@@ -160,10 +160,8 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thi
         LOGE("player is not init,it is null");
         return PLAYER_RESULT_ERROR;
     }
-
     char *data = (char *) malloc(len);
     if (!data)return PLAYER_RESULT_ERROR;
-
     env->GetByteArrayRegion(pkt, 0, len, (jbyte *) data);
     return player->HandleRTPPkt((char *) data, len, maxFrameLen, isLiteMode);
 }extern "C"

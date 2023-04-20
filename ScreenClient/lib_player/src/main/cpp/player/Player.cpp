@@ -305,6 +305,10 @@ void unpackCallback(H264Pkt result) {
 
 int Player::HandleRTPPkt(char *pkt, unsigned int len, unsigned int maxFrameLen,
                          int isLiteMod) {
+    if (!playerInfo) {
+        LOGE("HandleRTPPkt() fail,playerInfo = null");
+        return PLAYER_RESULT_ERROR;
+    }
 
     PlayState state = playerInfo->GetPlayState();
     if (state != STARTED) {

@@ -20,7 +20,7 @@
 
 
 struct RTPDataInfo {
-    unsigned long last_Sq;
+    long last_Sq;
     unsigned long curr_Sq;
     unsigned long start_time;
     unsigned long receive_count;
@@ -53,7 +53,7 @@ struct H264Packet {
 typedef void (*Callback)(H264Pkt
 pkt);
 
-int UnPacket(char *rtpPacket, const unsigned int length, const unsigned int maxFrameLen,
+int UnPacket(char *rtpPacket, const int length, const unsigned int maxFrameLen,
              unsigned int isLiteMod,
              const Callback callback);
 

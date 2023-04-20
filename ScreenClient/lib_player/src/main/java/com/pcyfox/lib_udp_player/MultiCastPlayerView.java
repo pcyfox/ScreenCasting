@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -77,8 +78,10 @@ public class MultiCastPlayerView extends RelativeLayout {
         multiCastHost = host;
         videoPort = port;
         this.maxFrameLen = maxFrameLen;
+
         HandlerThread handlerThread = new HandlerThread("Fuck Video Data Handler");
         handlerThread.start();
+
         handler = new Handler(handlerThread.getLooper());
         post(() -> {
             addSurfaceView();
@@ -178,7 +181,8 @@ public class MultiCastPlayerView extends RelativeLayout {
         isPause = false;
         isPlaying = false;
         if (handler != null) {
-            handler.getLooper().quitSafely();
+            Looper looper = handler.getLooper();
+            if (looper != null) looper.quitSafely();
         }
 
         if (multicastSocket != null) {
