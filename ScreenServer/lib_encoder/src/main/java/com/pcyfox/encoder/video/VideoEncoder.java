@@ -49,7 +49,6 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     private int rotation = 90;
     private final int iFrameInterval = 1;
 
-    //for disable video
     private final FpsLimiter fpsLimiter = new FpsLimiter();
     private String type = CodecUtil.H264_MIME;
     private FormatVideoEncoder formatVideoEncoder = FormatVideoEncoder.YUV420Dynamical;
@@ -488,6 +487,8 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
 
     private void createAsyncCallback() {
         Log.d(TAG, "createAsyncCallback() called");
+
+
         callback = new MediaCodec.Callback() {
             @Override
             public void onInputBufferAvailable(@NonNull MediaCodec mediaCodec, int inBufferIndex) {

@@ -12,6 +12,7 @@ public class FpsLimiter {
   private long ratioF = 1000 / 30;
   private long ratio = 1000 / 30;
 
+
   public void setFPS(int fps) {
     Log.d(TAG, "setFPS() called with: fps = [" + fps + "]");
     startTS = System.currentTimeMillis();

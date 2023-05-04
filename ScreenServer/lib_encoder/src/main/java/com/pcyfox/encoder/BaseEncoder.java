@@ -1,5 +1,7 @@
 package com.pcyfox.encoder;
 
+import static android.media.MediaCodec.BUFFER_FLAG_KEY_FRAME;
+
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
@@ -7,6 +9,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+import com.pcyfox.encoder.input.video.FpsLimiter;
 import com.pcyfox.encoder.utils.CodecUtil;
 
 import java.nio.ByteBuffer;
@@ -23,6 +26,7 @@ public abstract class BaseEncoder implements EncoderCallback {
     protected volatile boolean running = false;
     protected boolean isBufferMode = true;
     protected CodecUtil.Force force = CodecUtil.Force.FIRST_COMPATIBLE_FOUND;
+
 
     public void start() {
         start(true);
@@ -131,6 +135,7 @@ public abstract class BaseEncoder implements EncoderCallback {
     @Override
     public void outputAvailable(@NonNull MediaCodec mediaCodec, int outBufferIndex,
                                 @NonNull MediaCodec.BufferInfo bufferInfo) throws IllegalStateException {
+
         ByteBuffer byteBuffer;
         byteBuffer = mediaCodec.getOutputBuffer(outBufferIndex);
 //        Log.d(TAG, "outputAvailable() byteBuffer size="+bufferInfo.size);
