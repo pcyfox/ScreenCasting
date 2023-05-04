@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -15,10 +14,9 @@ import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.df.lib_push.Publisher
 import com.df.lib_push.VideoEncodeParam
-import com.df.screenserver.R
 import com.df.lib_push.service.ScreenRecorderService
+import com.df.screenserver.R
 import kotlinx.android.synthetic.main.activity_screen_record.*
-import kotlin.random.Random
 
 
 class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
@@ -42,17 +40,11 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
     }
 
     private fun initTestVideo() {
-        vv_test.setVideoPath("/sdcard/test.mp4")
-        vv_test.setOnPreparedListener {
-            vv_test.start()
-            it.isLooping = true
-        }
-
 //        val w = ScreenUtils.getScreenWidth()
 //        val h = ScreenUtils.getScreenHeight()
 
-        val w = 720
-        val h = 480
+        val w = 1920
+        val h = 1080
 
         et_w.setText(w.toString())
         et_h.setText(h.toString())
@@ -60,11 +52,9 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
 
         val fps = et_fps.text.toString().toInt()
         val q = et_q.text.toString().toFloat()
-
+        et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
+        // et_udp_max_len.setText((3000).toString())
         val bitRate: Int = (w * h * fps * q).toInt()
-        //et_udp_max_len.setText((Publisher.MAX_PKT_LEN).toString())
-
-        et_udp_max_len.setText((3000).toString())
         et_bitrate.setText(bitRate.toString())
     }
 
@@ -78,16 +68,20 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
             R.id.btn_start_screen -> {
                 if (btn_start_screen.text.toString() == "START") {
                     btn_start_screen.text = "STOP"
-                    startActivityForResult(
-                        (getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager).createScreenCaptureIntent(),
-                        REQUEST_CODE
-                    )
+                    requestMediaProjectionManager()
                 } else {
                     btn_start_screen.text = "START"
                     ScreenRecorderService.stop(this)
                 }
             }
         }
+    }
+
+    private fun requestMediaProjectionManager() {
+        startActivityForResult(
+            (getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager).createScreenCaptureIntent(),
+            REQUEST_CODE
+        )
     }
 
 
@@ -105,16 +99,20 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
 
         val w = Integer.parseInt(et_w.text.toString())
         val h = Integer.parseInt(et_h.text.toString())
+
         val bitrate = et_bitrate.text.toString().toFloat()
         val fps = Integer.parseInt(et_fps.text.toString())
+
         val maxUdpPktLen = Integer.parseInt(et_udp_max_len.text.toString())
 
+        val encodeParam = VideoEncodeParam(
+            w, h, fps, resources.displayMetrics.densityDpi, bitrate.toInt()
+        )
 
-        var encodeParam = VideoEncodeParam(720, 480, 20, 1, (720 * 480 * 20 * 0.04).toInt(), 5)
-
-//        VideoEncodeParam(
-//            w, h, fps, resources.displayMetrics.densityDpi, bitrate.toInt()
-//        ),
+        Log.d(
+            TAG,
+            "onActivityResult() called with: requestCode = $requestCode, encodeParam= $encodeParam"
+        )
 
         ScreenRecorderService.start(
             this,
@@ -125,8 +123,5 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
             Publisher.MULTI_CAST_IP,
             Publisher.TARGET_PORT,
         )
-
     }
-
-
 }

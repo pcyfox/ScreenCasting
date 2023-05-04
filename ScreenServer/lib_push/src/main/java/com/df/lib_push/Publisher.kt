@@ -69,6 +69,7 @@ class Publisher(
     }
 
     fun send(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
+        Log.d(TAG, "send() called with: presentationTimeUs= ${info.presentationTimeUs}")
         val buf = ByteArray(info.size)
         h264Buffer.get(buf, info.offset, info.size)
 

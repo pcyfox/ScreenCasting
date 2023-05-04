@@ -19,7 +19,8 @@ import com.df.lib_push.VideoEncodeParam
  *
  */
 class ScreenRecorderService : Service() {
-    private var serverDisplay: ScreenDisplay? = null
+    private var screenDisplay: ScreenDisplay? = null
+    private var isUseGL = true
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -56,18 +57,18 @@ class ScreenRecorderService : Service() {
             )
             when (state) {
                 0 -> {//stop
-                    serverDisplay?.stopStream()
+                    screenDisplay?.stopStream()
                     stopSelf()
                     return -1
                 }
                 //start
                 1 -> start()
                 //pause
-                2 -> serverDisplay?.run {
+                2 -> screenDisplay?.run {
                     pause()
                 }
                 //resume
-                3 -> serverDisplay?.run {
+                3 -> screenDisplay?.run {
                     resume()
                 }
                 else -> {
@@ -78,10 +79,6 @@ class ScreenRecorderService : Service() {
         return START_STICKY
     }
 
-
-    private fun changeState() {
-
-    }
 
     private fun start() {
         if (isStreaming()) {
@@ -95,25 +92,24 @@ class ScreenRecorderService : Service() {
 
         requestDisplayIntent?.run {
             Log.d(TAG, "start() startStreamRtp...")
-            serverDisplay = ScreenDisplay(applicationContext, ip, port, maxUdpPktLen)
-            serverDisplay?.setIntentResult(resultCode, this)
+            screenDisplay = ScreenDisplay(applicationContext, ip, port, maxUdpPktLen, isUseGL)
+            screenDisplay?.setIntentResult(resultCode, this)
             startStreamRtp(videoEncodeParam)
+            if (isUseGL) {
+                screenDisplay?.glInterface?.setForceRender(true)
+            }
         }
     }
 
 
     fun isStreaming(): Boolean {
-        return if (serverDisplay == null) {
-            false
-        } else {
-            serverDisplay!!.isStreaming
-        }
+        return screenDisplay != null && screenDisplay!!.isStreaming
     }
 
 
     fun stopStream() {
-        serverDisplay?.stopRecord()
-        serverDisplay?.stopStream()
+        screenDisplay?.stopRecord()
+        screenDisplay?.stopStream()
     }
 
     override fun onDestroy() {
@@ -124,7 +120,7 @@ class ScreenRecorderService : Service() {
 
 
     private fun startStreamRtp(videoEncodeParam: VideoEncodeParam) {
-        serverDisplay?.run {
+        screenDisplay?.run {
             if (isStreaming) {
                 stopStream()
                 return

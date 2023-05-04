@@ -1,8 +1,26 @@
+/*
+ * Copyright (C) 2021 pedroSG94.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.pcyfox.encoder.utils.gl;
 
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Pair;
 
 /**
  * Created by pedro on 22/03/19.
@@ -12,35 +30,90 @@ public class SizeCalculator {
 
   public static void calculateViewPort(boolean keepAspectRatio, int mode, int previewWidth,
       int previewHeight, int streamWidth, int streamHeight) {
-    if (keepAspectRatio) {
-      if (previewWidth > previewHeight) { //landscape
-        if (mode == 0) { //adjust
-          int realWidth = previewHeight * streamWidth / streamHeight;
-          GLES20.glViewport((previewWidth - realWidth) / 2, 0, realWidth, previewHeight);
-        } else { //fill
-          int realHeight = previewWidth * streamHeight / streamWidth;
-          GLES20.glViewport(0, -((realHeight - previewWidth) / 2), previewWidth, realHeight);
-        }
-      } else { //portrait
-        if (mode == 0) { //adjust
-          int realHeight = previewWidth * streamHeight / streamWidth;
-          GLES20.glViewport(0, (previewHeight - realHeight) / 2, previewWidth, realHeight);
-        } else { //fill
-          int realWidth = previewHeight * streamWidth / streamHeight;
-          GLES20.glViewport(-((realWidth - previewWidth) / 2), 0, realWidth, previewHeight);
-        }
+    Pair<Point, Point> pair =
+        getViewport(keepAspectRatio, mode, previewWidth, previewHeight, streamWidth, streamHeight);
+    GLES20.glViewport(pair.first.x, pair.first.y, pair.second.x, pair.second.y);
+  }
+
+  public static void calculateViewPortEncoder(int streamWidth, int streamHeight, boolean isPortrait) {
+    Pair<Point, Point> pair;
+    float factor = (float) streamWidth / (float) streamHeight;
+    if (factor >= 1f) {
+      if (isPortrait) {
+        int width = (int) (streamHeight / factor);
+        int oX = (streamWidth - width) / 2;
+        pair = new Pair<>(new Point(oX, 0), new Point(width, streamHeight));
+      } else {
+        pair = new Pair<>(new Point(0, 0), new Point(streamWidth, streamHeight));
       }
     } else {
-      GLES20.glViewport(0, 0, previewWidth, previewHeight);
+      if (isPortrait) {
+        pair = new Pair<>(new Point(0, 0), new Point(streamWidth, streamHeight));
+      } else {
+        int height = (int) (streamWidth * factor);
+        int oY = (streamHeight - height) / 2;
+        pair = new Pair<>(new Point(0, oY), new Point(streamWidth, height));
+      }
+    }
+    GLES20.glViewport(pair.first.x, pair.first.y, pair.second.x, pair.second.y);
+  }
+
+  public static Pair<Point, Point> getViewport(boolean keepAspectRatio, int mode, int previewWidth,
+      int previewHeight, int streamWidth, int streamHeight) {
+    if (keepAspectRatio) {
+      float streamAspectRatio = (float) streamWidth / (float) streamHeight;
+      float previewAspectRatio = (float) previewWidth / (float) previewHeight;
+      int xo = 0;
+      int yo = 0;
+      int xf = previewWidth;
+      int yf = previewHeight;
+      if ((streamAspectRatio > 1f
+          && previewAspectRatio > 1f
+          && streamAspectRatio > previewAspectRatio) || (streamAspectRatio < 1f
+          && previewAspectRatio < 1
+          && streamAspectRatio > previewAspectRatio) || (streamAspectRatio > 1f
+          && previewAspectRatio < 1f)) {
+        if (mode == 0) {
+          yf = streamHeight * previewWidth / streamWidth;
+          yo = (yf - previewHeight) / -2;
+        } else {
+          xf = streamWidth * previewHeight / streamHeight;
+          xo = (xf - previewWidth) / -2;
+        }
+      } else if ((streamAspectRatio > 1f
+          && previewAspectRatio > 1f
+          && streamAspectRatio < previewAspectRatio) || (streamAspectRatio < 1f
+          && previewAspectRatio < 1f
+          && streamAspectRatio < previewAspectRatio) || (streamAspectRatio < 1f
+          && previewAspectRatio > 1f)) {
+        if (mode == 0 || mode == 2) {
+          xf = streamWidth * previewHeight / streamHeight;
+          xo = (xf - previewWidth) / -2;
+        } else {
+          yf = streamHeight * previewWidth / streamWidth;
+          yo = (yf - previewHeight) / -2;
+        }
+      }
+      return new Pair<>(new Point(xo, yo), new Point(xf, yf));
+    } else {
+      return new Pair<>(new Point(0, 0), new Point(previewWidth, previewHeight));
     }
   }
 
-  public static void updateMatrix(int rotation, int width, int height, boolean isPreview,
-      boolean isPortrait, float[] MVPMatrix) {
+  public static void processMatrix(int rotation, boolean flipStreamHorizontal,
+      boolean flipStreamVertical, float[] MVPMatrix) {
+    PointF scale = new PointF(1f, 1f);
+
+    float xFlip = flipStreamHorizontal ? -1f : 1f;
+    float yFlip = flipStreamVertical ? -1f : 1f;
+    scale = new PointF(scale.x * xFlip, scale.y * yFlip);
+
+    updateMatrix(rotation, scale, MVPMatrix);
+  }
+
+  private static void updateMatrix(int rotation, PointF scale, float[] MVPMatrix) {
     Matrix.setIdentityM(MVPMatrix, 0);
-    PointF scale = getScale(rotation, width, height, isPortrait, isPreview);
     Matrix.scaleM(MVPMatrix, 0, scale.x, scale.y, 1f);
-    if (!isPreview && !isPortrait) rotation += 90;
     Matrix.rotateM(MVPMatrix, 0, rotation, 0f, 0f, -1f);
   }
 

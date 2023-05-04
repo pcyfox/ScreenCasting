@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 static PlayerInfo *playerInfo;
-static long timeoutUs = 10000;
+static long timeoutUs = 0;
 
 Player::Player() {
     playerInfo = new PlayerInfo;
@@ -303,7 +303,7 @@ void unpackCallback(H264Pkt result) {
 }
 
 
-int Player::HandleRTPPkt(char *pkt, unsigned int len, unsigned int maxFrameLen,
+int Player::HandleRTPPkt(char *pkt, int len, unsigned int maxFrameLen,
                          int isLiteMod) {
     if (!playerInfo) {
         LOGE("HandleRTPPkt() fail,playerInfo = null");

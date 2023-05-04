@@ -1,6 +1,7 @@
 package com.pcyfox.encoder.utils.gl.gif;
 
 import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 
 final class SimpleBitmapProvider implements GifDecoder.BitmapProvider {

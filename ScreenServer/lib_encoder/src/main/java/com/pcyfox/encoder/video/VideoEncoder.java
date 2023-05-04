@@ -13,7 +13,6 @@ import android.util.Pair;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 import com.pcyfox.encoder.BaseEncoder;
 import com.pcyfox.encoder.Frame;
@@ -36,7 +35,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class VideoEncoder extends BaseEncoder implements GetCameraData {
     private static final String TAG = "VideoEncoder";
-    private final GetVideoData getVideoData;
+    private final OnVideoData getVideoData;
     private boolean hasSetUpSpsPps = false;
     private boolean hardwareRotation = false;
 
@@ -63,7 +62,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         force = CodecUtil.Force.HARDWARE;
     }
 
-    public VideoEncoder(GetVideoData getVideoData) {
+    public VideoEncoder(OnVideoData getVideoData) {
         this.getVideoData = getVideoData;
     }
 
@@ -184,22 +183,9 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         handlerThread.start();
         Handler handler = new Handler(handlerThread.getLooper());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            createAsyncCallback();
-            codec.setCallback(callback, handler);
-            codec.start();
-        } else {
-            codec.start();
-            handler.post(() -> {
-                while (running) {
-                    try {
-                        getDataFromEncoder(null);
-                    } catch (IllegalStateException e) {
-                        Log.i(TAG, "Encoding error", e);
-                    }
-                }
-            });
-        }
+        createAsyncCallback();
+        codec.setCallback(callback, handler);
+        codec.start();
         running = true;
         Log.i(TAG, "started");
     }
@@ -207,11 +193,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
     @Override
     protected void stopImp() {
         if (handlerThread != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                handlerThread.quitSafely();
-            } else {
-                handlerThread.quit();
-            }
+            handlerThread.quitSafely();
         }
         queue.clear();
         hasSetUpSpsPps = false;
@@ -264,6 +246,9 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         }
     }
 
+    /**
+     * 请求获取关键帧
+     */
     public void forceSyncFrame() {
         if (isRunning()) {
             Bundle bundle = new Bundle();
@@ -327,7 +312,7 @@ public class VideoEncoder extends BaseEncoder implements GetCameraData {
         }
     }
 
-    private void sendSPSandPPS(MediaFormat mediaFormat) {
+    public void sendSPSandPPS(MediaFormat mediaFormat) {
         //H265
         if (type.equals(CodecUtil.H265_MIME)) {
             List<ByteBuffer> byteBufferList =

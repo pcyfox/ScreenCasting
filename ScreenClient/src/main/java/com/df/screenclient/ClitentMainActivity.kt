@@ -15,7 +15,7 @@ import com.pcyfox.lib_udp_player.PlayState
 class ClientMainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
 
-    private val maxFrameLen = 2 * 1024 * 1024 //视频帧大小限制
+    private val maxFrameLen = 4 * 1024 * 1024 //视频帧大小限制
     private val multiCastHost = "239.0.0.200"
     private val videoPort = 9527
     private var progressBar: ProgressBar? = null

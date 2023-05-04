@@ -1,7 +1,10 @@
 package com.df.lib_push;
 
+import static android.content.Context.MEDIA_PROJECTION_SERVICE;
+
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
 import android.media.AudioAttributes;
 import android.media.AudioPlaybackCaptureConfiguration;
@@ -16,7 +19,7 @@ import android.view.SurfaceView;
 
 import androidx.annotation.RequiresApi;
 
-import com.blankj.utilcode.util.ConvertUtils;
+import com.df.lib_push.utils.FpsListener;
 import com.pcyfox.encoder.Frame;
 import com.pcyfox.encoder.audio.AudioEncoder;
 import com.pcyfox.encoder.audio.GetAacData;
@@ -25,14 +28,12 @@ import com.pcyfox.encoder.input.audio.GetMicrophoneData;
 import com.pcyfox.encoder.input.audio.MicrophoneManager;
 import com.pcyfox.encoder.utils.CodecUtil;
 import com.pcyfox.encoder.video.FormatVideoEncoder;
-import com.pcyfox.encoder.video.GetVideoData;
+import com.pcyfox.encoder.video.OnVideoData;
 import com.pcyfox.encoder.video.VideoEncoder;
 
 import java.nio.ByteBuffer;
 
-import static android.content.Context.MEDIA_PROJECTION_SERVICE;
-
-public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrophoneData {
+public abstract class DisplayBase implements GetAacData, OnVideoData, GetMicrophoneData {
     private static final String TAG = "DisplayBase";
     private boolean disableAudio = true;
     protected Context context;
@@ -44,8 +45,8 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     private boolean streaming = false;
     private boolean isRunning = false;
     protected SurfaceView surfaceView;
-    private int dpi = 480;
 
+    private int dpi = 480;
     protected int width;
     protected int height;
 
@@ -53,10 +54,18 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
     private int resultCode = -1;
     private Intent data;
 
+
+    private OffScreenGlThread glInterface;
+    private final FpsListener fpsListener = new FpsListener();
+
     public DisplayBase(Context context, boolean useOpengl) {
         this.context = context;
-        mediaProjectionManager = ((MediaProjectionManager) context.getSystemService(MEDIA_PROJECTION_SERVICE));
         this.surfaceView = null;
+        if (useOpengl) {
+            glInterface = new OffScreenGlThread(context);
+            glInterface.init();
+        }
+        mediaProjectionManager = ((MediaProjectionManager) context.getSystemService(MEDIA_PROJECTION_SERVICE));
         videoEncoder = new VideoEncoder(this);
         microphoneManager = new MicrophoneManager(this);
         audioEncoder = new AudioEncoder(this);
@@ -69,6 +78,13 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         microphoneManager.setCustomAudioEffect(customAudioEffect);
     }
 
+    public GlInterface getGlInterface() {
+        if (glInterface != null) {
+            return glInterface;
+        } else {
+            throw new RuntimeException("You can't do it. You are not using Opengl");
+        }
+    }
 
     /**
      * Call this method before use @startStream. If not you will do a stream without video.
@@ -93,9 +109,15 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         this.dpi = dpi;
         this.width = width;
         this.height = height;
-
-        return videoEncoder.prepareVideoEncoder(width, height, fps, bitrate, rotation, true, iFrameInterval,
-                FormatVideoEncoder.SURFACE, avcProfile, avcProfileLevel);
+        boolean ret = videoEncoder.prepareVideoEncoder(width, height, fps, bitrate, rotation, true, iFrameInterval, FormatVideoEncoder.SURFACE, avcProfile, avcProfileLevel);
+        if (glInterface != null) {
+            if (rotation == 90 || rotation == 270) {
+                glInterface.setEncoderSize(height, width);
+            } else {
+                glInterface.setEncoderSize(width, height);
+            }
+        }
+        return ret;
     }
 
     public boolean prepareVideo(int width, int height, int fps, int bitrate, int rotation, int dpi) {
@@ -224,21 +246,33 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         if (data == null) {
             throw new RuntimeException("You need send intent data before startRecord or startStream");
         }
-
         videoEncoder.start();
-        if (!disableAudio) {
-            audioEncoder.start();
+        if (!disableAudio) audioEncoder.start();
+
+        if (glInterface != null) {
+            glInterface.setFps(videoEncoder.getFps());
+            glInterface.start();
+            glInterface.addMediaCodecSurface(videoEncoder.getInputSurface());
         }
 
-        //录屏相关
-        Surface surface = videoEncoder.getInputSurface();
+        Surface surface = (glInterface != null) ? glInterface.getSurface() : videoEncoder.getInputSurface();
+
         if (mediaProjection == null) {
             mediaProjection = mediaProjectionManager.getMediaProjection(resultCode, data);
         }
-        virtualDisplay = mediaProjection.createVirtualDisplay("Stream Display", videoEncoder.getWidth(), videoEncoder.getHeight(), dpi, 0, surface, null, null);
 
         if (!disableAudio) {
             microphoneManager.start();
+        }
+
+        int flag = DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR | DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC | DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION;
+
+        if (glInterface != null && videoEncoder.getRotation() == 90 || videoEncoder.getRotation() == 270) {
+            mediaProjection.createVirtualDisplay("Stream Display", videoEncoder.getHeight(),
+                    videoEncoder.getWidth(), dpi, flag, surface, null, null);
+        } else {
+            mediaProjection.createVirtualDisplay("Stream Display", videoEncoder.getWidth(),
+                    videoEncoder.getHeight(), dpi, flag, surface, null, null);
         }
     }
 
@@ -247,6 +281,15 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
         videoEncoder.reset();
         virtualDisplay.setSurface(videoEncoder.getInputSurface());
     }
+
+    public void requestKeyFrame() {
+        if (videoEncoder != null)
+            videoEncoder.forceSyncFrame();
+
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "requestKeyFrame() called");
+    }
+
 
     protected abstract void stopStreamRtp();
 
@@ -261,6 +304,11 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
             if (mediaProjection != null) {
                 mediaProjection.stop();
             }
+            if (glInterface != null) {
+                glInterface.removeMediaCodecSurface();
+                glInterface.stop();
+            }
+
             videoEncoder.stop();
             if (audioEncoder != null) {
                 audioEncoder.stop();
@@ -347,6 +395,7 @@ public abstract class DisplayBase implements GetAacData, GetVideoData, GetMicrop
      *
      * @param bitrate H264 in bits per second.
      */
+
     public void setVideoBitrateOnFly(int bitrate) {
         videoEncoder.setVideoBitrateOnFly(bitrate);
     }

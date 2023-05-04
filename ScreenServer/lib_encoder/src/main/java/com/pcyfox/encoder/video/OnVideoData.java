@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * Created by pedro on 20/01/17.
  */
 
-public interface GetVideoData {
+public interface OnVideoData {
 
   void onSpsPps(ByteBuffer sps, ByteBuffer pps);
 

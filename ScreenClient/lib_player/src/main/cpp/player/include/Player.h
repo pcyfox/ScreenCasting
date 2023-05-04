@@ -25,7 +25,7 @@ public:
 
     int Configure(ANativeWindow *window, int w, int h);
 
-    int HandleRTPPkt(char *pkt, unsigned int pktLen, unsigned int maxFrameLen, int isLiteMod);
+    int HandleRTPPkt(char *pkt, int pktLen, unsigned int maxFrameLen, int isLiteMod);
 
     int Play();
 
