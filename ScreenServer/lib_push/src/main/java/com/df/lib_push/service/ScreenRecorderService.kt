@@ -64,13 +64,9 @@ class ScreenRecorderService : Service() {
                 //start
                 1 -> start()
                 //pause
-                2 -> screenDisplay?.run {
-                    pause()
-                }
+                2 -> screenDisplay?.pause()
                 //resume
-                3 -> screenDisplay?.run {
-                    resume()
-                }
+                3 -> screenDisplay?.resume()
                 else -> {
                 }
             }

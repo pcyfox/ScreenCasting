@@ -41,8 +41,9 @@ public class ManagerRender {
   public static int numFilters = 0;
 
   private final CameraRender cameraRender;
-  private final List<BaseFilterRender> filterRenders;
   private final ScreenRender screenRender;
+
+  private final List<BaseFilterRender> filterRenders;
 
   private int width;
   private int height;
@@ -64,6 +65,7 @@ public class ManagerRender {
     this.previewWidth = previewWidth;
     this.previewHeight = previewHeight;
     cameraRender.initGl(width, height, context, previewWidth, previewHeight);
+
     screenRender.setStreamSize(encoderWidth, encoderHeight);
     screenRender.setTexId(cameraRender.getTexId());
     screenRender.initGl(context);

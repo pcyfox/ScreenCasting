@@ -69,15 +69,11 @@ class Publisher(
     }
 
     fun send(h264Buffer: ByteBuffer, info: MediaCodec.BufferInfo) {
-        Log.d(TAG, "send() called with: presentationTimeUs= ${info.presentationTimeUs}")
+        //  Log.d(TAG, "send() called with: presentationTimeUs= ${info.presentationTimeUs}")
         val buf = ByteArray(info.size)
         h264Buffer.get(buf, info.offset, info.size)
-
-        if (isRecording) {
-            handler?.post {
-                bufOS?.write(buf)
-            }
-        }
+        h264Buffer.clear()
+        if (isRecording) handler?.post { bufOS?.write(buf) }
         h264HandlerNative.packAndSedH264ToRTP(
             buf,
             buf.size,
@@ -86,7 +82,6 @@ class Publisher(
             clock,
             0, null
         )
-        h264Buffer.clear()
     }
 
 

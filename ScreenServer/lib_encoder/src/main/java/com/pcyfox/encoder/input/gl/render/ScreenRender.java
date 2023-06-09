@@ -40,7 +40,7 @@ import java.nio.FloatBuffer;
 public class ScreenRender {
 
   //rotation matrix
-  private final float[] squareVertexData = {
+  private static final float[] squareVertexData = {
       // X, Y, Z, U, V
       -1f, -1f, 0f, 0f, 0f, //bottom left
       1f, -1f, 0f, 1f, 0f, //bottom right
@@ -52,6 +52,7 @@ public class ScreenRender {
 
   private float[] MVPMatrix = new float[16];
   private float[] STMatrix = new float[16];
+
   private boolean AAEnabled = false;  //FXAA enable/disable
 
   private int texId;
