@@ -41,7 +41,7 @@ struct TempPacket {
     unsigned char *data;
     unsigned int index;
     unsigned int len;
-    unsigned int flag;
+    unsigned int flag;//start:0 mid:1 end:2
 } typedef *TempPkt;
 
 struct H264Packet {

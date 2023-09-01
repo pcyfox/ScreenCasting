@@ -282,6 +282,7 @@ int Player::Stop() {
         return PLAYER_RESULT_ERROR;
     }
     PlayState state = playerInfo->GetPlayState();
+    if (state == STOPPED)return PLAYER_RESULT_OK;
     if (state != STARTED && state != PAUSE) {
         LOGW("Stop(),fail ,playerInfo is not started");
         return PLAYER_RESULT_ERROR;
@@ -316,6 +317,12 @@ int Player::HandleRTPPkt(char *pkt, int len, unsigned int maxFrameLen,
         return PLAYER_RESULT_ERROR;
     }
     return UnPacket(pkt, len, maxFrameLen, isLiteMod, unpackCallback);
+}
+
+int Player::Release() {
+    Stop();
+    Clear();
+    return 0;
 }
 
 

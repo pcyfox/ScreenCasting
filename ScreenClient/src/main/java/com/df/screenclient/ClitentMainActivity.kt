@@ -35,6 +35,9 @@ class ClientMainActivity : AppCompatActivity() {
         playerView = findViewById(R.id.view_mcpv)
         progressBar = findViewById(R.id.progressBar)
         autoPlay()
+//        playerView?.postDelayed({
+//            finish()
+//        }, 3000)
     }
 
     private fun autoPlay() {

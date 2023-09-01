@@ -33,6 +33,8 @@ public:
 
     int Stop();
 
+    int Release();
+
     static void SetStateChangeListener(void (*listener)(PlayState));
 
     static void SetDecodecStateChangeListener(void (*listener)(int));

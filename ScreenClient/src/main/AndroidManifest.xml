@@ -24,6 +24,7 @@
         </activity>
 
         <activity
+            android:launchMode="singleTask"
             android:name=".ClientMainActivity"
             android:exported="true"
             android:screenOrientation="landscape" />

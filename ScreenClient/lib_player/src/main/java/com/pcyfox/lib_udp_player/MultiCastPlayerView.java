@@ -32,6 +32,7 @@ public class MultiCastPlayerView extends RelativeLayout {
     private NativePlayer nativeUDPPlayer;
     private int maxFrameLen;
     private SurfaceView surfaceView;
+    private HandlerThread handlerThread;
 
     public MultiCastPlayerView(Context context) {
         super(context);
@@ -78,10 +79,9 @@ public class MultiCastPlayerView extends RelativeLayout {
         multiCastHost = host;
         videoPort = port;
         this.maxFrameLen = maxFrameLen;
-
-        HandlerThread handlerThread = new HandlerThread("Fuck Video Data Handler");
+        if (handlerThread != null) handlerThread.quit();
+        handlerThread = new HandlerThread("Fuck Video Data Handler");
         handlerThread.start();
-
         handler = new Handler(handlerThread.getLooper());
         post(() -> {
             addSurfaceView();
@@ -92,6 +92,7 @@ public class MultiCastPlayerView extends RelativeLayout {
 
     private void initMultiBroadcast() {
         try {
+            if (multicastSocket != null) multicastSocket.disconnect();
             multicastSocket = new MulticastSocket(videoPort);
             InetAddress receiveAddress = InetAddress.getByName(multiCastHost);
             multicastSocket.joinGroup(receiveAddress);
@@ -148,7 +149,7 @@ public class MultiCastPlayerView extends RelativeLayout {
             try {
                 multicastSocket.receive(dataPacket);
                 int len = dataPacket.getLength();
-                if (len <= 12) continue;
+                if (len <= 16) continue;
                 nativeUDPPlayer.handlePkt(receiveByte, len, maxFrameLen, true);
                 if (!hasReceivedData) {
                     Log.d(TAG, "startReceiveData() --------- hasReceivedData----------");
@@ -181,13 +182,16 @@ public class MultiCastPlayerView extends RelativeLayout {
         }
         isPause = false;
         isPlaying = false;
-        if (handler != null) {
-            Looper looper = handler.getLooper();
-            if (looper != null) looper.quitSafely();
-        }
+
+        if (handlerThread != null) handlerThread.quit();
+        if (handler != null) handler.getLooper().quitSafely();
+        handlerThread = null;
+        handler = null;
+
 
         if (multicastSocket != null) {
             multicastSocket.close();
+            multicastSocket = null;
         }
         if (nativeUDPPlayer != null) {
             nativeUDPPlayer.stop();
@@ -197,6 +201,7 @@ public class MultiCastPlayerView extends RelativeLayout {
         if (surfaceView != null) {
             surfaceView.getHolder().getSurface().release();
             removeView(surfaceView);
+            surfaceView = null;
         }
     }
 

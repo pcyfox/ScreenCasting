@@ -121,10 +121,6 @@ int stop() {
         return PLAYER_RESULT_ERROR;
     }
     int ret = player->Stop();
-    if (ret == PLAYER_RESULT_OK) {
-        delete player;
-        player = NULL;
-    }
     return ret;
 }
 
@@ -168,6 +164,9 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thi
 
 JNIEXPORT void JNICALL
 Java_com_pcyfox_lib_1udp_1player_NativePlayer_release(JNIEnv *env, jobject thiz) {
-    stop();
+    if (stop() == PLAYER_RESULT_OK) {
+        player->Release();
+        delete player, player = NULL;
+    }
     delete &playerEnv;
 }
