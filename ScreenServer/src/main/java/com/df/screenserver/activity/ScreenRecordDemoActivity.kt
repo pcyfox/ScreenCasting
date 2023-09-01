@@ -43,8 +43,11 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
 //        val w = ScreenUtils.getScreenWidth()
 //        val h = ScreenUtils.getScreenHeight()
 
-        val w = 1920
-        val h = 1080
+//        val w = 1920
+//        val h = 1080
+
+        val w = 1280
+        val h = 720
 
         et_w.setText(w.toString())
         et_h.setText(h.toString())

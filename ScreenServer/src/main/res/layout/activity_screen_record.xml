@@ -26,7 +26,7 @@
                 android:hint="width"
                 android:inputType="number"
                 android:text="1920"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_red_light" />
 
             <EditText
                 android:id="@+id/et_h"
@@ -36,7 +36,7 @@
                 android:hint="height"
                 android:inputType="number"
                 android:text="1080"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_red_light" />
 
             <EditText
                 android:id="@+id/et_fps"
@@ -46,7 +46,7 @@
                 android:hint="fps"
                 android:inputType="number"
                 android:text="22"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_red_light" />
 
 
             <EditText
@@ -57,7 +57,7 @@
                 android:hint="q"
                 android:inputType="numberDecimal"
                 android:text="1"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/holo_red_light" />
 
             <EditText
 

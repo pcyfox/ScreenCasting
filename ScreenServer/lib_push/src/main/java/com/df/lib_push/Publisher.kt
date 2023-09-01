@@ -105,7 +105,7 @@ class Publisher(
         const val MULTI_CAST_IP = "239.0.0.200"
         const val TARGET_PORT = 9527
 
-        const val MAX_PKT_LEN = 62000
+        const val MAX_PKT_LEN = 6 * 1024 * 1024
     }
 }
 
