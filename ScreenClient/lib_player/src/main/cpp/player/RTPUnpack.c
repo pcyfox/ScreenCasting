@@ -348,7 +348,8 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
                 if (endCode != 1)
                     LOGD("----------FU-A pack mid-----------");
 
-                if (tempPkt->flag == 2 || tempPkt->flag < 0) {
+                if (tempPkt == NULL || tempPkt->data == NULL || tempPkt->flag == 2 ||
+                    tempPkt->flag < 0) {
                     LOGW("not found star pkt!");
                     break;
                 }
