@@ -69,4 +69,6 @@ public class NativePlayer {
 
     public native void release();
 
+    public native void test();
+
 }

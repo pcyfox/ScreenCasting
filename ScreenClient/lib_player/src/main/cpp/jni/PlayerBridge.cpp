@@ -10,6 +10,7 @@
 #include <android/native_window_jni.h>
 
 #include <StateListener.h>
+#include <iostream>
 #include "PlayerResult.h"
 
 
@@ -160,8 +161,9 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_handlePkt(JNIEnv *env, jobject thi
     if (!data)return PLAYER_RESULT_ERROR;
     env->GetByteArrayRegion(pkt, 0, len, (jbyte *) data);
     return player->HandleRTPPkt((char *) data, len, maxFrameLen, isLiteMode);
-}extern "C"
+}
 
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_pcyfox_lib_1udp_1player_NativePlayer_release(JNIEnv *env, jobject thiz) {
     if (stop() == PLAYER_RESULT_OK) {
@@ -169,4 +171,24 @@ Java_com_pcyfox_lib_1udp_1player_NativePlayer_release(JNIEnv *env, jobject thiz)
         delete player, player = NULL;
     }
     delete &playerEnv;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_pcyfox_lib_1udp_1player_NativePlayer_test(JNIEnv *env, jobject thiz) {
+    int str1[10];
+    int str2[10];
+
+    for (int i = 0; i < 10; i++) {
+        str1[i] = -1;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        str2[i] = i;
+    }
+    memcpy(str1 + 2, str2 + 2, 3*sizeof (int));
+
+    for (int i: str1) {
+        LOGD("-------test-------- %d", i);
+    }
 }

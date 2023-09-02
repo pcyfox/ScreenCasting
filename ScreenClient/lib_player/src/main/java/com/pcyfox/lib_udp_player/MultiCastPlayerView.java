@@ -106,6 +106,7 @@ public class MultiCastPlayerView extends RelativeLayout {
         if (nativeUDPPlayer != null) return nativeUDPPlayer;
         nativeUDPPlayer = new NativePlayer();
         nativeUDPPlayer.init(BuildConfig.DEBUG);
+        nativeUDPPlayer.test();
         return nativeUDPPlayer;
     }
 
