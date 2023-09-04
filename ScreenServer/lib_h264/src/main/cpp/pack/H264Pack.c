@@ -351,7 +351,7 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
 
     __uint16_t spsSize = (__uint16_t) spsLen - startCodeLen;
     __uint16_t ppsSize = (__uint16_t) ppsLen - startCodeLen;
-
+    //LOGD("---------SPS size=%d,PPS size=%d", spsSize, ppsSize);
     //5= STAP Header Len(1bit)+SPS Size Len(2bit)+PPS Size Len(2bit)
     stapA->len = spsSize + ppsSize + 5;
     stapA->pkt = (unsigned char *) calloc(stapA->len, sizeof(char));
@@ -360,17 +360,18 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
     //SPS size used 2 bit
     stapA->pkt[1] = spsSize >> 8;//前8位
     stapA->pkt[2] = spsSize & 0xFF;//后8位
-    //printCharsHex(spsData,spsSize+startCodeLen,spsSize+startCodeLen,"sps");
+    //printCharsHex(spsData, spsSize + startCodeLen, spsSize + startCodeLen, "SPS");
+    //printCharsHex(ppsData, ppsSize + startCodeLen, ppsSize + startCodeLen, "PPS");
     //copy sps
     memcpy(stapA->pkt + 3, spsData + startCodeLen, spsSize);
-    //printCharsHex(stapA->pkt,stapA->len,spsSize+3,"stapA1");
+    //printCharsHex(stapA->pkt, stapA->len, spsSize + 3, "stapA-sps");
     //PPS size used 2 bit
-    stapA->pkt[spsSize + 3] = ppsSize >> 8;//前8位
-    stapA->pkt[spsSize + 4] = ppsSize & 0xFF;//后8位
+    int ppsStart = 1 + 2 + spsSize;
+    stapA->pkt[ppsStart] = ppsSize >> 8;//前8位
+    stapA->pkt[ppsStart + 1] = ppsSize & 0xFF;//后8位
     //copy  pps
-    memcpy(stapA->pkt + 5 + spsSize, ppsData + startCodeLen, ppsSize);
-    // printCharsHex(stapA->pkt,stapA->len,stapA->len,"stapA");
-    int i = 0;
+    memcpy(stapA->pkt + ppsStart + 2, ppsData + startCodeLen, ppsSize);
+    printCharsHex(stapA->pkt, stapA->len, stapA->len, "stapA-SPS-PPS");
 }
 
 
