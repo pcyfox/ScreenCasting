@@ -310,13 +310,11 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             // FU-A: RTP header (12bytes)+ FU Indicator (1byte)  +  FU header(1 byte) + NALU payload
         case 28: {
             //printCharsHex(rtpData, length, 20, "---FU-A RAW  RTP---");
-            // For these NALUs, the first two bytes are the FU indicator （at 13） and the FU header (at 14).
+            // For these NALUs, the first two bytes are the FU indicator （at 13） and the FU header (14).
             // If the start bit is set, we reconstruct the original NAL header into byte 1:
             char FU_Header = rtpData[RTP_HEAD_LEN + 1];//after FU Indicator
             int startCode = FU_Header >> 7;
             int endCode = (FU_Header & 0x40) >> 6;
-            LOGD("----------FU-A pack startCode=%d,endCode=%d----------->", startCode, endCode);
-
             //LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode, endCode);
             if (tempPkt != NULL && tempPkt->index >= tempPkt->len) {
                 LOGE("---FU-A pack data error,frameLen>=maxFrameLen!");
@@ -330,7 +328,7 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
                     LOGE("---FU-A pack data error,cao not init temp pkt!");
                     return -1;
                 }
-                tempPkt->flag = 0;//start
+                tempPkt->flag = 0;
                 tempPkt->data[3] = HEAD_4;
                 int NALU_Type = FU_Header & 0x1F;
                 if (NALU_Type == 5) {//I Frame start
@@ -343,7 +341,6 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
                 //printCharsHex(rtpData, length, 20, "PKT-raw");
                 //FU payload start at :RTP Header len +FU-Indicator(1byte)+FU-Header(1byte)=14
                 int copyLen = offHeadSize - 2;
-                //if (copyLen > tempPkt->len)break;
                 memcpy(tempPkt->data + START_CODE_LEN, rtpData + RTP_HEAD_LEN + 2, copyLen);
                 tempPkt->index = START_CODE_LEN + copyLen;
                 //printCharsHex(tempPkt, length, 20, "---FU-A  START PackedRTP---");
@@ -351,27 +348,29 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             }//
 
             //end or mid
-            if (endCode == 1 || (startCode == 0 && endCode == 0)) {
-                if (endCode != 1)LOGD("----------FU-A pack mid-----------");
-                if (!tempPkt || !tempPkt->data)break;
-                if (tempPkt->flag != 0) {
-                    LOGW("not found start pkt!");
+            if (endCode == 1 || startCode == 0 && endCode == 0) {
+                if (endCode != 1)
+                    LOGD("----------FU-A pack mid-----------");
+                if (NULL == tempPkt || tempPkt->data == NULL || tempPkt->flag == 2 ||
+                    tempPkt->flag < 0) {
+                    LOGW("not found star pkt!");
                     break;
                 }
-                if (tempPkt->index <= START_CODE_LEN)break;
+                tempPkt->flag = 1;
+                if (tempPkt->index <= START_CODE_LEN) return -1;
                 int copyLen = offHeadSize - 2;
-                //if (copyLen > tempPkt->len - tempPkt->index)break;
+
                 memcpy(tempPkt->data + tempPkt->index, rtpData + RTP_HEAD_LEN + 2, copyLen);
                 tempPkt->index += copyLen;
-                tempPkt->flag = 1;//mid
 
-                //end
+                //en
                 if (endCode == 1) {
                     LOGD("----------FU-A pack end-----------|");
-                    tempPkt->flag = 2;//end
+                    if (tempPkt->flag != 1) break;
+                    tempPkt->flag = 2;
+                    if (tempPkt->index <= START_CODE_LEN) return -1;
                     H264Pkt h264_pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
                     h264_pkt->data = (char *) calloc(tempPkt->index, sizeof(char));
-
                     memcpy(h264_pkt->data, tempPkt->data, tempPkt->index);
                     h264_pkt->length = tempPkt->index;
                     // printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A  END PackedRTP---");
