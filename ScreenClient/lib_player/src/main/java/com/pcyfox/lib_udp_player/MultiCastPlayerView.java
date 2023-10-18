@@ -126,8 +126,9 @@ public class MultiCastPlayerView extends RelativeLayout {
                 }
                 buildPlayer();
                 post(() -> {
-                    if (surfaceView != null)
+                    if (surfaceView != null) {
                         nativeUDPPlayer.configPlayer(holder.getSurface(), surfaceView.getWidth(), surfaceView.getHeight());
+                    }
                 });
             }
 
