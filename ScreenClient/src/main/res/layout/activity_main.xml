@@ -48,6 +48,13 @@
                 android:onClick="onStartClick"
                 android:text="Start" />
 
+            <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:onClick="onStopClick"
+                android:text="Stop" />
 
             <Button
                 android:id="@+id/btn_visibility"

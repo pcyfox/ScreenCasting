@@ -76,6 +76,10 @@ class ClientMainActivity : AppCompatActivity() {
         configAndStart()
     }
 
+    fun onStopClick(v: View) {
+        playerView?.stopPlay()
+    }
+
     fun onVisibilityClick(v: View) {
         playerView?.run {
             this.isVisible = !this.isVisible

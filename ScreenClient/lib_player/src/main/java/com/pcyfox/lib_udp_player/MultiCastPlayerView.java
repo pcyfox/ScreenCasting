@@ -64,6 +64,10 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
     private void addSurfaceView() {
+        if (surfaceView != null) {
+            removeView(surfaceView);
+            surfaceView.getHolder().getSurface().release();
+        }
         surfaceView = new SurfaceView(getContext());
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
