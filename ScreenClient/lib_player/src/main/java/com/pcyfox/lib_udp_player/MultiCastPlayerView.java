@@ -18,7 +18,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 
 public class MultiCastPlayerView extends RelativeLayout {
-    private static final String TAG = "MultiCastPlayer";
+    private static final String TAG = "MultiCastPlayerView";
     //MediaCodec variable
     private volatile boolean isPlaying = false;
     private volatile boolean isPause = false;
@@ -171,8 +171,9 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
     public void startPlay() {
+        Log.d(TAG, hashCode() + ",startPlay() called");
         if (isPlaying) {
-            Log.e(TAG, "start play failed.  player is playing");
+            Log.e(TAG, "start play failed.playeris playing");
         } else {
             isPlaying = true;
             nativeUDPPlayer.play();
@@ -183,7 +184,7 @@ public class MultiCastPlayerView extends RelativeLayout {
 
 
     public void stopPlay() {
-        Log.d(TAG, "stopPlay() called");
+        Log.d(TAG, hashCode() + ",stopPlay() called");
         if (!isPlaying) {
             Log.e(TAG, "stopPlay() called,fuck, this player is not start");
             return;
