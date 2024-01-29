@@ -23,6 +23,7 @@ class ClientMainActivity : AppCompatActivity() {
 
     private var playerView: MultiCastPlayerView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate() called with: savedInstanceState ---------")
         super.onCreate(savedInstanceState)
         /*set it to be no title*/
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -34,10 +35,11 @@ class ClientMainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         playerView = findViewById(R.id.view_mcpv)
         progressBar = findViewById(R.id.progressBar)
+    }
+
+    override fun onResume() {
+        super.onResume()
         autoPlay()
-//        playerView?.postDelayed({
-//            finish()
-//        }, 3000)
     }
 
     private fun autoPlay() {
@@ -47,8 +49,15 @@ class ClientMainActivity : AppCompatActivity() {
         }
     }
 
+    private fun showProgress(isShow: Boolean = true) {
+        runOnUiThread {
+            progressBar?.isVisible = isShow
+        }
+    }
 
     private fun configAndStart() {
+        Log.d(TAG, "--------configAndStart() called------")
+        showProgress()
         playerView?.run {
             if (isPlaying) {
                 Log.e(TAG, "configAndStart() called player is playing")
@@ -59,9 +68,7 @@ class ClientMainActivity : AppCompatActivity() {
             setOnDecodeStateChangeListener {
                 Log.d(TAG, "onVisibilityClick() called state:$it")
                 if (it == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    runOnUiThread {
-                        progressBar?.isVisible = false
-                    }
+                    showProgress(false)
                 }
             }
 
@@ -91,6 +98,15 @@ class ClientMainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    fun onFinishClick(v: View) {
+        finish()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playerView?.pause()
     }
 
     override fun onStop() {

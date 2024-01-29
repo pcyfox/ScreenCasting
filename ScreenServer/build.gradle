@@ -35,7 +35,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -43,7 +42,6 @@ android {
         dataBinding = true
     }
 }
-def screenLibVersion = "V1.0.32"
 dependencies {
 
     testImplementation 'junit:junit:4.13.2'
@@ -60,6 +58,5 @@ dependencies {
     })
 
     implementation project(path: ':ScreenServer:lib_push')
-   // implementation "com.github.pcyfox.ScreenCasting:lib_push:${screenLibVersion}"
 
 }

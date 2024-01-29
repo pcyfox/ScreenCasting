@@ -63,6 +63,13 @@
                 android:layout_margin="10dp"
                 android:onClick="onVisibilityClick"
                 android:text="visibility" />
+            <Button
+                android:id="@+id/btn_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:onClick="onFinishClick"
+                android:text="finish" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
 

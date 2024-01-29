@@ -16,6 +16,10 @@ class TestActivity : AppCompatActivity() {
 //                performClick()
 //            }, 200)
 //        }
+
+        window.decorView.postDelayed({
+            startActivity(Intent(this, ClientMainActivity::class.java))
+        }, 1000)
     }
 
     fun onStartClick(v: View) {
@@ -25,9 +29,6 @@ class TestActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        window.decorView.postDelayed({
-            startActivity(Intent(this, ClientMainActivity::class.java))
-        }, 1000)
     }
 
 }

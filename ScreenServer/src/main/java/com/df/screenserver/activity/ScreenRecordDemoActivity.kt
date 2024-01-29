@@ -16,7 +16,9 @@ import com.df.lib_push.Publisher
 import com.df.lib_push.VideoEncodeParam
 import com.df.lib_push.service.ScreenRecorderService
 import com.df.screenserver.R
+import com.df.screenserver.dialog.PlayerDialog
 import kotlinx.android.synthetic.main.activity_screen_record.*
+import kotlinx.android.synthetic.main.activity_screen_record.view.whiteboard
 
 
 class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
@@ -68,6 +70,13 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
                 val i = index++ % (colors.size - 1)
                 container.setBackgroundColor(colors[i])
             }
+
+            R.id.btn_clear -> whiteboard.board.clear()
+
+            R.id.btn_video -> {
+                PlayerDialog().show(supportFragmentManager, "123")
+            }
+
             R.id.btn_start_screen -> {
                 if (btn_start_screen.text.toString() == "START") {
                     btn_start_screen.text = "STOP"

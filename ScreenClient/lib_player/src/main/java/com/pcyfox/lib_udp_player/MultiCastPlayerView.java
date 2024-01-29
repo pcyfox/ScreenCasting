@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -23,7 +22,6 @@ public class MultiCastPlayerView extends RelativeLayout {
     private volatile boolean isPlaying = false;
     private volatile boolean isPause = false;
     private volatile boolean hasReceivedData = false;
-
     static String multiCastHost = "239.0.0.200";
     private int videoPort = 2021;
     private MulticastSocket multicastSocket;
@@ -64,6 +62,7 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
     private void addSurfaceView() {
+        Log.d(TAG, "addSurfaceView() called");
         if (surfaceView != null) {
             removeView(surfaceView);
             surfaceView.getHolder().getSurface().release();
@@ -123,7 +122,8 @@ public class MultiCastPlayerView extends RelativeLayout {
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 Log.d(TAG, "surfaceChanged() called with: holder = [" + holder + "], format = [" + format + "], width = [" + width + "], height = [" + height + "]");
-                if (nativeUDPPlayer == null) return;
+                if (nativeUDPPlayer == null || handlerThread == null || handler == null) return;
+
                 PlayState state = nativeUDPPlayer.getState();
                 if (state == PlayState.STARTED || state == PlayState.PAUSE) {
                     nativeUDPPlayer.stop();
@@ -140,7 +140,9 @@ public class MultiCastPlayerView extends RelativeLayout {
             public void surfaceDestroyed(SurfaceHolder holder) {
                 Log.d(TAG, "surfaceDestroyed() called with: holder = [" + holder + "]");
                 isPause = true;
-                if (nativeUDPPlayer != null) nativeUDPPlayer.pause();
+                if (nativeUDPPlayer != null && isPlaying) {
+                    nativeUDPPlayer.pause();
+                }
             }
         });
     }
@@ -171,9 +173,9 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
     public void startPlay() {
-        Log.d(TAG, hashCode() + ",startPlay() called");
+        Log.d(TAG, hashCode() + ",startPlay() ------------called------------");
         if (isPlaying) {
-            Log.e(TAG, "start play failed.playeris playing");
+            Log.e(TAG, "start play failed.player is playing");
         } else {
             isPlaying = true;
             nativeUDPPlayer.play();
@@ -184,19 +186,19 @@ public class MultiCastPlayerView extends RelativeLayout {
 
 
     public void stopPlay() {
-        Log.d(TAG, hashCode() + ",stopPlay() called");
+        Log.d(TAG, hashCode() + ",stopPlay() -------------called--------------");
         if (!isPlaying) {
             Log.e(TAG, "stopPlay() called,fuck, this player is not start");
             return;
         }
-        isPause = false;
         isPlaying = false;
+        isPause = false;
 
         if (handlerThread != null) handlerThread.quit();
-        if (handler != null) handler.getLooper().quitSafely();
         handlerThread = null;
-        handler = null;
 
+        if (handler != null) handler.getLooper().quitSafely();
+        handler = null;
 
         if (multicastSocket != null) {
             multicastSocket.close();
@@ -233,8 +235,8 @@ public class MultiCastPlayerView extends RelativeLayout {
     }
 
     public static String bytesToHexString(byte[] src) {
-        StringBuilder stringBuilder = new StringBuilder("");
-        if (src == null || src.length <= 0) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (src == null || src.length == 0) {
             return null;
         }
         for (byte b : src) {
