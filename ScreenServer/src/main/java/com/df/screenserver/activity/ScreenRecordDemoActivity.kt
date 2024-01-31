@@ -1,13 +1,16 @@
 package com.df.screenserver.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.PermissionUtils
@@ -17,8 +20,18 @@ import com.df.lib_push.VideoEncodeParam
 import com.df.lib_push.service.ScreenRecorderService
 import com.df.screenserver.R
 import com.df.screenserver.dialog.PlayerDialog
-import kotlinx.android.synthetic.main.activity_screen_record.*
-import kotlinx.android.synthetic.main.activity_screen_record.view.whiteboard
+import kotlinx.android.synthetic.main.activity_screen_record.btn_start_screen
+import kotlinx.android.synthetic.main.activity_screen_record.container
+import kotlinx.android.synthetic.main.activity_screen_record.et_bitrate
+import kotlinx.android.synthetic.main.activity_screen_record.et_fps
+import kotlinx.android.synthetic.main.activity_screen_record.et_h
+import kotlinx.android.synthetic.main.activity_screen_record.et_q
+import kotlinx.android.synthetic.main.activity_screen_record.et_udp_max_len
+import kotlinx.android.synthetic.main.activity_screen_record.et_w
+import kotlinx.android.synthetic.main.activity_screen_record.tvTime
+import kotlinx.android.synthetic.main.activity_screen_record.whiteboard
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
@@ -29,6 +42,9 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         arrayListOf(Color.RED, Color.BLACK, Color.BLUE, Color.CYAN, Color.GREEN, Color.DKGRAY)
     private var index = 0
 
+
+    private var timer: TimeCountDown? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -37,8 +53,23 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
         PermissionUtils.permission(
             PermissionConstants.STORAGE, PermissionConstants.ACTIVITY_RECOGNITION
         ).request()
-
         initTestVideo()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        startTimer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        timer?.cancel()
+    }
+
+    private fun startTimer() {
+        timer?.cancel()
+        timer = TimeCountDown(Long.MAX_VALUE, 100, tvTime)
+        timer?.start()
     }
 
     private fun initTestVideo() {
@@ -135,5 +166,20 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
             Publisher.MULTI_CAST_IP,
             Publisher.TARGET_PORT,
         )
+    }
+}
+
+
+class TimeCountDown(millisInFuture: Long, countDownInterval: Long, val view: TextView) :
+    CountDownTimer(millisInFuture, countDownInterval) {
+    @SuppressLint("SimpleDateFormat")
+    override fun onTick(millisUntilFinished: Long) {
+        view.post {
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")
+            view.text = sdf.format(Date())
+        }
+    }
+
+    override fun onFinish() {
     }
 }

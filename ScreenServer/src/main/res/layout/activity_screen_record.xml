@@ -6,6 +6,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
         <com.df.screenserver.view.whiteboard.Whiteboard
             android:id="@+id/whiteboard"
             android:layout_width="match_parent"
@@ -129,5 +130,15 @@
                 android:text="clear" />
         </LinearLayout>
 
+
+        <TextView
+            android:text="timer"
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="24dp" />
     </FrameLayout>
 </layout>
