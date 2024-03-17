@@ -42,7 +42,9 @@ int GetNALUType(AVPacket *packet) {
 
 
 int
-Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigned int height,
+Player::createAMediaCodec(AMediaCodec **mMediaCodec,
+                          unsigned int width,
+                          unsigned int height,
                           uint8_t *sps,
                           int spsSize,
                           uint8_t *pps,
@@ -54,7 +56,7 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec, unsigned int width, unsigne
          height,
          spsSize, ppsSize, mine);
 
-    if (width * height == 0) {
+    if (width * height <= 0) {
         LOGE("createAMediaCodec() not support video size");
         return PLAYER_RESULT_ERROR;
     }
@@ -158,8 +160,10 @@ void *Player::Decode(void *) {
 
         do {
             auto *bufferInfo = (AMediaCodecBufferInfo *) malloc(sizeof(AMediaCodecBufferInfo));
+            if (!bufferInfo) {
+                return nullptr;
+            }
             outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, timeoutUs);
-
             if (outIndex >= 0) {
                 AMediaCodec_releaseOutputBuffer(codec, outIndex, bufferInfo->size != 0);
                 if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {

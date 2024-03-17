@@ -162,6 +162,9 @@ void ResetReceiveDataInfo() {
 ReceiveDataInfo analysePkt(const char *rtpPacket) {
     if (receiveDataInfo == NULL) {
         receiveDataInfo = malloc(sizeof(struct RTPDataInfo));
+        if (!receiveDataInfo) {
+            return receiveDataInfo;
+        }
         receiveDataInfo->start_time = getCurrentTime();
         receiveDataInfo->last_Sq = 0;
         receiveDataInfo->receive_count = 0;
@@ -247,6 +250,8 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
     analysePkt(rtpData);
 
     RTPPkt rtpPkt = (RTPPkt) malloc(sizeof(struct RtpPacketInfo));
+    if (!rtpPkt) return -1;
+
     rtpPkt->length = 0;
     unsigned long long currSq = ((rtpData[2] & 0xFF) << 8) + (rtpData[3] & 0xFF);
     rtpPkt->curr_Sq = currSq;
@@ -262,11 +267,15 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             //LOGD("---------------------SPS size= %d----------------------", spsSize);
             if (spsSize > offHeadSize - 3) break;
             char *sps = (char *) calloc(spsSize + START_CODE_LEN, sizeof(char));
+            if (!sps) break;
+
             sps[3] = HEAD_4;
             memcpy(sps + START_CODE_LEN, rtpData + RTP_HEAD_LEN + 3, spsSize);
             //printCharsHex(sps, spsSize + START_CODE_LEN, spsSize + START_CODE_LEN, "SPS");
 
             H264Pkt spsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
+            if (!spsSize)break;
+
             spsPkt->length = spsSize + START_CODE_LEN;
             spsPkt->data = sps;
             spsPkt->type = TYPE_SPS;
@@ -280,10 +289,14 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             //LOGD("---------------------PPS size= %d----------------------", ppsSize);
             unsigned len = ppsSize + START_CODE_LEN;
             char *pps = (char *) calloc(len, sizeof(char));
+            if (!pps)break;
+
             pps[3] = HEAD_4;
             memcpy(pps + START_CODE_LEN, rtpData + ppsSizeEnd + 1, ppsSize);
             //printCharsHex(pps, ppsSize + START_CODE_LEN, ppsSize + START_CODE_LEN, "PPS");
             H264Pkt ppsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
+            if (!ppsPkt)break;
+
             ppsPkt->length = len;
             ppsPkt->data = pps;
             ppsPkt->type = TYPE_PPS;
@@ -295,11 +308,15 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
                 LOGD("-----IDR in STAP----");
                 //maybe a P frame
                 char *idr = (char *) calloc(retain + START_CODE_LEN + 1, sizeof(char));
+                if (!idr)break;
+
                 idr[3] = HEAD_4;
                 idr[4] = TYPE_IDR;
                 memcpy(idr + START_CODE_LEN + 1, rtpData + ppsSizeEnd + ppsSize + 1, retain);
                 //    printCharsHex(idr,length+5,length,"idr");
                 H264Pkt idrPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
+                if (!idrPkt)break;
+
                 idrPkt->length = retain + START_CODE_LEN + 1;
                 idrPkt->data = idr;
                 idrPkt->type = TYPE_IDR;
@@ -370,7 +387,10 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
                     tempPkt->flag = 2;
                     if (tempPkt->index <= START_CODE_LEN) return -1;
                     H264Pkt h264_pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
+                    if (!h264_pkt)break;
+
                     h264_pkt->data = (char *) calloc(tempPkt->index, sizeof(char));
+                    if (!h264_pkt->data)break;
                     memcpy(h264_pkt->data, tempPkt->data, tempPkt->index);
                     h264_pkt->length = tempPkt->index;
                     // printCharsHex(h264_pkt->data, h264_pkt->length, 20, "---FU-A  END PackedRTP---");
@@ -388,10 +408,11 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             LOGD("---------------------Single RTP(I or P Frame)----------------------");
             //I\P
             char *data = (char *) calloc(offHeadSize + START_CODE_LEN, sizeof(char));
+            if (!data)break;
             data[3] = HEAD_4;
             memcpy(data + START_CODE_LEN, rtpData + RTP_HEAD_LEN, offHeadSize);
-
             H264Pkt pkt = (H264Pkt) malloc(sizeof(struct H264Packet));
+            if (!pkt)break;
             pkt->length = START_CODE_LEN + offHeadSize;
             pkt->data = data;
             callback(pkt);

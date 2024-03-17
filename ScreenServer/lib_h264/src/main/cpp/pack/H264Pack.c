@@ -262,6 +262,7 @@ int PackRTP(unsigned char *h264Pkt,
             unsigned int clock,
             int tag,
             Callback callback) {
+    if (!h264Pkt)return RESULT_ERROR;
 
     int8_t naluType = h264Pkt[4] & 0x1F;
 
@@ -295,6 +296,7 @@ int PackRTP(unsigned char *h264Pkt,
 
         unsigned int bufSize = maxPktLen - headerLen;
         unsigned char *buf = calloc(bufSize, sizeof(char));
+        if (!buf) { return RESULT_ERROR; }
 
         //1、add RTP header
         Result result = AddRTPHeader(ts, currentIndex == 0 ? 0 : 1, clock, buf, bufSize);
@@ -355,6 +357,8 @@ void UpdateSPS_PPS(unsigned char *spsData, int spsLen, unsigned char *ppsData, i
     //5= STAP Header Len(1bit)+SPS Size Len(2bit)+PPS Size Len(2bit)
     stapA->len = spsSize + ppsSize + 5;
     stapA->pkt = (unsigned char *) calloc(stapA->len, sizeof(char));
+    if (!stapA->pkt) return;
+
     //STAP-A unit  Type=24:0x18
     stapA->pkt[0] = 24;
     //SPS size used 2 bit
@@ -392,7 +396,9 @@ void clear() {
 void UpdateScreen(int w, int h) {
     if (!screenInfo) {
         screenInfo = malloc(sizeof(Pkt));
+        if (!screenInfo)return;
         screenInfo->pkt = calloc(5, sizeof(char));
+        if (!screenInfo->pkt)return;
         screenInfo->pkt[0] = 0x24;
     }
 

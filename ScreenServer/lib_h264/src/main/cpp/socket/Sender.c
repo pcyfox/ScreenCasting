@@ -35,6 +35,7 @@ void initSocket(char *ip, unsigned int port, int type) {
     int protocol = type == UDP ? IPPROTO_UDP : IPPROTO_TCP;
     socketClient = socket(AF_INET, SOCK_DGRAM, protocol);
     toAddress = malloc(sizeof(struct sockaddr_in));
+    if (!toAddress)return;
     toAddress->sin_family = AF_INET;
     toAddress->sin_addr.s_addr = inet_addr(ip);
     toAddress->sin_port = htons(port);

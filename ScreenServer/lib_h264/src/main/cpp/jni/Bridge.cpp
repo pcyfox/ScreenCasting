@@ -37,6 +37,7 @@ Java_com_pcyfox_h264_H264HandlerNative_init(JNIEnv *env, jobject thiz, jboolean 
 unsigned char *ByteArrayToChars(JNIEnv *env, jbyteArray bytes, int len) {
     jbyte *data = (env->GetByteArrayElements(bytes, JNI_FALSE));
     auto *dataCopy = (unsigned char *) calloc(len, sizeof(char));
+    if (!dataCopy)return nullptr;
     memcpy(dataCopy, data, len);
     env->ReleaseByteArrayElements(bytes, data, JNI_FALSE);
     return dataCopy;
