@@ -295,7 +295,16 @@ int Player::Stop() {
     AMediaCodec_stop(playerInfo->AMediaCodec);
     delete playerInfo;
     playerInfo = nullptr;
+    LOGI("--------Stop()  finish-------");
     return PLAYER_RESULT_OK;
+}
+
+int Player::Release() {
+    LOGI("--------Stop()  called-------");
+    Stop();
+    Clear();
+    LOGI("--------Stop()  finish-------");
+    return 0;
 }
 
 
@@ -321,12 +330,6 @@ int Player::HandleRTPPkt(char *pkt, int len, unsigned int maxFrameLen,
         return PLAYER_RESULT_ERROR;
     }
     return UnPacket(pkt, len, maxFrameLen, isLiteMod, unpackCallback);
-}
-
-int Player::Release() {
-    Stop();
-    Clear();
-    return 0;
 }
 
 

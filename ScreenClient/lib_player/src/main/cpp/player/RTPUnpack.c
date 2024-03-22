@@ -148,6 +148,8 @@
    *
    */
 
+#define IS_SHOW_DEBUG_LOG 0
+
 static TempPkt tempPkt = NULL;
 static ReceiveDataInfo receiveDataInfo = NULL;
 
@@ -258,20 +260,24 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
     //第13个字节
     int rtpType = rtpPkt->type = (rtpData[RTP_HEAD_LEN] & 0x1F);
     //printCharsHex(rtpData, length, 20, "---RTP---");
-    //  LOGD("---------------------RTP TYPE=%d,LENGTH=%d", rtpType, length);
+    if (IS_SHOW_DEBUG_LOG)
+        LOGD("---------------------RTP TYPE=%d,LENGTH=%d", rtpType, length);
     switch (rtpType) {
         // STAP-A:RTP Header（12 bit） +STAP Header（1 bit） +NALU1 Size（2 bit） + NALU +.....
         case 24: {
             unsigned int spsSize =
                     (rtpData[RTP_HEAD_LEN + 1] << 8) + rtpData[RTP_HEAD_LEN + 2] & 0xFF;
-            //LOGD("---------------------SPS size= %d----------------------", spsSize);
+            if (IS_SHOW_DEBUG_LOG)
+                LOGD("---------------------SPS size= %d----------------------", spsSize);
             if (spsSize > offHeadSize - 3) break;
             char *sps = (char *) calloc(spsSize + START_CODE_LEN, sizeof(char));
             if (!sps) break;
 
             sps[3] = HEAD_4;
             memcpy(sps + START_CODE_LEN, rtpData + RTP_HEAD_LEN + 3, spsSize);
-            //printCharsHex(sps, spsSize + START_CODE_LEN, spsSize + START_CODE_LEN, "SPS");
+
+            if (IS_SHOW_DEBUG_LOG)
+                printCharsHex(sps, spsSize + START_CODE_LEN, spsSize + START_CODE_LEN, "SPS");
 
             H264Pkt spsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             if (!spsSize)break;
@@ -286,14 +292,19 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             int ppsSizeEnd = ppsSizeStart + 1;
 
             int ppsSize = (rtpData[ppsSizeStart] << 8) + rtpData[ppsSizeEnd] & 0xFF;
-            //LOGD("---------------------PPS size= %d----------------------", ppsSize);
+
+            if (IS_SHOW_DEBUG_LOG)
+                LOGD("---------------------PPS size= %d----------------------", ppsSize);
+
             unsigned len = ppsSize + START_CODE_LEN;
             char *pps = (char *) calloc(len, sizeof(char));
             if (!pps)break;
 
             pps[3] = HEAD_4;
             memcpy(pps + START_CODE_LEN, rtpData + ppsSizeEnd + 1, ppsSize);
-            //printCharsHex(pps, ppsSize + START_CODE_LEN, ppsSize + START_CODE_LEN, "PPS");
+            if (IS_SHOW_DEBUG_LOG)
+                printCharsHex(pps, ppsSize + START_CODE_LEN, ppsSize + START_CODE_LEN, "PPS");
+
             H264Pkt ppsPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
             if (!ppsPkt)break;
 
@@ -313,7 +324,8 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
                 idr[3] = HEAD_4;
                 idr[4] = TYPE_IDR;
                 memcpy(idr + START_CODE_LEN + 1, rtpData + ppsSizeEnd + ppsSize + 1, retain);
-                //    printCharsHex(idr,length+5,length,"idr");
+                if (IS_SHOW_DEBUG_LOG)
+                    printCharsHex(idr, length + 5, length, "idr");
                 H264Pkt idrPkt = (H264Pkt) malloc(sizeof(struct H264Packet));
                 if (!idrPkt)break;
 
@@ -332,7 +344,11 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
             char FU_Header = rtpData[RTP_HEAD_LEN + 1];//after FU Indicator
             int startCode = FU_Header >> 7;
             int endCode = (FU_Header & 0x40) >> 6;
-            //LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode, endCode);
+
+            if (IS_SHOW_DEBUG_LOG)
+                LOGD("---FU-A maxFrameLen=%d,startCode=%d,endCode=%d", maxFrameLen, startCode,
+                     endCode);
+
             if (tempPkt != NULL && tempPkt->index >= tempPkt->len) {
                 LOGE("---FU-A pack data error,frameLen>=maxFrameLen!");
                 break;
@@ -430,5 +446,6 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
 void Clear(void) {
     LOGD("---------RTPUnpack called clear()----------");
     freeTempPkt();
-    free(receiveDataInfo);
+    if (receiveDataInfo)
+        free(receiveDataInfo);
 }

@@ -11,17 +11,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.pcyfox.lib_udp_player.MultiCastPlayerView
 import com.pcyfox.lib_udp_player.PlayState
+import kotlinx.android.synthetic.main.activity_main.ll_btns
 
 class ClientMainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
-
     private val maxFrameLen = 4 * 1024 * 1024 //视频帧大小限制
     private val multiCastHost = "239.0.0.200"
     private val videoPort = 9527
     private var progressBar: ProgressBar? = null
-
-
     private var playerView: MultiCastPlayerView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate() called with: savedInstanceState ---------")
         super.onCreate(savedInstanceState)
@@ -35,6 +34,7 @@ class ClientMainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         playerView = findViewById(R.id.view_mcpv)
         progressBar = findViewById(R.id.progressBar)
+        ll_btns.isVisible = BuildConfig.DEBUG
     }
 
     override fun onResume() {
@@ -64,14 +64,12 @@ class ClientMainActivity : AppCompatActivity() {
                 return
             }
             config(multiCastHost, videoPort, maxFrameLen)
-
             setOnDecodeStateChangeListener {
                 Log.d(TAG, "onVisibilityClick() called state:$it")
                 if (it == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     showProgress(false)
                 }
             }
-
             postDelayed({
                 startPlay()
             }, 200)

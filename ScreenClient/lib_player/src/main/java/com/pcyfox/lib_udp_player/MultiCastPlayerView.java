@@ -178,6 +178,7 @@ public class MultiCastPlayerView extends RelativeLayout {
             Log.e(TAG, "start play failed.player is playing");
         } else {
             isPlaying = true;
+            if (nativeUDPPlayer == null) return;
             nativeUDPPlayer.play();
             handler.post(this::startReceiveData);
             Log.d(TAG, "startPlay() called");
@@ -204,6 +205,7 @@ public class MultiCastPlayerView extends RelativeLayout {
             multicastSocket.close();
             multicastSocket = null;
         }
+
         if (nativeUDPPlayer != null) {
             nativeUDPPlayer.stop();
             nativeUDPPlayer = null;

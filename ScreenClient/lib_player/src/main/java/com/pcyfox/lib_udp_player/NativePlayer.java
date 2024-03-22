@@ -14,7 +14,6 @@ public class NativePlayer {
     }
 
     private PlayState state;
-
     private OnPlayStateChangeListener onStateChangeListener;
     private OnDecodeStateChangeListener onDecodeStateChangeListener;
 
@@ -29,7 +28,6 @@ public class NativePlayer {
     public PlayState getState() {
         return state;
     }
-
 
     //call in native
     public void onPlayerStateChange(int state) {
@@ -52,12 +50,10 @@ public class NativePlayer {
         }
     }
 
-
-    //-------------for native-------------------------
+    //------------------ for native -------------------------
     public native int init(boolean isDebug);
 
     public native int configPlayer(Surface surface, int w, int h);
-
 
     public native int handlePkt(byte[] rtpPkt, int pktLen, int maxFrameLen, boolean isLiteMod);
 
