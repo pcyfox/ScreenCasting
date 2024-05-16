@@ -123,7 +123,6 @@ public class MultiCastPlayerView extends RelativeLayout {
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
                 Log.d(TAG, "surfaceChanged() called with: holder = [" + holder + "], format = [" + format + "], width = [" + width + "], height = [" + height + "]");
                 if (nativeUDPPlayer == null || handlerThread == null || handler == null) return;
-
                 PlayState state = nativeUDPPlayer.getState();
                 if (state == PlayState.STARTED || state == PlayState.PAUSE) {
                     nativeUDPPlayer.stop();

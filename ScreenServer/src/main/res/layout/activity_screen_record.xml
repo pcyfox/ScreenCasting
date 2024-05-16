@@ -12,91 +12,97 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:orientation="vertical"
-            android:paddingStart="12dp">
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/et_w"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="width"
-                android:inputType="number"
-                android:text="1920"
-                android:textColor="@android:color/holo_red_light" />
+                android:layout_marginTop="30dp"
+                android:orientation="vertical"
+                android:paddingStart="12dp">
 
-            <EditText
-                android:id="@+id/et_h"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="height"
-                android:inputType="number"
-                android:text="1080"
-                android:textColor="@android:color/holo_red_light" />
+                <EditText
+                    android:id="@+id/et_w"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="width"
+                    android:inputType="number"
+                    android:text="1920"
+                    android:textColor="@android:color/holo_red_light" />
 
-            <EditText
-                android:id="@+id/et_fps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="fps"
-                android:inputType="number"
-                android:text="22"
-                android:textColor="@android:color/holo_red_light" />
+                <EditText
+                    android:id="@+id/et_h"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="height"
+                    android:inputType="number"
+                    android:text="1080"
+                    android:textColor="@android:color/holo_red_light" />
 
-
-            <EditText
-                android:id="@+id/et_q"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="q"
-                android:inputType="numberDecimal"
-                android:text="1"
-                android:textColor="@android:color/holo_red_light" />
-
-            <EditText
-
-                android:id="@+id/et_bitrate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="bitRate"
-                android:inputType="number"
-                android:textColor="@android:color/holo_blue_light" />
+                <EditText
+                    android:id="@+id/et_fps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="fps"
+                    android:inputType="number"
+                    android:text="22"
+                    android:textColor="@android:color/holo_red_light" />
 
 
-            <EditText
-                android:id="@+id/et_udp_max_len"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:hint="udp_max_len"
-                android:inputType="number"
-                android:textColor="@android:color/holo_blue_light" />
+                <EditText
+                    android:id="@+id/et_q"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="q"
+                    android:inputType="numberDecimal"
+                    android:text="1"
+                    android:textColor="@android:color/holo_red_light" />
 
-            <Button
-                android:id="@+id/btn_start_screen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:onClick="onClick"
-                android:text="START" />
+                <EditText
+                    android:id="@+id/et_bitrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="bitRate"
+                    android:inputType="number"
+                    android:textColor="@android:color/holo_blue_light" />
 
-            <EditText
-                android:id="@+id/tv_url"
-                android:layout_width="499dp"
-                android:layout_height="150dp"
-                android:layout_marginTop="60dp"
-                android:layout_marginBottom="30dp"
-                android:textColor="@android:color/holo_blue_light"
-                android:textSize="50dp" />
-        </LinearLayout>
+
+                <EditText
+                    android:id="@+id/et_udp_max_len"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:hint="udp_max_len"
+                    android:inputType="number"
+                    android:textColor="@android:color/holo_blue_light" />
+
+                <Button
+                    android:id="@+id/btn_start_screen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:onClick="onClick"
+                    android:text="START" />
+
+                <EditText
+                    android:id="@+id/tv_url"
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="60dp"
+                    android:layout_marginBottom="30dp"
+                    android:textColor="@android:color/holo_blue_light"
+                    android:textSize="50dp" />
+            </LinearLayout>
+
+
+        </ScrollView>
 
         <Button
             android:id="@+id/btn_video"
@@ -132,12 +138,12 @@
 
 
         <TextView
-            android:text="timer"
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
+            android:text="timer"
             android:textColor="@android:color/holo_red_light"
             android:textSize="24dp" />
     </FrameLayout>

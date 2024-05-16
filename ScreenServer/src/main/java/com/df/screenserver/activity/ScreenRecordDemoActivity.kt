@@ -39,7 +39,17 @@ class ScreenRecordDemoActivity : FragmentActivity(), View.OnClickListener {
     private val REQUEST_CODE = 202
 
     private val colors =
-        arrayListOf(Color.RED, Color.BLACK, Color.BLUE, Color.CYAN, Color.GREEN, Color.DKGRAY)
+        arrayListOf(
+            Color.RED,
+            Color.BLACK,
+            Color.BLUE,
+            Color.CYAN,
+            Color.GREEN,
+            Color.DKGRAY,
+            Color.WHITE,
+            Color.YELLOW,
+            Color.LTGRAY
+        )
     private var index = 0
 
 
