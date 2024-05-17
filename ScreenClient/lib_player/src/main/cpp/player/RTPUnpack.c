@@ -445,6 +445,7 @@ int UnPacket(char *rtpData, const int length, const unsigned int maxFrameLen,
 
 void Clear(void) {
     LOGD("---------RTPUnpack called clear()----------");
+
     freeTempPkt();
     if (receiveDataInfo)
         free(receiveDataInfo);

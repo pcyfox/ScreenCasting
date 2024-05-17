@@ -93,6 +93,7 @@ Player::createAMediaCodec(AMediaCodec **mMediaCodec,
         mMediaCodec = nullptr;
         return PLAYER_RESULT_ERROR;
     } else {
+        if (!playerInfo)return PLAYER_RESULT_ERROR;
         playerInfo->videoFormat = videoFormat;
         playerInfo->window = window;
         LOGD("createAMediaCodec() set AMediaCodec  configure success!");
@@ -126,11 +127,12 @@ int updateCodec(uint8_t *sps,
 }
 
 void *Player::Decode(void *) {
+    if (!playerInfo)return nullptr;
     AMediaCodec *codec = playerInfo->AMediaCodec;
     size_t out_size = 0;
     ssize_t outIndex = 0;
     AVPacket *packet = nullptr;
-    while (playerInfo->GetPlayState() == STARTED) {
+    while (playerInfo && playerInfo->GetPlayState() == STARTED) {
         playerInfo->packetQueue.get(&packet);
         if (packet == nullptr || packet->data == nullptr)continue;
         // 获取buffer的索引
@@ -164,6 +166,7 @@ void *Player::Decode(void *) {
                 return nullptr;
             }
             outIndex = AMediaCodec_dequeueOutputBuffer(codec, bufferInfo, timeoutUs);
+            if (!playerInfo)return nullptr;
             if (outIndex >= 0) {
                 AMediaCodec_releaseOutputBuffer(codec, outIndex, bufferInfo->size != 0);
                 if (bufferInfo->flags & AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM) {
@@ -195,6 +198,7 @@ void *Player::Decode(void *) {
 
 void Player::StartDecodeThread() {
     LOGI("Start decode thread");
+    if (!playerInfo)return;
     void *param = playerInfo;
     pthread_create(&playerInfo->decode_thread, NULL, Decode, param);
     pthread_setname_np(playerInfo->decode_thread, "decode_thread");
@@ -210,6 +214,7 @@ void Player::SetDebug(bool debug) {
 
 int Player::Configure(ANativeWindow *window, int w, int h) {
     LOGD("Configure() called with: w=%d,h=%d", w, h);
+    if (!playerInfo)return PLAYER_RESULT_ERROR;
     if (playerInfo->GetPlayState() != ERROR) {
         playerInfo->window = window;
         playerInfo->windowWith = w;
@@ -235,16 +240,19 @@ int Player::Configure(ANativeWindow *window, int w, int h) {
 }
 
 void Player::SetStateChangeListener(void (*listener)(PlayState)) {
+    if (!playerInfo)return;
     playerInfo->SetStateListener(listener);
 }
 
 void Player::SetDecodecStateChangeListener(void (*listener)(int)) {
+    if (!playerInfo)return;
     playerInfo->decodecStateListener = listener;
 }
 
 
 int Player::Play() {
     LOGI("--------Play()  called-------");
+    if (!playerInfo)return PLAYER_RESULT_ERROR;
     if (playerInfo->GetPlayState() == PAUSE) {
         playerInfo->SetPlayState(STARTED);
         return PLAYER_RESULT_OK;
@@ -271,6 +279,7 @@ int Player::Play() {
 
 int Player::Pause(int delay) {
     LOGI("--------Pause()  called-------");
+    if (!playerInfo)return PLAYER_RESULT_ERROR;
     if (playerInfo->GetPlayState() != STARTED) {
         LOGE("--------Pause()  called-,fail player not started------");
         return PLAYER_RESULT_ERROR;
@@ -293,8 +302,8 @@ int Player::Stop() {
     }
     playerInfo->SetPlayState(STOPPED);
     AMediaCodec_stop(playerInfo->AMediaCodec);
-    delete playerInfo;
-    playerInfo = nullptr;
+
+    delete playerInfo, playerInfo = nullptr;
     LOGI("--------Stop()  finish-------");
     return PLAYER_RESULT_OK;
 }
@@ -309,6 +318,7 @@ int Player::Release() {
 
 
 void unpackCallback(H264Pkt result) {
+    if (!playerInfo)return;
     auto *avPacket = new AVPacket();
     avPacket->data = result->data;
     avPacket->size = result->length;
